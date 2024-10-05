@@ -13,7 +13,6 @@ const HomePage = () => {
       const response = await axios.get('/api/getlastdataphoto')
         .then((response) => {
           const data = response.data;
-          console.log(data);
           setPhotoData(data); // Store photo data;
         })
         .catch((err) => {
@@ -36,7 +35,6 @@ const HomePage = () => {
 
       const response = await axios.get('/api/getlastdatacomments')
       .then((response) => {;
-        console.log(response);
         const data = response.data;
         setComments(data); // Store comments
       })

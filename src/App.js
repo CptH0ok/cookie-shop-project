@@ -7,6 +7,7 @@ import Reviews from './pages/reviews';
 import Login from './pages/login';  // Login component
 import Signup from './pages/signup';  // Signup component
 import ProtectedRoute from './components/ProtectedRoute';  // The protected route component
+import LoginSuccess from './components/LoginSuccess';
 
 function App() {
   return (
@@ -17,12 +18,15 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
+        {/* Handle Google Login Success */}
+        <Route path="/login/success" element={<LoginSuccess />} />
+
         {/* Protected Routes */}
         <Route path="/" element={<ProtectedRoute element={<HomePage />} />} />
         <Route path="/shop" element={<ProtectedRoute element={<ShopPage />} />} />
         <Route path="/reviews" element={<ProtectedRoute element={<Reviews />} />} />
 
-        {/* Wildcard route: Let backend handle unhandled paths like /auth/google */}
+        {/* Wildcard route: Let backend handle unhandled paths*/}
         <Route path="*" element={<h2>404 Not Found</h2>} />
       </Routes>
     </Router>

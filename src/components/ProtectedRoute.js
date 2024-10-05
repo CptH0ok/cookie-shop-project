@@ -1,10 +1,63 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
+import axios from 'axios';
 
-const ProtectedRoute = ({ element }) => {
-  const isAuthenticated = localStorage.getItem('token');  // Check if token exists
+const ProtectedRoute = ({ element, ...rest }) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  
+  useEffect(() => {
+    const validateToken = async () => {
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        setIsAuthenticated(false);
+        setIsLoading(false);
+        return;
+      }
 
-  return isAuthenticated ? element : <Navigate to="/login" />;
+      try {
+        // Make a request to your backend to verify the JWT
+        const response = await axios.get('http://localhost:3001/verify-token', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        // If the response is successful, set isAuthenticated to true
+        if (response.status === 200) {
+          setIsAuthenticated(true);
+        }
+      } catch (error) {
+        console.error('Token validation failed:', error);
+        setIsAuthenticated(false);
+        setErrorMessage(error.response?.data?.message || 'Token validation failed'); // Display the error message
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    validateToken();
+  }, []);
+
+  // Show a loading indicator while validating the token
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  // Redirect to login if not authenticated
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Display error message if any
+  if (errorMessage) {
+    return <div>Error: {errorMessage}</div>;
+  }
+
+  // If authenticated, render the requested route
+  return element;
 };
 
 export default ProtectedRoute;
