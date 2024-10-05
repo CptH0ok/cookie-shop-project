@@ -1,14 +1,21 @@
 .marquee {
-  display: flex;
-  animation: marquee linear infinite;
+  overflow: hidden; /* Prevent overflow */
+  white-space: nowrap; /* Keep content in a single line */
+  width: 100%; /* Full width */
+  position: relative; /* For positioning the inner content */
+}
+
+.my-component .marquee-inner {
+  display: flex; /* Use flexbox for horizontal layout */
+  animation: marquee 10s linear infinite; /* Adjust duration for speed */
 }
 
 @keyframes marquee {
   0% {
-    transform: translateX(100%); /* Start just off the right edge */
+    transform: translateX(0); /* Start at the beginning */
   }
   100% {
-    transform: translateX(-100%); /* End just off the left edge */
+    transform: translateX(-150%); /* Move halfway left (to the end of the first set) */
   }
 }
 
