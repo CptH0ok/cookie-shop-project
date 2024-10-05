@@ -1,0 +1,67 @@
+/* Ensure the page scrolls and the rest of the content remains flexible */
+body, html {
+  margin: 0;
+  padding: 0;
+}
+
+/* Only center the review container */
+.review-container {
+  width: 80%; /* Adjust width as needed */
+  margin: 0 auto; /* Horizontally center the container */
+  padding: 40px;
+  border: 2px solid #ccc;
+  background-color: #fff;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Add a subtle shadow for better visibility */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px; /* Adjust height as needed */
+  position: relative;
+  margin-top: 100px; /* Add top margin to create space above */
+}
+
+/* Each review will be absolutely positioned and fade in/out */
+.review {
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.review.active {
+  opacity: 1;
+}
+
+/* Larger text for the reviews */
+.recommendation {
+  font-size: 48px; /* Larger emoji for recommendation */
+  margin-bottom: 20px;
+}
+
+.review-text {
+  font-size: 24px; /* Larger review text */
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.review-date {
+  font-size: 18px;
+  color: #555;
+}
+
+/* Positive and Negative styles for recommendation icons */
+.recommendation.positive {
+  color: green;
+}
+
+.recommendation.negative {
+  color: red;
+}

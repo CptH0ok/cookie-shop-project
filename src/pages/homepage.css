@@ -1,0 +1,26 @@
+.marquee {
+  display: flex;
+  animation: marquee linear infinite;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(100%); /* Start just off the right edge */
+  }
+  100% {
+    transform: translateX(-100%); /* End just off the left edge */
+  }
+}
+
+.inline-block {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.relative {
+  position: relative; /* Allows for absolute positioning of other elements if needed */
+}
+
+.overflow-hidden {
+  overflow: hidden; /* Ensures content does not overflow the container */
+}
