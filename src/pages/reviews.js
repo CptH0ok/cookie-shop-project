@@ -6,15 +6,27 @@ const Reviews = () => {
   const [reviews, setReviews] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [error, setError] = useState(null);
 
   // Fetch reviews from the API
   const fetchReviews = async () => {
-    try {
-      const response = await axios.get('/api/pagereviews');
-      setReviews(response.data);
-    } catch (error) {
-      console.error('Error fetching reviews:', error);
-    }
+    const response = await axios.get('/api/pagereviews')
+    .then((response) => {;
+        setReviews(response.data);
+    })
+    .catch((err) => {
+      // Handle error
+      if (err.response) {
+        // Server responded with a status other than 2xx
+        setError(err.response.data.error.message);
+      } else if (err.request) {
+        // Request was made but no response received
+        setError('No response from server');
+      } else {
+        // Something happened in setting up the request
+        setError('Error setting up request');
+      }
+    });
   };
 
   // Fetch reviews on component mount and every 60 minutes (3600000 ms)
@@ -39,6 +51,22 @@ const Reviews = () => {
     const date = new Date(dateString);
     return date.toLocaleDateString();
   };
+
+  if(error){
+    return (
+      <div class="error-container">
+        <div class="error-message">
+          <span class="caution">⚠️</span>
+            Something went wrong! Please try again.
+          <span class="caution">⚠️</span>
+        </div>
+        <details>
+          <summary>More Info</summary>
+          <p>Details: {error}</p>
+        </details>
+      </div>
+    );
+  }
 
   return (
     <div className="review-container">
