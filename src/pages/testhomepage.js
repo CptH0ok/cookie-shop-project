@@ -8,6 +8,7 @@ const navigation = [
   { name: 'Shop', href: '#' },
   { name: 'Something', href: '#' },
   { name: 'Something 2', href: '#' },
+  { name: 'About Us', href: '#' },
 ]
 
 const TestHomePage = () => {
