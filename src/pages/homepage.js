@@ -126,11 +126,13 @@ const HomePage = () => {
           <div className="flex-1 text-center relative overflow-hidden">
             {comments.length > 0 ? (
               <div className="whitespace-nowrap overflow-hidden">
+              <div className="my-component">
                 <div className="marquee">
+                <div className="marquee-inner">
                   <div
                     className="inline-block"
                     style={{
-                      animationDuration: `${comments.length * 3}s`, // Adjust speed as needed
+                      animationDuration: `${comments.length * 5}s`, // Adjust speed as needed
                     }}
                   >
                     {comments.map((comment, index) => (
@@ -147,6 +149,8 @@ const HomePage = () => {
                       </span>
                     ))}
                   </div>
+                </div>
+                </div>
                 </div>
               </div>
             ) : (
