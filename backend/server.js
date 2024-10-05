@@ -22,30 +22,44 @@ app.get('/api/products', async (req, res) => {
   res.json(products);
 });
 
-app.get('/api/pagereviews', async (req, res) => {
-  const reviews = await FB.getPageReviews();
-  res.json(reviews);
+app.get('/api/pagereviews', async (req, res, next) => {
+  try {
+    const reviews = await FB.getPageReviews();
+    res.json(reviews);
+  } catch (error) {
+    next(error);
+  }
+  
 });
 
-app.get('/api/getlastdataphoto', async (req, res) => {
-  const lastPostId = await FB.getLastPost();
-  var photo = null;
-
-  if (lastPostId) {
-    //likes = await FB.getPostLikes(lastPostId);
-    photo = await FB.getPostPicture(lastPostId);
+app.get('/api/getlastdataphoto', async (req, res, next) => {
+  try {
+    const lastPostId = await FB.getLastPost();
+    const photo = await FB.getPostPicture(lastPostId);
+    res.json(photo);
+  } catch (error) {
+    next(error);
   }
-  res.json(photo);
+  
 });
 
-app.get('/api/getlastdatacomments', async (req, res) => {
-  const lastPostId = await FB.getLastPost();
-  var comments = null;
-
-  if (lastPostId) {
-    comments = await FB.getPostComments(lastPostId);
+app.get('/api/getlastdatacomments', async (req, res, next) => {
+  try{
+    const lastPostId = await FB.getLastPost();
+    const comments = await FB.getPostComments(lastPostId);
+    res.json(comments);
+  } catch (error) {
+      next(error);
   }
-  res.json(comments);
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  res.status(err.status || 500).json({
+    error: {
+      message: err.response.data.error.message || 'Internal Server Error',
+    },
+  });
 });
 
 // Start server

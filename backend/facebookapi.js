@@ -23,10 +23,10 @@ async function getFacebookPageReviews() {
     response.data.data.forEach(review => {
         console.log(review.review_text);
     });
-    return response.data.data;
+    return response.data.data
   } catch (error) {
     console.error('Error retrieving Facebook page reviews:', error.response?.data);
-    return null;
+    throw error;
   }
 }
 
@@ -51,7 +51,7 @@ async function postToFacebookPage(message) {
       return response.data.id;
     } catch (error) {
       console.error('Error posting to Facebook page:', error.response.data);
-      return null;
+      throw error;
     }
   }
 
@@ -72,10 +72,11 @@ async function getLastFacebookPost() {
     );
     const lastPost = response.data.data[0];
     console.log('Last Post:', lastPost);
-    return lastPost.id;  // Return the post ID to use in the next functions
+    return lastPost.id;
+
   } catch (error) {
     console.error('Error retrieving last Facebook page post:', error.response?.data);
-    return null;
+    throw error;
   }
 }
 
@@ -95,13 +96,11 @@ async function getFacebookPostComments(postId) {
       }
     );
     console.log('Post Comments:', response.data.data);
-    response.data.data.forEach(comment => {
-      console.log("Commenter: " + comment.from.name + "\nCommented: " + comment.message);
-  });
-  return response.data.data;
+    return response.data.data
+
   } catch (error) {
     console.error('Error retrieving post comments:', error.response?.data);
-    return null;
+    throw error;
   }
 }
 
@@ -120,11 +119,13 @@ async function getFacebookPostPicture(postId) {
         }
       }
     );
+
     console.log('Picture Link:', response.data.data);
-  return response.data.data;
+    return response.data.data;
+
   } catch (error) {
     console.error('Error retrieving picture link:', error.response?.data);
-    return null;
+    throw error;
   }
 }
 
@@ -144,10 +145,11 @@ async function getFacebookPostLikes(postId) {
       }
     );
     console.log('Post Likes:', response.data.data);
+
     return response.data.data;
   } catch (error) {
     console.error('Error retrieving post likes:', error.response?.data);
-    return null;
+    throw error;
   }
 }
 

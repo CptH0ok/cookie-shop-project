@@ -5,28 +5,54 @@ import './homepage.css'; // Custom CSS for styles
 const HomePage = () => {
   const [photoData, setPhotoData] = useState(null);
   const [comments, setComments] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     // Function to fetch photo data from /api/getlastdataphoto
     const fetchPhotoData = async () => {
-      try {
-        const response = await axios.get('/api/getlastdataphoto');
-        const data = response.data;
-        setPhotoData(data); // Store photo data
-      } catch (error) {
-        console.error('Error fetching photo data:', error);
-      }
+      const response = await axios.get('/api/getlastdataphoto')
+        .then((response) => {
+          const data = response.data;
+          console.log(data);
+          setPhotoData(data); // Store photo data;
+        })
+        .catch((err) => {
+          // Handle error
+          if (err.response) {
+            // Server responded with a status other than 2xx
+            setError(err.response.data.error.message);
+          } else if (err.request) {
+            // Request was made but no response received
+            setError('No response from server');
+          } else {
+            // Something happened in setting up the request
+            setError('Error setting up request');
+          }
+        });
     };
 
     // Function to fetch comments from /api/getlastdatacomments
     const fetchComments = async () => {
-      try {
-        const response = await axios.get('/api/getlastdatacomments');
+
+      const response = await axios.get('/api/getlastdatacomments')
+      .then((response) => {;
+        console.log(response);
         const data = response.data;
         setComments(data); // Store comments
-      } catch (error) {
-        console.error('Error fetching comments:', error);
-      }
+      })
+      .catch((err) => {
+        // Handle error
+        if (err.response) {
+          // Server responded with a status other than 2xx
+          setError(err.response.data.error.message);
+        } else if (err.request) {
+          // Request was made but no response received
+          setError('No response from server');
+        } else {
+          // Something happened in setting up the request
+          setError('Error setting up request');
+        }
+      });
     };
 
     // Initial fetch
@@ -41,6 +67,24 @@ const HomePage = () => {
     return () => clearInterval(interval); // Cleanup interval on component unmount
   }, []);
 
+
+
+  if(error){
+    return (
+      <div class="error-container">
+        <div class="error-message">
+          <span class="caution">⚠️</span>
+            Something went wrong! Please try again.
+          <span class="caution">⚠️</span>
+        </div>
+        <details>
+          <summary>More Info</summary>
+          <p>Details: {error}</p>
+        </details>
+      </div>
+    );
+  }
+
   return (
     
     <div className="bg-gray-900 text-white h-screen flex flex-col justify-between">
@@ -48,6 +92,7 @@ const HomePage = () => {
       <div className="flex items-center justify-center p-4">
         <h1 className="text-5xl font-bold">Welcome to Our Cookie Shop</h1>
       </div>
+
       <div className="relative">
         {/* Header for Facebook Activity */}
         <div className="bg-gray-700 text-white text-center py-1 flex items-center justify-center">
