@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import GoogleSignIn from '../components/GoogleSignIn';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -18,10 +19,6 @@ const Login = () => {
     } catch (err) {
       setError('Invalid credentials');
     }
-  };
-
-  const handleGoogleLogin = () => {
-    window.location.href = 'http://localhost:3000/auth/google';
   };
 
   return (
@@ -43,7 +40,8 @@ const Login = () => {
         <button type="submit">Login</button>
         {error && <p>{error}</p>}
       </form>
-      <button onClick={handleGoogleLogin}>Login with Google</button>
+        <GoogleSignIn />
+    
     </div>
   );
 };

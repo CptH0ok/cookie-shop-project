@@ -5,10 +5,9 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const Product = require('./models/product');
 const FB = require('./facebookapi');
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const { OAuth2Client } = require('google-auth-library');
 const User = require('./models/User'); // MongoDB User Model
 
 const app = express();
@@ -21,28 +20,37 @@ app.use(express.json());
 mongoose.connect(process.env.MONGO_URI,
    {}).then(() => console.log('MongoDB Connected'));
 
-// Passport Google Strategy
-passport.use(new GoogleStrategy({
-  clientID: process.env.GOOGLE_CLIENT_ID,
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: '/auth/google/callback'
-}, async (accessToken, refreshToken, profile, done) => {
-  const { id, displayName, emails } = profile;
-  const email = emails[0].value;
+// Initialize the Google OAuth2 client
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+// Middleware to authenticate JWT
+const authenticateJWT = async (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1]; // Get token from headers
+
+  if (!token) {
+    return res.sendStatus(401); // Unauthorized if token is not provided
+  }
 
   try {
-    let user = await User.findOne({ googleId: id });
-
-    if (!user) {
-      user = new User({ googleId: id, name: displayName, email });
-      await user.save();
-    }
-
-    done(null, user);
+    // Try verifying the JWT token with your secret
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    return next(); // Valid token, proceed to the next middleware
   } catch (err) {
-    done(err, false);
+    // If verification fails, it might be a Google token
+    try {
+      const ticket = await client.verifyIdToken({
+        idToken: token,
+        audience: process.env.GOOGLE_CLIENT_ID, // Specify the CLIENT_ID of the app that accesses the backend
+      });
+      req.user = ticket.getPayload(); // Store user information in req.user
+      return next(); // Valid Google token, proceed to the next middleware
+    } catch (error) {
+      console.error('Invalid token:', error);
+      return res.sendStatus(403); // Forbidden if the token is invalid
+    }
   }
-}));
+};
 
 // Routes
 app.get('/api/products', async (req, res) => {
@@ -79,14 +87,6 @@ app.get('/api/getlastdatacomments', async (req, res, next) => {
   } catch (error) {
       next(error);
   }
-});
-
-// Google Login Route
-app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-
-app.get('/auth/google/callback', passport.authenticate('google', { session: false }), (req, res) => {
-  const token = jwt.sign({ id: req.user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-  res.redirect(`http://localhost:3000/login/success?token=${token}`);
 });
 
 // Email Sign Up
@@ -137,10 +137,11 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Protected Route Example
-app.get('/protected', passport.authenticate('jwt', { session: false }), (req, res) => {
-  res.json({ message: 'You are authenticated' });
+// Token verification route
+app.get('/verify-token', authenticateJWT, (req, res) => {
+  res.sendStatus(200); // Send 200 OK if the token is valid
 });
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {
