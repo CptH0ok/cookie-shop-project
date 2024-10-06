@@ -17,7 +17,7 @@ const navigate = useNavigate();
       script.onload = () => {
         // Initialize Google Sign-In
         window.google.accounts.id.initialize({
-          client_id: "577750909481-14u39qkd1duvu6nopnc35141ecn115b5.apps.googleusercontent.com", // Replace with your actual Client ID
+          client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
           callback: handleCredentialResponse,
         });
         
@@ -35,7 +35,7 @@ const navigate = useNavigate();
     };
 
     loadGoogleScript();
-  }, []);
+  });
 
   return (
     <div>

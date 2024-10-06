@@ -1,5 +1,5 @@
 const path = require('path')
-require('dotenv').config({ path: path.resolve(__dirname, './.env') });
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -21,7 +21,7 @@ mongoose.connect(process.env.MONGO_URI,
    {}).then(() => console.log('MongoDB Connected'));
 
 // Initialize the Google OAuth2 client
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const client = new OAuth2Client(process.env.REACT_APP_GOOGLE_CLIENT_ID);
 
 // Middleware to authenticate JWT
 const authenticateJWT = async (req, res, next) => {
@@ -41,7 +41,7 @@ const authenticateJWT = async (req, res, next) => {
     try {
       const ticket = await client.verifyIdToken({
         idToken: token,
-        audience: process.env.GOOGLE_CLIENT_ID, // Specify the CLIENT_ID of the app that accesses the backend
+        audience: process.env.REACT_APP_GOOGLE_CLIENT_ID, // Specify the CLIENT_ID of the app that accesses the backend
       });
       req.user = ticket.getPayload(); // Store user information in req.user
       return next(); // Valid Google token, proceed to the next middleware
