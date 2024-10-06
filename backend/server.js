@@ -23,6 +23,14 @@ mongoose.connect(process.env.MONGO_URI,
 // Initialize the Google OAuth2 client
 const client = new OAuth2Client(process.env.REACT_APP_GOOGLE_CLIENT_ID);
 
+const checkAdmin = (req, res, next) => {
+  if (req.user && req.user.role === 'admin') {
+    next(); // The user is an admin, proceed to the next middleware or route
+  } else {
+    return res.status(403).send('Access denied. Admins only.');
+  }
+};
+
 // Middleware to authenticate JWT
 const authenticateJWT = async (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1]; // Get token from headers
@@ -130,18 +138,21 @@ app.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user.id, role: user.role}, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.json({ token });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }
 });
 
+app.get('/admin', authenticateJWT, checkAdmin, (req, res) => {
+  res.send('Welcome to the admin dashboard.');
+});
+
 // Token verification route
 app.get('/verify-token', authenticateJWT, (req, res) => {
   res.sendStatus(200); // Send 200 OK if the token is valid
 });
-
 
 // Error handling middleware
 app.use((err, req, res, next) => {

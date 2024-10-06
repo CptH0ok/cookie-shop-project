@@ -6,6 +6,7 @@ import GoogleSignIn from '../components/GoogleSignIn';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [userRole, setUserRole] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -15,6 +16,7 @@ const Login = () => {
       const res = await axios.post('http://localhost:3000/login', { email, password });
       localStorage.setItem('token', res.data.token);
       setError('');
+      setUserRole(res.data.role);
       navigate('/');  // Redirect to home page
     } catch (err) {
       setError('Invalid credentials');
