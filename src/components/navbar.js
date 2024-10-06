@@ -16,6 +16,7 @@ const Navbar = () => {
         <ul className="flex space-x-4">
           <li><Link to="/" className="text-white">Home</Link></li>
           <li><Link to="/shop" className="text-white">Shop</Link></li>
+          <li><Link to="/maps" className="text-white">Maps</Link></li>
           <li><Link to="/reviews" className="text-white">Reviews</Link></li>
           <button onClick={handleLogout}>Logout</button>
         </ul>
