@@ -9,6 +9,7 @@ import Signup from './pages/signup';  // Signup component
 import Maps from './pages/maps'
 import ProtectedRoute from './components/ProtectedRoute';  // The protected route component
 import LoginSuccess from './components/LoginSuccess';
+import Admin from './pages/admin';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
         <Route path="/shop" element={<ProtectedRoute element={<ShopPage />} />} />
         <Route path="/maps" element={<ProtectedRoute element={<Maps />} />} />
         <Route path="/reviews" element={<ProtectedRoute element={<Reviews />} />} />
+        <Route path="/admin" element={<ProtectedRoute element={<Admin />} />} />
 
         {/* Wildcard route: Let backend handle unhandled paths*/}
         <Route path="*" element={<h2>404 Not Found</h2>} />

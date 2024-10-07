@@ -4,20 +4,21 @@ import axios from 'axios';
 import GoogleSignIn from '../components/GoogleSignIn';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [userRole, setUserRole] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
-    e.preventDefault();
+    e.preventDefault();  // Prevent the default form submission behavior
+
+    // Get the form data directly from the input fields
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+
     try {
       const res = await axios.post('http://localhost:3000/login', { email, password });
       localStorage.setItem('token', res.data.token);
       setError('');
-      setUserRole(res.data.role);
-      navigate('/');  // Redirect to home page
+      navigate('/');  // Redirect to home page after login
     } catch (err) {
       setError('Invalid credentials');
     }
@@ -29,21 +30,20 @@ const Login = () => {
       <form onSubmit={handleLogin}>
         <input
           type="email"
+          name="email"  // The "name" attribute is used to access the value
           placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          required
         />
         <input
           type="password"
+          name="password"  // The "name" attribute is used to access the value
           placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          required
         />
         <button type="submit">Login</button>
         {error && <p>{error}</p>}
       </form>
-        <GoogleSignIn />
-    
+      <GoogleSignIn />
     </div>
   );
 };

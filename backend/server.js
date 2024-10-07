@@ -146,7 +146,7 @@ app.post('/login', async (req, res) => {
 });
 
 app.get('/admin', authenticateJWT, checkAdmin, (req, res) => {
-  res.send('Welcome to the admin dashboard.');
+  res.sendStatus(200);
 });
 
 // Token verification route

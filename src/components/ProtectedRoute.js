@@ -3,14 +3,15 @@ import { Navigate } from 'react-router-dom';
 import axios from 'axios';
 
 const ProtectedRoute = ({ element, ...rest }) => {
+  const token = localStorage.getItem('token');
+
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   
   useEffect(() => {
     const validateToken = async () => {
-      const token = localStorage.getItem('token');
-      
+    
       if (!token) {
         setIsAuthenticated(false);
         setIsLoading(false);
@@ -29,6 +30,8 @@ const ProtectedRoute = ({ element, ...rest }) => {
         if (response.status === 200) {
           setIsAuthenticated(true);
         }
+
+
       } catch (error) {
         console.error('Token validation failed:', error);
         setIsAuthenticated(false);
@@ -39,7 +42,7 @@ const ProtectedRoute = ({ element, ...rest }) => {
     };
 
     validateToken();
-  }, []);
+  }, [token]);
 
   // Show a loading indicator while validating the token
   if (isLoading) {
@@ -56,7 +59,6 @@ const ProtectedRoute = ({ element, ...rest }) => {
     return <div>Error: {errorMessage}</div>;
   }
 
-  // If authenticated, render the requested route
   return element;
 };
 
