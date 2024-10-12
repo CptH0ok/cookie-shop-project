@@ -1,6 +1,6 @@
 "use client";
 
-import '/Users/shellyoron/cookie-shop-project/src/styles/styles.css'; 
+import '../styles/styles.css'; 
 
 const ContactUs = () => {
     return ( 
