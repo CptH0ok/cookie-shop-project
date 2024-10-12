@@ -37,7 +37,7 @@ const Navbar = () => {
       </div>
       <Link
         to={"/Signup"}
-        className="mr-4 mt-2 relative flex z-10 h-10 rounded-md bg-yellow-600 text-white stroke-white  duration-500 hover:bg-white hover:text-black hover:stroke-black hover:backdrop-contrast-75 px-2.5 py-2.5 drop-shadow-md duration-500"
+        className="mr-4 mt-2 relative flex z-10 h-10 rounded-md bg-yellow-600 text-white stroke-white  duration-500 hover:bg-yellow-500 hover:backdrop-contrast-75 px-2.5 py-2.5 drop-shadow-md duration-500"
       >
         <svg
           class="size-6 pb-1"
@@ -57,7 +57,7 @@ const Navbar = () => {
         <a className="text-sm font-sans text-nowrap font-semibold">Sign Up</a>
       </Link>
       <Link to={"/Login"}
-        className="mr-4 mt-2 relative flex z-10 h-10 rounded-md ring-1 text-white/70 stroke-white/30 ring-white/30 bg-white/5 duration-500 hover:stroke-white hover:text-white hover:bg-white/30 px-2.5 py-2.5 drop-shadow-md duration-500"
+        className="mr-4 mt-2 relative flex z-10 h-10 rounded-md ring-1 text-white/70 stroke-white/30 ring-white/30 bg-white/5 duration-500 hover:ring-white hover:stroke-black hover:text-black hover:bg-white px-2.5 py-2.5 drop-shadow-md duration-500"
       >
         <svg
           class="pb-1 size-6"

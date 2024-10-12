@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 
@@ -91,80 +92,8 @@ const HomePage = () => {
                 Contact Us
               </a>
             </div>
-            <div class="lg:mx-auto text-left ">
-              <h4 class="text-lg text-gray-900 font-medium mb-7">Pagedone</h4>
-              <ul class="text-sm  transition-all duration-500">
-                <li class="mb-6">
-                  <a
-                    href="javascript:;"
-                    class="text-gray-600 hover:text-gray-900"
-                  >
-                    Home
-                  </a>
-                </li>
-                <li class="mb-6">
-                  <a
-                    href="javascript:;"
-                    class=" text-gray-600 hover:text-gray-900"
-                  >
-                    About
-                  </a>
-                </li>
-                <li class="mb-6">
-                  <a
-                    href="javascript:;"
-                    class=" text-gray-600 hover:text-gray-900"
-                  >
-                    Pricing
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="javascript:;"
-                    class=" text-gray-600 hover:text-gray-900"
-                  >
-                    Features
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div class="lg:mx-auto text-left ">
-              <h4 class="text-lg text-gray-900 font-medium mb-7">Products</h4>
-              <ul class="text-sm  transition-all duration-500">
-                <li class="mb-6">
-                  <a
-                    href="javascript:;"
-                    class="text-gray-600 hover:text-gray-900"
-                  >
-                    Figma UI System
-                  </a>
-                </li>
-                <li class="mb-6">
-                  <a
-                    href="javascript:;"
-                    class=" text-gray-600 hover:text-gray-900"
-                  >
-                    Icons Assets
-                  </a>
-                </li>
-                <li class="mb-6">
-                  <a
-                    href="javascript:;"
-                    class=" text-gray-600 hover:text-gray-900"
-                  >
-                    Responsive Blocks
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="javascript:;"
-                    class=" text-gray-600 hover:text-gray-900"
-                  >
-                    Components Library
-                  </a>
-                </li>
-              </ul>
-            </div>
+            <div></div>
+            <div></div>
             <div class="lg:mx-auto text-left">
               <h4 class="text-lg text-gray-900 font-medium mb-7">Resources</h4>
               <ul class="text-sm  transition-all duration-500">
@@ -243,13 +172,12 @@ const HomePage = () => {
           <div class="py-7 border-t border-gray-200">
             <div class="flex items-center justify-center flex-col lg:justify-between lg:flex-row">
               <span class="text-sm text-gray-500 ">
-                ©<a href="https://pagedone.io/">pagedone</a> 2024, All rights
-                reserved.
+                ©<Link to={"/"}>Cookie Land</Link> 2024, All rights reserved.
               </span>
               <div class="flex mt-4 space-x-4 sm:justify-center lg:mt-0 ">
                 <a
                   href="javascript:;"
-                  class="w-9 h-9 rounded-full bg-gray-700 flex justify-center items-center hover:bg-indigo-600"
+                  class="w-9 h-9 rounded-full bg-gray-700 flex justify-center items-center hover:bg-yellow-600 duration-500"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -269,7 +197,7 @@ const HomePage = () => {
                 </a>
                 <a
                   href="javascript:;"
-                  class="w-9 h-9 rounded-full bg-gray-700 flex justify-center items-center hover:bg-indigo-600"
+                  class="w-9 h-9 rounded-full bg-gray-700 flex justify-center items-center hover:bg-yellow-600 duration-500"
                 >
                   <svg
                     class="w-[1.25rem] h-[1.125rem] text-white"
@@ -285,7 +213,7 @@ const HomePage = () => {
                 </a>
                 <a
                   href="javascript:;"
-                  class="w-9 h-9 rounded-full bg-gray-700 flex justify-center items-center hover:bg-indigo-600"
+                  class="w-9 h-9 rounded-full bg-gray-700 flex justify-center items-center hover:bg-yellow-600 duration-500"
                 >
                   <svg
                     class="w-[1rem] h-[1rem] text-white"
@@ -301,7 +229,7 @@ const HomePage = () => {
                 </a>
                 <a
                   href="javascript:;"
-                  class="w-9 h-9 rounded-full bg-gray-700 flex justify-center items-center hover:bg-indigo-600"
+                  class="w-9 h-9 rounded-full bg-gray-700 flex justify-center items-center hover:bg-yellow-600 duration-500"
                 >
                   <svg
                     class="w-[1.25rem] h-[0.875rem] text-white"
