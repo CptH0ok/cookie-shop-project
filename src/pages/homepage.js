@@ -52,7 +52,7 @@ const HomePage = () => {
           className="absolute inset-x-0 top-[calc(100%-13rem)] z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]"
         ></div>
       </div>
-      <body className="order-3 relative bg-white bg-cover bg-center h-auto">
+      <body className="relative bg-white bg-cover bg-center h-auto">
         <div className="flex h-96">
           <h1 className="bg-black w-1/2 h-auto pt-12 text-center text-balance text-white text-6xl font-serif font-bold">
             Freshly Baked
@@ -68,20 +68,20 @@ const HomePage = () => {
           <div className="relative right-0 bg-unsplash-[AO_6utzivow/sm] w-1/2 h-auto"></div>
         </div>
       </body>
-      <footer class="order-4 w-full">
+      <footer class="w-full">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-8 py-10 max-sm:max-w-sm max-sm:mx-auto gap-y-8">
+          <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-8 py-6 max-sm:max-w-sm max-sm:mx-auto gap-y-8">
             <div class="col-span-full mb-10 lg:col-span-2 lg:mb-0">
               <a href="#" class="flex justify-center lg:justify-start">
                 <img
                   src="https://img.icons8.com/fluency/48/cookies.png"
-                  className="ml-5 w-14 h-14 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300"
+                  className="w-20 h-20 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300"
                 ></img>
-                <p className="pt-2 pl-1 text-4xl text-black font-serif font-bold">
+                <p className="pt-2 pl-1 text-6xl text-black text-nowrap font-serif font-bold">
                   Cookie Land
                 </p>
               </a>
-              <p class="py-8 text-sm text-gray-500 lg:max-w-xs text-center lg:text-left">
+              <p class="pt-2 pb-6 text-base text-gray-500 lg:max-w-sm text-center lg:text-left">
                 Have a question, special request, or just want to say hello?
                 We’d love to hear from you!
               </p>
