@@ -4,45 +4,13 @@ import { useState } from "react";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 
-const navigation = [
-  { name: "Shop", href: "#" },
-  { name: "Something", href: "#" },
-  { name: "Something 2", href: "#" },
-  { name: "About Us", href: "#" },
-];
-
 const TestHomePage = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
   return (
-    <div className="flex flex-col bg-cover bg-center min-h-screen h-auto">
-      <div className="bg-unsplash-[1Gv_4RcljOE/lg] z-10 relative">
-      <div className="absolute flex sticky top-0 backdrop-blur-md backdrop-contrast-75 pt-3 pb-2 z-20 w-full drop-shadow-2xl">
-      <div className="flex pl-4">
-          <svg class="size-12 stroke-white/30 hover:stroke-white duration-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-          </svg>
-        </div>
-        <div className="flex justify-center w-full">
-          <img src="https://img.icons8.com/fluency/48/cookies.png" className="ml-5 w-14 h-14 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300"></img>
-          <p className="pt-2 pl-1 text-4xl text-white font-serif font-bold">Cookie Land</p>
-        </div>
-        <button href="#" className="mr-4 mt-2 relative flex z-10 h-10 rounded-md ring-1 text-white/30 stroke-white/30 ring-white/30 duration-500 hover:ring-white hover:stroke-white hover:text-white hover:backdrop-contrast-75 px-2.5 py-2.5 drop-shadow-md duration-500">
-          <a className="text-sm font-sans font-semibold">Sign Up</a>
-        </button>
-        <button href="#" className="mr-4 mt-2 relative flex z-10 h-10 rounded-md ring-1 text-white/30 stroke-white/30 ring-white/30 duration-500 hover:ring-white hover:stroke-white hover:text-white hover:backdrop-contrast-75 px-2.5 py-2.5 drop-shadow-md duration-500">
-          <svg class="pb-1 size-6"xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H2.25" />
-          </svg>
-          <a className="text-sm font-sans font-semibold">Login</a>
-        </button>
-      </div>
+    <div className="relative flex flex-col z-10 min-h-screen h-auto">
+      <div className="relative bg-unsplash-[1Gv_4RcljOE/lg] z-10">
         <div class="absolute inset-0 bg-black bg-opacity-75 z-0"></div>
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 top-40 z-10 overflow-hidden"
-        ></div>
-        <div className="mx-auto max-w-2xl py-32 sm:py-48 lg:py-32">
+        <div className="mx-auto max-w-2xl mt-10 sm:py-48 lg:py-36">
           <div className="hidden sm:mb-8 sm:flex sm:justify-center">
             <div className="text-white relative rounded-full px-3 py-1 z-10 text-base font-serif leading-6 ring-1 ring-white/10 hover:ring-white/20">
               New Gluten Free Options!{" "}
@@ -57,7 +25,10 @@ const TestHomePage = () => {
               Baking Hapiness, One Cookie at a Time.
             </h1>
             <p className="relative z-10 mt-6 text-lg leading-8 text-white font-serif">
-            Our cookies are baked fresh throughout the day to ensure every bite is warm and soft, just like they came out of your oven. Whether you visit us in-store or order online, you’ll always enjoy cookies at peak deliciousness.
+              Our cookies are baked fresh throughout the day to ensure every
+              bite is warm and soft, just like they came out of your oven.
+              Whether you visit us in-store or order online, you’ll always enjoy
+              cookies at peak deliciousness.
             </p>
             <div className="mt-10 flex items-center justify-center gap-x-6">
               <a
@@ -84,7 +55,14 @@ const TestHomePage = () => {
         <div className="flex h-96">
           <h1 className="bg-black w-1/2 h-auto pt-12 text-center text-balance text-white text-6xl font-serif font-bold">
             Freshly Baked
-            <p className="text-2xl mt-4 ml-10 mr-10 mb-10 text-center text-pretty font-serif font-light tracking-tight">At Cookie Land, we bake happiness into every bite! From classic chocolate chip to indulgent double fudge and unique seasonal flavors, our cookies are handcrafted daily using the finest ingredients. Whether you're grabbing a quick treat for yourself or a box to share, we have something for everyone to enjoy. Explore our menu and order your favorite cookies today!</p>
+            <p className="text-2xl mt-4 ml-10 mr-10 mb-10 text-center text-pretty font-serif font-light tracking-tight">
+              At Cookie Land, we bake happiness into every bite! From classic
+              chocolate chip to indulgent double fudge and unique seasonal
+              flavors, our cookies are handcrafted daily using the finest
+              ingredients. Whether you're grabbing a quick treat for yourself or
+              a box to share, we have something for everyone to enjoy. Explore
+              our menu and order your favorite cookies today!
+            </p>
           </h1>
           <div className="relative right-0 bg-unsplash-[AO_6utzivow/sm] w-1/2 h-auto"></div>
         </div>
@@ -93,15 +71,18 @@ const TestHomePage = () => {
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-8 py-10 max-sm:max-w-sm max-sm:mx-auto gap-y-8">
             <div class="col-span-full mb-10 lg:col-span-2 lg:mb-0">
-              <a
-                href="#"
-                class="flex justify-center lg:justify-start"
-              >
-                <img src="https://img.icons8.com/fluency/48/cookies.png" className="ml-5 w-14 h-14 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300"></img>
-                <p className="pt-2 pl-1 text-4xl text-black font-serif font-bold">Cookie Land</p>
+              <a href="#" class="flex justify-center lg:justify-start">
+                <img
+                  src="https://img.icons8.com/fluency/48/cookies.png"
+                  className="ml-5 w-14 h-14 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300"
+                ></img>
+                <p className="pt-2 pl-1 text-4xl text-black font-serif font-bold">
+                  Cookie Land
+                </p>
               </a>
               <p class="py-8 text-sm text-gray-500 lg:max-w-xs text-center lg:text-left">
-              Have a question, special request, or just want to say hello? We’d love to hear from you! 
+                Have a question, special request, or just want to say hello?
+                We’d love to hear from you!
               </p>
               <a
                 href="#"
