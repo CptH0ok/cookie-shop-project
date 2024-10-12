@@ -15,9 +15,12 @@ import Admin from './pages/admin';
 function App() {
   return (
     <Router>
-      {/* <Navbar /> */}
+      <div className='w-full sticky top-0 z-20'>
+        <Navbar />
+      </div>
       <Routes>
         {/* Public Routes */}
+        <Route path="/" element={<TestHomePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
@@ -25,7 +28,6 @@ function App() {
         <Route path="/login/success" element={<LoginSuccess />} />
 
         {/* Protected Routes */}
-        <Route path="/" element={<ProtectedRoute element={<TestHomePage />} />} />
         <Route path="/shop" element={<ProtectedRoute element={<ShopPage />} />} />
         <Route path="/maps" element={<ProtectedRoute element={<Maps />} />} />
         <Route path="/reviews" element={<ProtectedRoute element={<Reviews />} />} />
