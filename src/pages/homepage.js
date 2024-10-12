@@ -9,7 +9,7 @@ const HomePage = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   return (
     <div className="relative flex flex-col z-10 min-h-screen h-auto">
-      <div className="relative bg-unsplash-[1Gv_4RcljOE/lg] z-10">
+      <div className="relative bg-unsplash-[1Gv_4RcljOE/lg] bg-no-repeat bg-cover z-10">
         <div class="absolute inset-0 bg-black bg-opacity-75 z-0"></div>
         <div className="mx-auto max-w-2xl mt-10 sm:py-48 lg:py-36">
           <div className="hidden sm:mb-8 sm:flex sm:justify-center">
@@ -52,8 +52,8 @@ const HomePage = () => {
           className="absolute inset-x-0 top-[calc(100%-13rem)] z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]"
         ></div>
       </div>
-      <body className="relative bg-white bg-cover bg-center h-auto">
-        <div className="flex h-96">
+      <body className="relative bg-black h-auto">
+        <div className="flex h-auto">
           <h1 className="bg-black w-1/2 h-auto pt-12 text-center text-balance text-white text-6xl font-serif font-bold">
             Freshly Baked
             <p className="text-2xl mt-4 ml-10 mr-10 mb-10 text-center text-pretty font-serif font-light tracking-tight">
@@ -65,7 +65,25 @@ const HomePage = () => {
               our menu and order your favorite cookies today!
             </p>
           </h1>
-          <div className="relative right-0 bg-unsplash-[AO_6utzivow/sm] w-1/2 h-auto"></div>
+          <div className="relative right-0 bg-unsplash-[AO_6utzivow/sm] bg-cover bg-center bg-no-repeat w-1/2 h-auto"></div>
+        </div>
+        <div className="flex h-auto">
+        <div className="relative left-0 bg-unsplash-[wQ9VuP_Njr4/sm] bg-cover bg-bottom bg-no-repeat w-1/2 h-auto"></div>
+          <h1 className="bg-black w-1/2 h-auto pt-12 text-center text-balance text-white text-6xl font-serif font-bold">
+            Made Fresh, Delivered Fast
+            <p className="text-2xl mt-4 ml-10 mr-10 mb-10 text-center text-pretty font-serif font-light tracking-tight">
+              Can't stop by? No worries! We offer same-day delivery to satisfy your cookie cravings. Freshly baked, right to your doorstep.
+            </p>
+          </h1>
+        </div>
+        <div className="flex h-auto">
+          <h1 className="bg-black w-1/2 h-auto pt-12 text-center text-balance text-white text-6xl font-serif font-bold">
+          Custom Orders for Special Occasions
+            <p className="text-2xl mt-4 ml-10 mr-10 mb-10 text-center text-pretty font-serif font-light tracking-tight">
+              From birthdays to corporate events, we’ll help make your celebrations a little sweeter with personalized cookie boxes, gift sets, and more.
+            </p>
+          </h1>
+          <div className="relative right-0 bg-unsplash-[Hli3R6LKibo/sm] bg-cover bg-top bg-no-repeat w-1/2 h-auto"></div>
         </div>
       </body>
       <footer class="w-full">
