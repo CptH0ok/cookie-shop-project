@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navbar from './components/navbar';
+import Footer from './components/footer';
 import HomePage from './pages/homepage';
 import ShopPage from './pages/shoppage';
 import Reviews from './pages/reviews';
@@ -35,6 +36,7 @@ function App() {
         {/* Wildcard route: Let backend handle unhandled paths*/}
         <Route path="*" element={<h2>404 Not Found</h2>} />
       </Routes>
+      <Footer />
     </Router>
   );
 }
