@@ -1,32 +1,43 @@
-"use client";
-
-import '/Users/shellyoron/cookie-shop-project/src/styles/styles.css';
-import shelly from "../assets/shelly.jpg"
-import eitan from "../assets/eitan.jpg"
+import React from 'react';
+import './aboutus.css';
 
 const AboutUs = () => {
   return (
-    <div className="relative flex flex-col z-10 min-h-screen h-auto">
-      <div className="relative bg-unsplash-[1Gv_4RcljOE/lg] bg-no-repeat bg-cover z-10">
-        <div className="absolute inset-0 bg-black bg-opacity-75 z-0"></div>
-        <div className="mx-auto max-w-2xl mt-10 sm:py-48 lg:py-36">
-          <div className="text-center">
-            <h1 className="title">About Cookie Land</h1>
-            <p className="title_opening">
-              Discover the story behind our passion for baking and our commitment to bringing joy through every cookie we create.
-            </p>
-          </div>
+    <div className="flex flex-col min-h-screen">
+      {/* Header section */}
+      <header className="bg-pink-100 p-4">
+        <div className="container mx-auto flex justify-between items-center">
+          {/* Brand logo/name */}
+          <h1 className="text-3xl font-bold text-pink-600">Your Brand</h1>
+          
+          {/* Mobile menu toggle button */}
+          <button onClick={toggleMenu} className="md:hidden">
+            <Menu size={24} />
+          </button>
+          
+          {/* Navigation menu */}
+          <nav className={`${isMenuOpen ? 'block' : 'hidden'} md:block`}>
+            <ul className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4">
+              {/* Navigation items */}
+              <li><a href="#" className="text-pink-600 hover:text-pink-800">Home</a></li>
+              <li><a href="#" className="text-pink-600 hover:text-pink-800">Our Story</a></li>
+              <li><a href="#" className="text-pink-600 hover:text-pink-800">Contact</a></li>
+            </ul>
+          </nav>
         </div>
-      </div>
-      <div className="2xl:container 2xl:mx-auto lg:py-16 lg:px-20 md:py-12 md:px-6 py-9 px-4">
-          <div className="flex flex-col lg:flex-row justify-between gap-8">
-              <div className="w-full lg:w-5/12 flex flex-col justify-center">
-                  <h1 className="title_black">About Us</h1>
-                  <p className="paragraph_small "> At Cookie Land, we believe in using only the finest ingredients, supporting local suppliers, and creating a warm, welcoming environment for our customers. Our commitment to quality and community is baked into every cookie we make.</p>
-              </div>
-              <div className="w-full lg:w-8/12 ">
-                  <img className="w-full h-full" src="https://images.unsplash.com/photo-1464979681340-bdd28a61699e?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="A shop" />
-              </div>
+      </header>
+
+      {/* Main content area */}
+      <main className="flex-grow container mx-auto px-4 py-8">
+        {/* Page title */}
+        <h2 className="text-4xl font-bold text-center mb-8">Our Story</h2>
+        
+        {/* Two-column grid for content */}
+        <div className="grid md:grid-cols-2 gap-8">
+          {/* Image column */}
+          <div>
+            {/* Placeholder image - replace with your actual image */}
+            <img src="/api/placeholder/600/400" alt="Our Story" className="w-full h-auto rounded-lg shadow-lg" />
           </div>
 
           <div className="flex lg:flex-row flex-col justify-between gap-8 pt-12">
@@ -61,8 +72,17 @@ const AboutUs = () => {
                   </div>
               </div>
           </div>
-      </div>
-      </div>
+        </div>
+      </main>
+
+      {/* Footer section */}
+      <footer className="bg-pink-100 p-4 mt-8">
+        <div className="container mx-auto text-center text-pink-600">
+          {/* Copyright notice */}
+          <p>&copy; 2024 Your Brand. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
   );
 };
 

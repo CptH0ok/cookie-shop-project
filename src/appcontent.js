@@ -14,7 +14,6 @@ import ErrorPage from './pages/error';
 import CookieDetailPage from './components/cookiedetailpage';
 import GlutenFreePage from './pages/glutenfreepage';
 import AboutUsPage from './pages/aboutus';
-import AboutUsPage from './pages/aboutus';
 import ContactUsPage from './pages/contactus';
 
 function AppContent() {
