@@ -4,6 +4,7 @@ import Navbar from './components/navbar';
 import Footer from './components/footer';
 import HomePage from './pages/homepage';
 import ShopPage from './pages/shoppage';
+import AboutUsPage from './pages/aboutus';
 import Reviews from './pages/reviews';
 import Login from './pages/login';  // Login component
 import Signup from './pages/signup';  // Signup component
@@ -23,6 +24,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/aboutus" element={<AboutUsPage />} />
 
         {/* Handle Google Login Success */}
         <Route path="/login/success" element={<LoginSuccess />} />
