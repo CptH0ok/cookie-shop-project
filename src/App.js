@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navbar from './components/navbar';
-import TestHomePage from './pages/testhomepage';
 import HomePage from './pages/homepage';
 import ShopPage from './pages/shoppage';
 import Reviews from './pages/reviews';
@@ -20,7 +19,7 @@ function App() {
       </div>
       <Routes>
         {/* Public Routes */}
-        <Route path="/" element={<TestHomePage />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
