@@ -16,7 +16,7 @@ function AppContent() {
   const location = useLocation();
 
   const pathsWithLayout = [
-    "/", "/login", "/signup", "/login/success",
+    "/", "/login","/Login", "/signup", "/login/success",
     "/shop", "/maps", "/reviews", "/admin"
   ];
 

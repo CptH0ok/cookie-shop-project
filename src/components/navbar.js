@@ -60,7 +60,7 @@ const Navbar = () => {
 
         <a className="text-sm font-sans text-nowrap font-semibold">Sign Up</a>
       </Link>
-      <Link to={"/Login"}
+      <Link to={"/login"}
         className="mr-4 mt-2 relative flex z-10 h-10 rounded-md ring-1 text-white/70 stroke-white/30 ring-white/30 bg-white/5 duration-500 hover:ring-white hover:stroke-black hover:text-black hover:bg-white px-2.5 py-2.5 drop-shadow-md duration-500"
       >
         <svg

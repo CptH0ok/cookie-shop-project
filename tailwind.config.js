@@ -8,5 +8,5 @@ module.exports = {
       },
     },
   },
-  plugins: [require('tailwindcss-unsplash')],
+  plugins: [require('tailwindcss-unsplash'),require('@tailwindcss/forms'),],
 };
