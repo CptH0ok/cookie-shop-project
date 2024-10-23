@@ -4,6 +4,7 @@ import Navbar from './components/navbar';
 import Footer from './components/footer';
 import HomePage from './pages/homepage';
 import ShopPage from './pages/shoppage';
+import ErrorPage from './pages/error';
 import Reviews from './pages/reviews';
 import Login from './pages/login';  // Login component
 import Signup from './pages/signup';  // Signup component
@@ -34,7 +35,7 @@ function App() {
         <Route path="/admin" element={<ProtectedRoute element={<Admin />} />} />
 
         {/* Wildcard route: Let backend handle unhandled paths*/}
-        <Route path="*" element={<h2>404 Not Found</h2>} />
+        <Route path="*" element={<ErrorPage />} />
       </Routes>
       <Footer />
     </Router>
