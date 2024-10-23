@@ -6,7 +6,7 @@ import { XMarkIcon } from '@heroicons/react/24/outline'
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
 
   const handleLogout = () => {
     localStorage.removeItem("token"); // Remove token on logout
