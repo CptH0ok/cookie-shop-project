@@ -1,6 +1,7 @@
 import React from "react";
 import error from "../assets/error.png"
 import bg from "../assets/errbg.png"
+import { Link } from "react-router-dom";
 
 const ErrorPage = () => {
   return (
@@ -17,8 +18,12 @@ const ErrorPage = () => {
                   Oops! The Oven’s Empty!
       </h1>
       <p className="relative mt-1 text-lg text-center leading-8 text-white drop-shadow-2xl font-serif">
-            Looks like this page doesn’t exist anymore. Maybe it got eaten? Why not check out our latest cookie flavors instead!
+            Looks like this page doesn’t exist anymore. Maybe it got eaten? Why not check out <Link to={"/"} className="inline underline underline-offset-2 hover:text-yellow-500 duration-300" >
+            our latest cookie flavors instead!
+      </Link>
       </p>
+
+
     </div>
   );
 };
