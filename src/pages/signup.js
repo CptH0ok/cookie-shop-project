@@ -12,7 +12,7 @@ const Signup = () => {
     const handleSignup = async (e) => {
       e.preventDefault();
       try {
-        const res = await axios.post('http://localhost:3000/signup', { email, password, name });
+        const res = await axios.post('http://localhost:3001/signup', { email, password, name });
         localStorage.setItem('token', res.data.token);
         setError('');
         navigate('/')
@@ -41,7 +41,7 @@ const Signup = () => {
           </h2>
         </div>
         <div className="z-10 mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form action="#" method="POST" className="space-y-6">
+          <form onSubmit={handleSignup}>
           <div>
               <label htmlFor="email" className="block text-sm z-10 font-medium leading-6 text-white">
                 Name
@@ -90,7 +90,6 @@ const Signup = () => {
             </div>
 
             <div>
-            <form onSubmit={handleSignup}>
               <button
                 type="submit"
                 className="flex w-full justify-center mt-10 rounded-md bg-yellow-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-yellow-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-600"
@@ -98,20 +97,18 @@ const Signup = () => {
                 Sign Up
               </button>
               {error && <p>{error}</p>}
-              </form>
               <div className='mt-2'>
               </div>
             </div>
-          </form>
-
           <p className="mt-10 text-center text-sm text-semibold text-white">
             Already A Member?{' '}
             <Link to="/login" className="font-semibold leading-6 text-yellow-600 hover:text-yellow-500 duration-300">
               Log In
             </Link>
           </p>
+          </form>
         </div>
-      </div>      
+      </div>   
     </div>
     );
   };
