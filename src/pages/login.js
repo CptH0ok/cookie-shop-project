@@ -18,6 +18,7 @@ const Login = () => {
       const res = await axios.post('http://localhost:3000/login', { email, password });
       localStorage.setItem('token', res.data.token);
       setError('');
+      console.log("Login Success")
       navigate('/');  // Redirect to home page after login
     } catch (err) {
       setError('Invalid credentials');
@@ -43,7 +44,7 @@ const Login = () => {
           </h2>
         </div>
         <div className="z-10 mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form action="#" method="POST" className="space-y-6">
+        <form onSubmit={handleLogin}>
             <div>
               <label htmlFor="email" className="block text-sm z-10 font-medium leading-6 text-white">
                 Email address
@@ -84,7 +85,7 @@ const Login = () => {
             </div>
 
             <div>
-            <form onSubmit={handleLogin}>
+
               <button
                 type="submit"
                 className="flex w-full justify-center mt-10 rounded-md bg-yellow-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-yellow-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-600"
@@ -92,12 +93,12 @@ const Login = () => {
                 Log in
               </button>
               {error && <p>{error}</p>}
+              </div>
               </form>
               <div className='mt-2'>
               <GoogleSignIn/>
-              </div>
             </div>
-          </form>
+
 
           <p className="mt-10 text-center text-sm text-semibold text-white">
             Not A Member?{' '}
