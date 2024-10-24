@@ -26,41 +26,26 @@ const Login = () => {
 
   return (
     <div className='relative flex flex-col z-10 min-h-screen h-auto'>
-      <div className='relative top-10 mt-12'>
-      <form onSubmit={handleLogin}>
-        <input className=''
-          type="email"
-          name="email"  // The "name" attribute is used to access the value
-          placeholder="Email"
-          required
-        />
-        <input
-          type="password"
-          name="password"  // The "name" attribute is used to access the value
-          placeholder="Password"
-          required
-        />
-        <button type="submit">Login</button>
-        {error && <p>{error}</p>}
-      </form>
-      <GoogleSignIn />
+      <div className="flex min-h-full bg-unsplash-[ZS3OfU40CQU/lg] bg-no-repeat bg-cover bg-center flex-1 flex-col justify-center z-10 px-6 py-12 lg:px-8">
+        <div class="absolute inset-0 bg-black bg-opacity-75 z-0"></div>
+        <div className="z-10 sm:mx-auto sm:w-full sm:max-w-sm">
+        <div className="z-10 flex justify-center w-full">
+        <img
+          src="https://img.icons8.com/fluency/48/cookies.png"
+          className="z-10 sw-24 h-24 transition ease-in-out delay-150 drop-shadow-md hover:-translate-y-1 hover:scale-110 duration-300"
+        ></img>
+        <p className="z-10 pt-2 pl-1 text-6xl text-nowrap text-white drop-shadow-md font-serif font-bold">
+          Cookie Land
+        </p>
       </div>
-      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <img
-            alt="Your Company"
-            src="https://tailwindui.com/plus/img/logos/mark.svg?color=yellow&shade=600"
-            className="mx-auto h-10 w-auto"
-          />
-          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            Sign in to your account
+          <h2 className="z-10 mt-10 text-center text-2xl font-bold leading-9 tracking-tight font-serif font-bold text-white">
+            Log in to your account
           </h2>
         </div>
-
-        <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+        <div className="z-10 mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           <form action="#" method="POST" className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
+              <label htmlFor="email" className="block text-sm z-10 font-medium leading-6 text-white">
                 Email address
               </label>
               <div className="mt-2">
@@ -77,7 +62,7 @@ const Login = () => {
 
             <div>
               <div className="flex items-center justify-between">
-                <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
+                <label htmlFor="password" className="block text-sm font-medium leading-6 text-white">
                   Password
                 </label>
                 <div className="text-sm">
@@ -99,19 +84,25 @@ const Login = () => {
             </div>
 
             <div>
+            <form onSubmit={handleLogin}>
               <button
                 type="submit"
                 className="flex w-full justify-center rounded-md bg-yellow-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-yellow-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-600"
               >
                 Sign in
               </button>
+              {error && <p>{error}</p>}
+              </form>
+              <div className='mt-2'>
+              <GoogleSignIn/>
+              </div>
             </div>
           </form>
 
-          <p className="mt-10 text-center text-sm text-gray-500">
+          <p className="mt-10 text-center text-sm text-semibold text-white">
             Not a member?{' '}
             <a href="#" className="font-semibold leading-6 text-yellow-600 hover:text-yellow-500">
-              Start a 14 day free trial
+              Sign Up
             </a>
           </p>
         </div>
