@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios';
 import GoogleSignIn from '../components/GoogleSignIn';
 
@@ -38,7 +38,7 @@ const Login = () => {
           Cookie Land
         </p>
       </div>
-          <h2 className="z-10 mt-10 text-center text-2xl font-bold leading-9 tracking-tight font-serif font-bold text-white">
+          <h2 className="z-10 mt-10 text-center text-2xl font-bold leading-9 tracking-tight font-serif font-bold drop-shadow-md text-white">
             Log in to your account
           </h2>
         </div>
@@ -87,9 +87,9 @@ const Login = () => {
             <form onSubmit={handleLogin}>
               <button
                 type="submit"
-                className="flex w-full justify-center rounded-md bg-yellow-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-yellow-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-600"
+                className="flex w-full justify-center mt-10 rounded-md bg-yellow-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-yellow-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-600"
               >
-                Sign in
+                Log in
               </button>
               {error && <p>{error}</p>}
               </form>
@@ -100,10 +100,10 @@ const Login = () => {
           </form>
 
           <p className="mt-10 text-center text-sm text-semibold text-white">
-            Not a member?{' '}
-            <a href="#" className="font-semibold leading-6 text-yellow-600 hover:text-yellow-500">
+            Not A Member?{' '}
+            <Link to="/signup" className="font-semibold leading-6 text-yellow-600 hover:text-yellow-500 duration-300">
               Sign Up
-            </a>
+            </Link>
           </p>
         </div>
       </div>      
