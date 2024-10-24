@@ -15,10 +15,9 @@ const Login = () => {
     const password = e.target.password.value;
 
     try {
-      const res = await axios.post('http://localhost:3000/login', { email, password });
+      const res = await axios.post('http://localhost:3001/login', { email, password });
       localStorage.setItem('token', res.data.token);
       setError('');
-      console.log("Login Success")
       navigate('/');  // Redirect to home page after login
     } catch (err) {
       setError('Invalid credentials');
