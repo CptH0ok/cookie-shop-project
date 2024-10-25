@@ -23,7 +23,13 @@ mongoose.connect(process.env.MONGO_URI,
 // Initialize the Google OAuth2 client
 const client = new OAuth2Client(process.env.REACT_APP_GOOGLE_CLIENT_ID);
 
-const checkAdmin = (req, res, next) => {
+const checkAdmin = async (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1]; // Get token from headers
+
+  // Try verifying the JWT token with your secret
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  req.user = decoded;
+
   if (req.user && req.user.role === 'admin') {
     next(); // The user is an admin, proceed to the next middleware or route
   } else {
@@ -114,7 +120,7 @@ app.post('/signup', async (req, res) => {
     user = new User({ email, password: hashedPassword, name });
     await user.save();
 
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user.id, name: user.name, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.json({ token });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
@@ -129,24 +135,24 @@ app.post('/login', async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ message: 'No such user' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ message: 'Wrong password' });
     }
 
-    const token = jwt.sign({ id: user.id, role: user.role}, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user.id, name: user.name, role: user.role}, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.json({ token });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }
 });
 
-app.get('/admin', authenticateJWT, checkAdmin, (req, res) => {
-  res.sendStatus(200);
+app.get('/admin', checkAdmin, (req, res) => {
+  res.json('Welcome "' + req.user.name + '" to admin panel!');
 });
 
 // Token verification route

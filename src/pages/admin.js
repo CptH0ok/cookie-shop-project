@@ -1,55 +1,43 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode';
+import ErrorPage from './error';
+import './admin.css';
 
 const Admin = () => {
     const token = localStorage.getItem('token');
     const [error, setError] = useState('');
-    const [userRole, setUserRole] = useState(null);
-    const navigate = useNavigate();
+    const [adminPageData, setAdminPageData] = useState(null);
 
     const checkAdmin = async() => {
 
-        if (!token) {
-            setError('');
-            navigate('/login');  // Redirect to home page after login
-            return;
-          }
-
-        try {
-            const res = await axios.get('http://localhost:3000/admin', {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              });
-
-            if (res.status === 200)
-            {
-                setError('');
+        const res = await axios.get('http://localhost:3001/admin', {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            }).then((res) => {;
+                setAdminPageData(res.data);
+        })
+        .catch((err) => {
+            // Handle error
+            if (err.response) {
+            // Server responded with a status other than 2xx
+            setError('Access Denied');
             } else {
-                setError('Access Denied')
+            // Something happened in setting up the request
+            setError(err.response.data.error.message);
             }
-
-            const role = jwtDecode(token).role;
-            setUserRole(role);
-            
-        } catch (err) {
-            setError('Invalid Request: ' + err.message);
-            setUserRole('unauthenticated');
-        }
+        });
     }
     
     checkAdmin();
 
-    if (userRole === "admin"){
-        return(
-            <h2>Welcome to admin panel {error && <p>{error}</p>}</h2>
-        );
-    };
-    return (
-        <h2>{error && <p>{error}</p>}</h2>
-    );
+    return(
+        <div className="page-container">
+            <h2 className="text-center text-xl">
+                {error === '' ? adminPageData : error}
+            </h2>
+        </div>
+    )
 };
 
 export default Admin;
