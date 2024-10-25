@@ -24,7 +24,7 @@ const navigate = useNavigate();
         // Render the Google Sign-In button
         window.google.accounts.id.renderButton(
           document.getElementById('buttonDiv'),
-          { theme: 'outline', size: 'large'} // Customization attributes
+          { theme: 'filled_blue', size: 'large'} // Customization attributes
         );
 
         // Optionally, display the One Tap dialog

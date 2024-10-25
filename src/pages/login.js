@@ -94,7 +94,7 @@ const Login = () => {
               {error && <p>{error}</p>}
               </div>
               </form>
-              <div className='mt-2'>
+              <div className='flex w-full justify-center mt-10 rounded-md mt-2'>
               <GoogleSignIn/>
             </div>
 
