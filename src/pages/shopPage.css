@@ -116,13 +116,13 @@ body {
   
   /* Background Images */
   .bg-unsplash-cookie-list {
-    background-image: url('path/to/your/cookie-list-image.jpg');
+    background-image: url('../assets/errbg.png');
     background-size: cover;
     background-position: center;
   }
   
   .bg-unsplash-footer {
-    background-image: url('path/to/your/footer-image.jpg');
+    background-image: url('../assets/errbg.png');
     background-size: cover;
     background-position: center;
   }

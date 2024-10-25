@@ -1,15 +1,8 @@
-<<<<<<< Updated upstream
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import ProductCard from '../components/productcard';
-=======
 // client/src/components/shopPage.js : for the actual shopping page
 "use client";
 
 import { useState, useEffect } from "react";
 import './shopPage.css';
-
->>>>>>> Stashed changes
 
 const ShopPage = () => {
   const [cookies, setCookies] = useState([]);
