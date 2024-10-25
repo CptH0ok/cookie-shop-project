@@ -8,7 +8,7 @@ const FB = require('./facebookapi');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { OAuth2Client } = require('google-auth-library');
-const User = require('./models/User'); // MongoDB User Model
+const User = require('./models/user'); // MongoDB User Model
 
 const app = express();
 
@@ -102,7 +102,7 @@ app.post('/signup', async (req, res) => {
   const { email, password, name } = req.body;
 
   try {
-    let user = await User.findOne({ email });
+    let user = await User.findOne({ email });ד
 
     if (user) {
       return res.status(400).json({ message: 'User already exists' });

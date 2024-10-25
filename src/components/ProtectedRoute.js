@@ -49,9 +49,9 @@ const ProtectedRoute = ({ element, ...rest }) => {
     return <div>Loading...</div>;
   }
 
-  // Redirect to login if not authenticated
+  // Redirect to homepage if not authenticated
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   // Display error message if any
