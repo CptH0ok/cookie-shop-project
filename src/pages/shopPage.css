@@ -1,0 +1,152 @@
+/* General Styling */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Serif", sans-serif;
+    background-color: #000; /* Black background for the dark theme */
+    color: white;
+  }
+  
+  h1,
+  h2 {
+    color: #fff;
+  }
+  
+  /* Header Section Styling */
+  .header {
+    background-size: cover;
+    background-position: center;
+    position: relative;
+  }
+  
+  .header h1 {
+    font-size: 4rem;
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  .header p {
+    margin-top: 1.5rem;
+    font-size: 1.125rem;
+    text-align: center;
+  }
+  
+  /* Overlay for darkening background images */
+  .header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.75); /* Dark overlay */
+  }
+  
+  /* Cookie List Section */
+  .cookie-list {
+    padding: 2rem 1rem;
+    background-color: #000;
+  }
+  
+  .cookie-list .cookie-item {
+    background-color: white;
+    color: black;
+    width: 18rem;
+    padding: 1rem;
+    border-radius: 10px;
+    margin: 1rem;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+  }
+  
+  .cookie-list .cookie-item:hover {
+    transform: translateY(-5px);
+  }
+  
+  .cookie-item img {
+    width: 100%;
+    height: 12rem;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  
+  .cookie-item h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-top: 0.75rem;
+  }
+  
+  .cookie-item p {
+    font-size: 1rem;
+    margin: 0.5rem 0;
+  }
+  
+  .cookie-item .price {
+    color: #f39c12;
+    font-size: 1.25rem;
+    font-weight: bold;
+  }
+  
+  /* Stock status */
+  .cookie-item .in-stock {
+    color: #27ae60; /* Green for in stock */
+  }
+  
+  .cookie-item .out-of-stock {
+    color: #e74c3c; /* Red for out of stock */
+  }
+  
+  /* Footer Section */
+  .footer {
+    padding: 3rem 0;
+    background-color: #000;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  
+  .footer h1 {
+    font-size: 3rem;
+    font-weight: bold;
+  }
+  
+  .footer p {
+    margin-top: 1rem;
+    font-size: 1.125rem;
+    max-width: 35rem;
+  }
+  
+  /* Background Images */
+  .bg-unsplash-cookie-list {
+    background-image: url('path/to/your/cookie-list-image.jpg');
+    background-size: cover;
+    background-position: center;
+  }
+  
+  .bg-unsplash-footer {
+    background-image: url('path/to/your/footer-image.jpg');
+    background-size: cover;
+    background-position: center;
+  }
+  
+  /* Responsive Design */
+  @media (min-width: 640px) {
+    .cookie-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+    }
+  
+    .cookie-item {
+      width: 22rem;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .header h1 {
+      font-size: 6rem;
+    }
+  
+    .cookie-item {
+      width: 24rem;
+    }
+  }
+  
