@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import './shopPage.css';
+import './shoppage.css';
 
 const ShopPage = () => {
   const [cookies, setCookies] = useState([]);
