@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Example of creating reusable classes using @apply */
+.title {
+  @apply relative text-balance z-10 text-white text-4xl font-bold font-serif tracking-tight sm:text-6xl;
+}
+
+.title_opening {
+  @apply relative z-10 mt-6 text-lg leading-8 text-white font-serif;
+}
+.paragraph {
+  @apply text-2xl mt-4 ml-10 mr-10 mb-10 text-center text-pretty font-serif font-light tracking-tight;
+}
