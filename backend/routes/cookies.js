@@ -1,7 +1,7 @@
 //retrieve the cookies from the DB
 
 const express = require('express');
-const Cookie = require('../models/cookie');
+const Cookie = require('../models/cookie.js');
 const router = express.Router();
 
 // Get all cookies
