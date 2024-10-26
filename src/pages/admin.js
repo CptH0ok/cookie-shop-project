@@ -10,7 +10,7 @@ const Admin = () => {
 
     const checkAdmin = async() => {
 
-        const res = await axios.get('http://localhost:3001/admin', {
+        const res = await axios.get('http://localhost:3001/api/admin', {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
