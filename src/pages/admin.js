@@ -21,10 +21,10 @@ const Admin = () => {
             // Handle error
             if (err.response) {
             // Server responded with a status other than 2xx
-            setError('Access Denied');
+            setError(err.response.data);
             } else {
             // Something happened in setting up the request
-            setError(err.response.data.error.message);
+            setError(err.response.data);
             }
         });
     }

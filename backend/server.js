@@ -24,11 +24,9 @@ mongoose.connect(process.env.MONGO_URI,
 const client = new OAuth2Client(process.env.REACT_APP_GOOGLE_CLIENT_ID);
 
 const checkAdmin = async (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1]; // Get token from headers
-
-  // Try verifying the JWT token with your secret
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  req.user = decoded;
+  const email = req.user.email
+  let user = await User.findOne({ email }); //add user role from database
+  req.user.role = user.role;
 
   if (req.user && req.user.role === 'admin') {
     next(); // The user is an admin, proceed to the next middleware or route
@@ -103,12 +101,30 @@ app.get('/api/getlastdatacomments', async (req, res, next) => {
   }
 });
 
+//using the authenticateJWT just to parse the token
+app.get('/googlelogin', authenticateJWT, async(req, res) => {
+  const [email, name] = [req.user.email, req.user.name];
+
+  let user = await User.findOne({ email });
+
+  if (user) {
+    console.info('User already exists in db');
+  }
+
+  else{
+    user = new User({ email, name, role: 'admin' });
+    await user.save();
+  }
+
+  res.sendStatus('200');
+});
+
 // Email Sign Up
 app.post('/signup', async (req, res) => {
   const { email, password, name } = req.body;
 
   try {
-    let user = await User.findOne({ email });ד
+    let user = await User.findOne({ email });
 
     if (user) {
       return res.status(400).json({ message: 'User already exists' });
@@ -120,7 +136,7 @@ app.post('/signup', async (req, res) => {
     user = new User({ email, password: hashedPassword, name });
     await user.save();
 
-    const token = jwt.sign({ id: user.id, name: user.name, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user.id, name: user.name, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
     res.json({ token });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
@@ -144,20 +160,20 @@ app.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Wrong password' });
     }
 
-    const token = jwt.sign({ id: user.id, name: user.name, role: user.role}, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user.id, name: user.name, role: user.role}, process.env.JWT_SECRET, { expiresIn: '1d' });
     res.json({ token });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }
 });
 
-app.get('/admin', checkAdmin, (req, res) => {
+app.get('/admin', authenticateJWT, checkAdmin, (req, res) => {
   res.json('Welcome "' + req.user.name + '" to admin panel!');
 });
 
 // Token verification route
 app.get('/verify-token', authenticateJWT, (req, res) => {
-  res.sendStatus(200); // Send 200 OK if the token is valid
+  res.status(200).json({ name: req.user.name}); // Send 200 OK if the token is valid
 });
 
 // Error handling middleware
