@@ -102,7 +102,7 @@ app.get('/api/getlastdatacomments', async (req, res, next) => {
 });
 
 //using the authenticateJWT just to parse the token
-app.get('/googlelogin', authenticateJWT, async(req, res) => {
+app.get('/api/googlelogin', authenticateJWT, async(req, res) => {
   const [email, name] = [req.user.email, req.user.name];
 
   let user = await User.findOne({ email });
@@ -120,7 +120,7 @@ app.get('/googlelogin', authenticateJWT, async(req, res) => {
 });
 
 // Email Sign Up
-app.post('/signup', async (req, res) => {
+app.post('/api/signup', async (req, res) => {
   const { email, password, name } = req.body;
 
   try {
@@ -144,7 +144,7 @@ app.post('/signup', async (req, res) => {
 });
 
 // Email Login
-app.post('/login', async (req, res) => {
+app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
@@ -167,12 +167,12 @@ app.post('/login', async (req, res) => {
   }
 });
 
-app.get('/admin', authenticateJWT, checkAdmin, (req, res) => {
+app.get('/api/admin', authenticateJWT, checkAdmin, (req, res) => {
   res.json('Welcome "' + req.user.name + '" to admin panel!');
 });
 
 // Token verification route
-app.get('/verify-token', authenticateJWT, (req, res) => {
+app.get('/api/verify-token', authenticateJWT, (req, res) => {
   res.status(200).json({ name: req.user.name}); // Send 200 OK if the token is valid
 });
 
