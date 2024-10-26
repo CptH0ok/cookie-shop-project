@@ -26,13 +26,21 @@ const client = new OAuth2Client(process.env.REACT_APP_GOOGLE_CLIENT_ID);
 const checkAdmin = async (req, res, next) => {
   const email = req.user.email
   let user = await User.findOne({ email }); //add user role from database
-  req.user.role = user.role;
 
-  if (req.user && req.user.role === 'admin') {
-    next(); // The user is an admin, proceed to the next middleware or route
+  if(req.user){
+    req.user.role = user.role;
+
+    if (req.user.role === 'admin') {
+      next(); // The user is an admin, proceed to the next middleware or route
+    } else {
+      return res.status(403).send('Access denied. Admins only.');
+    }
   } else {
-    return res.status(403).send('Access denied. Admins only.');
+    return res.status(500).send('Internal Error');
   }
+  
+
+  
 };
 
 // Middleware to authenticate JWT
@@ -136,7 +144,7 @@ app.post('/api/signup', async (req, res) => {
     user = new User({ email, password: hashedPassword, name });
     await user.save();
 
-    const token = jwt.sign({ id: user.id, name: user.name, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    const token = jwt.sign({ id: user.id, name: user.name, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
     res.json({ token });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
@@ -160,7 +168,7 @@ app.post('/api/login', async (req, res) => {
       return res.status(400).json({ message: 'Wrong password' });
     }
 
-    const token = jwt.sign({ id: user.id, name: user.name, role: user.role}, process.env.JWT_SECRET, { expiresIn: '1d' });
+    const token = jwt.sign({ id: user.id, name: user.name, email: user.email, role: user.role}, process.env.JWT_SECRET, { expiresIn: '1d' });
     res.json({ token });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
