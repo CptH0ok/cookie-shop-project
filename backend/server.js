@@ -9,7 +9,8 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { OAuth2Client } = require('google-auth-library');
 const User = require('./models/user'); // MongoDB User Model
-const cookieRoutes = require('./routes/cookies');
+const Cookie = require('./models/cookie.js');
+
 
 const app = express();
 
@@ -98,11 +99,17 @@ app.get('/api/getlastdatacomments', async (req, res, next) => {
   }
 });
 
+app.get('/api/cookies', async (req, res) => {
+  try {
+    const cookies = await Cookie.find({});
+    res.json(cookies);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // Middleware to serve static images
 app.use('/images', express.static('images'));
-
-// Use the cookies routes
-app.use('/api/cookies', cookieRoutes);
 
 
 // Email Sign Up
