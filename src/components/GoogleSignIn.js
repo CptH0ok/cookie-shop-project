@@ -1,16 +1,30 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useNavigate } from "react-router-dom";
 
 const GoogleSignIn = () => {
-const navigate = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const handleCredentialResponse = (response) => {
+    const handleCredentialResponse = async (response) => {
       localStorage.setItem('token', response.credential);
-      navigate('/');  // Redirect to home page
+      const token = response.credential;
+      const res = await axios.get('http://localhost:3001/googlelogin', {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+        }).then((res) => {;
+            console.log("good");
+    })
+    .catch((err) => {
+        // Handle error
+        console.log("bad");
+    });
+
+    navigate('/');
     };
 
-    const loadGoogleScript = () => {
+    const loadGoogleScript = async () => {
       const script = document.createElement('script');
       script.src = 'https://accounts.google.com/gsi/client';
       script.async = true;
