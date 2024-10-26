@@ -1,16 +1,30 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useNavigate } from "react-router-dom";
 
 const GoogleSignIn = () => {
-const navigate = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const handleCredentialResponse = (response) => {
+    const handleCredentialResponse = async (response) => {
       localStorage.setItem('token', response.credential);
-      navigate('/');  // Redirect to home page
+      const token = response.credential;
+      const res = await axios.get('http://localhost:3001/api/googlelogin', {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+        }).then((res) => {;
+            console.log("good");
+    })
+    .catch((err) => {
+        // Handle error
+        console.log("bad");
+    });
+
+    navigate('/');
     };
 
-    const loadGoogleScript = () => {
+    const loadGoogleScript = async () => {
       const script = document.createElement('script');
       script.src = 'https://accounts.google.com/gsi/client';
       script.async = true;
@@ -24,7 +38,7 @@ const navigate = useNavigate();
         // Render the Google Sign-In button
         window.google.accounts.id.renderButton(
           document.getElementById('buttonDiv'),
-          { theme: 'outline', size: 'large'} // Customization attributes
+          { theme: 'filled_blue', size: 'large'} // Customization attributes
         );
 
         // Optionally, display the One Tap dialog

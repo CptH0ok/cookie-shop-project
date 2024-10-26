@@ -1,0 +1,9 @@
+.page-container {
+    width: 80%; /* Adjust width as needed */
+    margin: 0 auto; /* Horizontally center the container */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 250px;
+    position: relative;
+  }

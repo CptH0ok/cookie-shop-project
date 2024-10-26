@@ -15,7 +15,7 @@ const Login = () => {
     const password = e.target.password.value;
 
     try {
-      const res = await axios.post('http://localhost:3001/login', { email, password });
+      const res = await axios.post('http://localhost:3001/api/login', { email, password });
       localStorage.setItem('token', res.data.token);
       setError('');
       navigate('/');  // Redirect to home page after login
@@ -94,7 +94,7 @@ const Login = () => {
               {error && <p>{error}</p>}
               </div>
               </form>
-              <div className='mt-2'>
+              <div className='flex w-full justify-center mt-10 rounded-md mt-2'>
               <GoogleSignIn/>
             </div>
 
