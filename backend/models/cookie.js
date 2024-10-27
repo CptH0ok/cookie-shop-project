@@ -1,5 +1,3 @@
-// server/models/cookie.js
-
 const mongoose = require('mongoose');
 
 const cookieSchema = new mongoose.Schema({
@@ -35,7 +33,7 @@ const cookieSchema = new mongoose.Schema({
     type: Boolean,
     required: true,
   }
-});
+}, { collection: 'cookie_shop' }); // Specify the collection name here
 
 const Cookie = mongoose.model('Cookie', cookieSchema);
 
