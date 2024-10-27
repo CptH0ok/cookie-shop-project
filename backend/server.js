@@ -18,6 +18,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Serve static images from the "images" folder
+app.use('/images', express.static(path.join(__dirname, 'images')));
+
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI,
    {}).then(() => console.log('MongoDB Connected'));
@@ -112,16 +115,19 @@ app.get('/api/getlastdatacomments', async (req, res, next) => {
 });
 
 app.get('/api/cookies', async (req, res) => {
+  console.log('Fetching cookies');
   try {
     const cookies = await Cookie.find({});
+    console.log('Fetched cookies:', cookies); // Log the cookies retrieved
     res.json(cookies);
   } catch (err) {
+    console.error('Error fetching cookies:', err); // Log any errors
     res.status(500).json({ message: err.message });
   }
 });
 
-// Middleware to serve static images
-app.use('/images', express.static('images'));
+
+
 
 
 //using the authenticateJWT just to parse the token
