@@ -7,7 +7,7 @@ import Signup from './pages/signup';
 import LoginSuccess from './components/loginsuccess';
 import ProtectedRoute from './components/protectedroute';
 import ShopPage from './pages/shoppage';
-import Maps from './pages/maps';
+import Branches from './pages/branches';
 import Reviews from './pages/reviews';
 import Admin from './pages/admin';
 import ErrorPage from './pages/error';
@@ -17,7 +17,7 @@ function AppContent() {
 
   const pathsWithLayout = [
     "/", "/login/success",
-    "/shop", "/maps", "/reviews", "/admin"
+    "/shop", "/branches", "/reviews", "/admin"
   ];
 
   const showLayout = pathsWithLayout.includes(location.pathname);
@@ -35,7 +35,7 @@ function AppContent() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/login/success" element={<LoginSuccess />} />
         <Route path="/shop" element={<ProtectedRoute element={<ShopPage />} />} />
-        <Route path="/maps" element={<ProtectedRoute element={<Maps />} />} />
+        <Route path="/branches" element={<Branches />} />
         <Route path="/reviews" element={<ProtectedRoute element={<Reviews />} />} />
         <Route path="/admin" element={<ProtectedRoute element={<Admin />} />} />
         <Route path="*" element={<ErrorPage />} />
