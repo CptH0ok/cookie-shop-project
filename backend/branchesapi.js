@@ -54,8 +54,10 @@ router.get('/list', async (req, res) => {
 
 // 5. Enhanced Search branches by name, city, opening hours, or services
 router.get('/search', async (req, res) => {
-    const { name, city, day, time, delivery, takeaway, dineIn } = req.query;
+    const { id, name, city, day, time, delivery, takeaway, dineIn } = req.query;
     const searchCriteria = {};
+
+    if (id) searchCriteria._id = id;
 
     // Filter by branch name (case-insensitive, partial match)
     if (name) searchCriteria.name = new RegExp(name, 'i');
@@ -81,6 +83,11 @@ router.get('/search', async (req, res) => {
     } catch (error) {
         res.status(400).json({ message: 'Error searching branches', error });
     }
+
+    //example of filtering:
+    // GET /api/branches/search?city=New%20York
+    // GET /api/branches/search?delivery=true
+
 });
 
 // 6. Function to get Google Maps iframe for a branch location
@@ -95,8 +102,8 @@ router.get('/map/:id', async (req, res) => {
         const addressQuery = `${streetNumber}+${streetName},+${city},+${state},+${country}`;
         const mapUrl = `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${encodeURIComponent(addressQuery)}`;
 
-        res.send(`
-            <div class="map-container">
+        res.json({ mapIframeHtml: `
+            <div class="branch-container">
                 <iframe
                     width="100%"
                     height="100%"
@@ -107,7 +114,7 @@ router.get('/map/:id', async (req, res) => {
                     src="${mapUrl}">
                 </iframe>
             </div>
-        `);
+        ` });
     } catch (error) {
         res.status(400).json({ message: 'Error fetching map iframe', error });
     }
