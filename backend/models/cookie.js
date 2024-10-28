@@ -35,6 +35,7 @@ const cookieSchema = new mongoose.Schema({
   }
 }, { collection: 'cookie_shop' }); // Specify the collection name here
 
+
 const Cookie = mongoose.model('Cookie', cookieSchema);
 
 module.exports = Cookie;
