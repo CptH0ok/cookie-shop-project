@@ -3,6 +3,7 @@
 const express = require('express');
 const Branch = require('./models/branch'); // Assuming Branch model is in models folder
 const router = express.Router();
+const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 
 // 1. Create a new branch
 router.post('/create', async (req, res) => {
