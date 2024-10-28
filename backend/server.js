@@ -22,8 +22,8 @@ app.use(express.json());
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI,
-   {}).then(() => console.log('MongoDB Connected'));
+mongoose.connect(process.env.MONGO_URI, {dbName: 'cookie_DB'}
+   ).then(() => console.log('MongoDB Connected'));
 
 // Initialize the Google OAuth2 client
 const client = new OAuth2Client(process.env.REACT_APP_GOOGLE_CLIENT_ID);
