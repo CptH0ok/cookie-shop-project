@@ -1,12 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Dialog, DialogPanel } from "@headlessui/react";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 
 const HomePage = () => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   return (
     <div className="relative flex flex-col z-10 min-h-screen h-auto">
       <div className="relative bg-unsplash-[1Gv_4RcljOE/lg] bg-no-repeat bg-cover z-10">

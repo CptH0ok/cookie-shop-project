@@ -8,7 +8,7 @@ const FB = require('./facebookapi');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { OAuth2Client } = require('google-auth-library');
-const User = require('./models/User'); // MongoDB User Model
+const User = require('./models/user'); // MongoDB User Model
 
 const app = express();
 
@@ -23,12 +23,24 @@ mongoose.connect(process.env.MONGO_URI,
 // Initialize the Google OAuth2 client
 const client = new OAuth2Client(process.env.REACT_APP_GOOGLE_CLIENT_ID);
 
-const checkAdmin = (req, res, next) => {
-  if (req.user && req.user.role === 'admin') {
-    next(); // The user is an admin, proceed to the next middleware or route
+const checkAdmin = async (req, res, next) => {
+  const email = req.user.email
+  let user = await User.findOne({ email }); //add user role from database
+
+  if(req.user){
+    req.user.role = user.role;
+
+    if (req.user.role === 'admin') {
+      next(); // The user is an admin, proceed to the next middleware or route
+    } else {
+      return res.status(403).send('Access denied. Admins only.');
+    }
   } else {
-    return res.status(403).send('Access denied. Admins only.');
+    return res.status(500).send('Internal Error');
   }
+  
+
+  
 };
 
 // Middleware to authenticate JWT
@@ -97,8 +109,26 @@ app.get('/api/getlastdatacomments', async (req, res, next) => {
   }
 });
 
+//using the authenticateJWT just to parse the token
+app.get('/api/googlelogin', authenticateJWT, async(req, res) => {
+  const [email, name] = [req.user.email, req.user.name];
+
+  let user = await User.findOne({ email });
+
+  if (user) {
+    console.info('User already exists in db');
+  }
+
+  else{
+    user = new User({ email, name, role: 'admin' });
+    await user.save();
+  }
+
+  res.sendStatus('200');
+});
+
 // Email Sign Up
-app.post('/signup', async (req, res) => {
+app.post('/api/signup', async (req, res) => {
   const { email, password, name } = req.body;
 
   try {
@@ -114,7 +144,7 @@ app.post('/signup', async (req, res) => {
     user = new User({ email, password: hashedPassword, name });
     await user.save();
 
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user.id, name: user.name, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
     res.json({ token });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
@@ -122,36 +152,36 @@ app.post('/signup', async (req, res) => {
 });
 
 // Email Login
-app.post('/login', async (req, res) => {
+app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ message: 'No such user' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ message: 'Wrong password' });
     }
 
-    const token = jwt.sign({ id: user.id, role: user.role}, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user.id, name: user.name, email: user.email, role: user.role}, process.env.JWT_SECRET, { expiresIn: '1d' });
     res.json({ token });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }
 });
 
-app.get('/admin', authenticateJWT, checkAdmin, (req, res) => {
-  res.sendStatus(200);
+app.get('/api/admin', authenticateJWT, checkAdmin, (req, res) => {
+  res.json('Welcome "' + req.user.name + '" to admin panel!');
 });
 
 // Token verification route
-app.get('/verify-token', authenticateJWT, (req, res) => {
-  res.sendStatus(200); // Send 200 OK if the token is valid
+app.get('/api/verify-token', authenticateJWT, (req, res) => {
+  res.status(200).json({ name: req.user.name}); // Send 200 OK if the token is valid
 });
 
 // Error handling middleware
