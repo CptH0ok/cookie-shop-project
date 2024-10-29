@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import './Reviews.css'; // Custom CSS for styles
+import './reviews.css'; // Custom CSS for styles
 
 const Reviews = () => {
   const [reviews, setReviews] = useState([]);

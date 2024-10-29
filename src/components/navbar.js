@@ -1,8 +1,12 @@
 import React from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Dialog, DialogBackdrop, DialogPanel, DialogTitle, TransitionChild } from '@headlessui/react'
+import { XMarkIcon } from '@heroicons/react/24/outline'
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false)
 
   const handleLogout = () => {
     localStorage.removeItem("token"); // Remove token on logout
@@ -11,7 +15,7 @@ const Navbar = () => {
 
   return (
     <nav className="flex absolute backdrop-blur-md backdrop-contrast-75 pt-3 pb-2 z-20 w-full drop-shadow-2xl">
-      <div className="flex pl-4">
+      <button className="flex pl-4" onClick={() => setOpen(true)}>
         <svg
           class="size-12 stroke-white/30 hover:stroke-white duration-500"
           xmlns="http://www.w3.org/2000/svg"
@@ -25,7 +29,7 @@ const Navbar = () => {
             d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
           />
         </svg>
-      </div>
+      </button>
       <div className="flex justify-center w-full">
         <img
           src="https://img.icons8.com/fluency/48/cookies.png"
@@ -56,7 +60,7 @@ const Navbar = () => {
 
         <a className="text-sm font-sans text-nowrap font-semibold">Sign Up</a>
       </Link>
-      <Link to={"/Login"}
+      <Link to={"/login"}
         className="mr-4 mt-2 relative flex z-10 h-10 rounded-md ring-1 text-white/70 stroke-white/30 ring-white/30 bg-white/5 duration-500 hover:ring-white hover:stroke-black hover:text-black hover:bg-white px-2.5 py-2.5 drop-shadow-md duration-500"
       >
         <svg
@@ -75,6 +79,45 @@ const Navbar = () => {
         </svg>
         <a className="text-sm font-sans font-semibold">Login</a>
       </Link>
+
+
+      <Dialog open={open} onClose={setOpen} className="relative z-20">
+      <DialogBackdrop
+        transition
+        className="fixed inset-0 backdrop-blur-2xl bg-contrast-75 transition-opacity drop-shadow-2xl duration-500 ease-in-out data-[closed]:opacity-0"
+      />
+
+      <div className="fixed inset-0 overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="pointer-events-none fixed inset-y-0 left-0 flex max-w-full ">
+            <DialogPanel
+              transition
+              className="pointer-events-auto relative w-screen max-w-xs transform transition duration-500 ease-in-out data-[closed]:-translate-x-full sm:duration-500"
+            >
+              <TransitionChild>
+                <div className="absolute right-2 top-0 -ml-8 flex pl-2 pt-2 duration-500 ease-in-out data-[closed]:opacity-0 sm:-mr-10 sm:pl-0">
+                  <button
+                    type="button"
+                    onClick={() => setOpen(false)}
+                    className="relative rounded-md text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+                  >
+                    <span className="absolute -inset-2.5" />
+                    <span className="sr-only">Close panel</span>
+                    <XMarkIcon aria-hidden="true" className="h-6 w-6" />
+                  </button>
+                </div>
+              </TransitionChild>
+              <div className="flex h-full flex-col overflow-y-scroll bg-black py-6 shadow-xl">
+                <div className="px-4 sm:px-6">
+                  <DialogTitle className="text-base font-semibold leading-6 text-white">Panel title</DialogTitle>
+                </div>
+                <div className="relative mt-6 flex-1 px-4 sm:px-6">{/* Your content */}</div>
+              </div>
+            </DialogPanel>
+          </div>
+        </div>
+      </div>
+    </Dialog>
     </nav>
   );
 };
