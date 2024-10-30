@@ -2,11 +2,12 @@
 
 const express = require('express');
 const User = require('./models/user');
+const PurchaseHistory = require('./models/purchasehistory');
 const router = express.Router();
-const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+const {authenticateJWT, checkAdmin, checkPermissions} = require('./middlewares');
 
 // 1. Create a new user
-router.post('/create', async (req, res) => {
+router.post('/create', authenticateJWT, checkAdmin, async (req, res) => {
     try {
         const newUser = new User(req.body);
         const savedUser = await newUser.save();
@@ -17,7 +18,7 @@ router.post('/create', async (req, res) => {
 });
 
 // 2. Update a user by ID
-router.put('/update/:id', async (req, res) => {
+router.put('/update/:id', authenticateJWT, checkPermissions, async (req, res) => {
     try {
         const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!updatedUser) {
@@ -30,7 +31,7 @@ router.put('/update/:id', async (req, res) => {
 });
 
 // 3. Delete a user by ID
-router.delete('/delete/:id', async (req, res) => {
+router.delete('/delete/:id', authenticateJWT, checkPermissions, async (req, res) => {
     try {
         const deletedUser = await User.findByIdAndDelete(req.params.id);
         if (!deletedUser) {
@@ -43,7 +44,7 @@ router.delete('/delete/:id', async (req, res) => {
 });
 
 // 4. List all users
-router.get('/list', async (req, res) => {
+router.get('/list', authenticateJWT, async (req, res) => {
     try {
         const users = await User.find();
         res.json(users);
@@ -53,7 +54,7 @@ router.get('/list', async (req, res) => {
 });
 
 // 5. Enhanced Search users by name, city, opening hours, or services
-router.get('/search', async (req, res) => {
+router.get('/search', authenticateJWT, async (req, res) => {
     const { id, googleId, email, name, role } = req.query;
     const searchCriteria = {};
 
@@ -78,9 +79,21 @@ router.get('/search', async (req, res) => {
     }
 
     //example of filtering:
-    // GET /api/users/search?city=New%20York
-    // GET /api/users/search?delivery=true
+    // GET /api/users/search?name=ethan
+    // GET /api/users/search?role=admin
 
 });
+
+// 6. get purchase history of specific user
+router.get('/:userId/purchase-history', authenticateJWT, checkPermissions, async (req, res) => {
+    try {
+        const purchases = await PurchaseHistory.find({ memberId: req.params.userId });
+        res.json(purchases);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching purchase history', error });
+    }
+});
+
+
 
 module.exports = router;
