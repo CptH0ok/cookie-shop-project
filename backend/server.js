@@ -10,6 +10,7 @@ const bcrypt = require('bcryptjs');
 const { OAuth2Client } = require('google-auth-library');
 const User = require('./models/user');
 const branchesApi = require('./branchesapi');
+const usersApi = require('./usersapi');
 const convertCurrency = require('./currencyapi')
 
 const app = express();
@@ -18,6 +19,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use('/api/branches', branchesApi);
+app.use('/api/users', usersApi);
 app.use('/api/currency', convertCurrency);
 
 // Connect to MongoDB
