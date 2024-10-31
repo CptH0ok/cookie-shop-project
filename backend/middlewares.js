@@ -1,3 +1,7 @@
+const { OAuth2Client } = require('google-auth-library');
+const client = new OAuth2Client(process.env.REACT_APP_GOOGLE_CLIENT_ID);
+const jwt = require('jsonwebtoken');
+
 const checkPermissions = async (req, res, next) => {
     if (req.params.userId !== req.user?._id){
         checkAdmin(req, res, (err) => {
@@ -37,6 +41,7 @@ const checkPermissions = async (req, res, next) => {
       req.user = decoded;
       return next(); // Valid token, proceed to the next middleware
     } catch (err) {
+      console.info('Invalid token:', err);
       // If verification fails, it might be a Google token
       try {
         const ticket = await client.verifyIdToken({
@@ -46,7 +51,7 @@ const checkPermissions = async (req, res, next) => {
         req.user = ticket.getPayload(); // Store user information in req.user
         return next(); // Valid Google token, proceed to the next middleware
       } catch (error) {
-        console.error('Invalid token:', error);
+        console.error('Invalid Google token:', error);
         return res.sendStatus(403); // Forbidden if the token is invalid
       }
     }
