@@ -44,8 +44,6 @@ const checkAdmin = async (req, res, next) => {
     return res.status(500).send('Internal Error');
   }
   
-
-  
 };
 
 // Middleware to authenticate JWT
@@ -127,28 +125,50 @@ app.get('/api/cookies', async (req, res) => {
   }
 });
 
-// Search and filter by category and stock status - if we want to add more fields we can
+// Search and filter by category, name (in sensitive) and stock status - if we want to add more fields we can
 app.get('/api/cookies/search', async (req, res) => {
-  const { category, available } = req.query;
-  
+  const { name, category, available } = req.query;
+
   // Building the filter object based on query parameters
   let filter = {};
-  if (category) {
-    filter.category = category;
+
+  // Search by name if provided
+  if (name) {
+      filter.name = { $regex: new RegExp(name, 'i') }; // Case-insensitive search
   }
+
+  // Search by category if provided
+  if (category) {
+      filter.category = category; // Assuming exact match
+  }
+
+  // Search by availability if provided
   if (available !== undefined) {
-    filter.available = available === 'true';
+      filter.available = available === 'true'; // Convert string to boolean
   }
 
   try {
-    const cookies = await Cookie.find(filter);
-    res.json(cookies);
+      const cookies = await Cookie.find(filter);
+      res.json(cookies);
   } catch (err) {
-    console.error('Error fetching filtered cookies:', err);
-    res.status(500).json({ message: err.message });
+      console.error('Error fetching filtered cookies:', err);
+      res.status(500).json({ message: err.message });
   }
 });
 
+
+// Fetch unique categories from cookies - for the filter bar.
+//can also do it staticly if we prefer and delete this
+app.get('/api/cookies/categories', async (req, res) => {
+  try {
+      const cookies = await Cookie.find({});
+      const uniqueCategories = [...new Set(cookies.map(cookie => cookie.category))];
+      res.json(uniqueCategories);
+  } catch (err) {
+      console.error('Error fetching categories:', err);
+      res.status(500).json({ message: err.message });
+  }
+});
 
 
 //using the authenticateJWT just to parse the token
@@ -244,7 +264,7 @@ doing it by the name of the cookie and not by _id (for the admins convenience)
 it is case-insensitive*/
 
 app.put('/api/cookies/:name', authenticateJWT, checkAdmin, async (req, res) => {
-  const cookieName = req.params.name;
+  const cookieName = decodeURIComponent(req.params.name);
   const updatedData = req.body;
 
   try {
