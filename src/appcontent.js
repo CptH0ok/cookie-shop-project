@@ -14,13 +14,15 @@ import ErrorPage from './pages/error';
 import CookieDetailPage from './components/cookiedetailpage';
 import GlutenFreePage from './pages/glutenfreepage';
 import AboutUsPage from './pages/aboutus';
+import AboutUsPage from './pages/aboutus';
+import ContactUsPage from './pages/contactus';
 
 function AppContent() {
   const location = useLocation();
 
   const pathsWithLayout = [
     "/", "/login/success",
-    "/shop", "/branches", "/reviews", "/admin", "/glutenfree", "/aboutus"
+    "/shop", "/branches", "/reviews", "/admin", "/glutenfree", "/aboutus", "/contactus"
   ];
 
   const showLayout = pathsWithLayout.includes(location.pathname);
@@ -40,6 +42,8 @@ function AppContent() {
         <Route path="/aboutus" element={<AboutUsPage />} />
         <Route path="/shop" element={<ShopPage />} />
         <Route path="/cookie/:name" element={<CookieDetailPage />} />
+        <Route path="/aboutus" element={<AboutUsPage />} />
+        <Route path="/contactus" element={<ContactUsPage />} />
         <Route path="/branches" element={<Branches />} />
         <Route path="/reviews" element={<ProtectedRoute element={<Reviews />} />} />
         <Route path="/admin" element={<ProtectedRoute element={<Admin />} />} />
