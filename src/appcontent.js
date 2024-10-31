@@ -11,13 +11,15 @@ import Branches from './pages/branches';
 import Reviews from './pages/reviews';
 import Admin from './pages/admin';
 import ErrorPage from './pages/error';
+import AboutUsPage from './pages/aboutus';
+import ContactUsPage from './pages/contactus';
 
 function AppContent() {
   const location = useLocation();
 
   const pathsWithLayout = [
     "/", "/login/success",
-    "/shop", "/branches", "/reviews", "/admin"
+    "/shop", "/branches", "/reviews", "/admin", "/aboutus", "/contactus"
   ];
 
   const showLayout = pathsWithLayout.includes(location.pathname);
@@ -35,6 +37,8 @@ function AppContent() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/login/success" element={<LoginSuccess />} />
         <Route path="/shop" element={<ProtectedRoute element={<ShopPage />} />} />
+        <Route path="/aboutus" element={<AboutUsPage />} />
+        <Route path="/contactus" element={<ContactUsPage />} />
         <Route path="/branches" element={<Branches />} />
         <Route path="/reviews" element={<ProtectedRoute element={<Reviews />} />} />
         <Route path="/admin" element={<ProtectedRoute element={<Admin />} />} />
