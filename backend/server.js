@@ -7,7 +7,6 @@ const Product = require('./models/product');
 const FB = require('./facebookapi');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const { OAuth2Client } = require('google-auth-library');
 const User = require('./models/user');
 const branchesApi = require('./branchesapi');
 const usersApi = require('./usersapi');
@@ -26,9 +25,6 @@ app.use('/api/currency', convertCurrency);
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI,
    {dbName: "cookie_DB"}).then(() => console.log('MongoDB Connected'));
-
-// Initialize the Google OAuth2 client
-const client = new OAuth2Client(process.env.REACT_APP_GOOGLE_CLIENT_ID);
 
 // Routes
 app.get('/api/products', async (req, res) => {

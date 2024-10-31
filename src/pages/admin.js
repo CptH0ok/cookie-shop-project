@@ -14,7 +14,7 @@ const Admin = () => {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
-            }).then((res) => {;
+            }).then((res) => {
                 setAdminPageData(res.data);
         })
         .catch((err) => {

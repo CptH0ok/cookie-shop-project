@@ -94,6 +94,24 @@ router.get('/:userId/purchase-history', authenticateJWT, checkPermissions, async
     }
 });
 
-
+router.get('/getuserdetails', authenticateJWT, async(req, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ error: 'User not authenticated' });
+      }
+      
+      const { email, name, picture } = req.user;
+      const userDetails = { email, name };
+      
+      if (picture) {
+        userDetails.picture = picture;
+      }
+  
+      res.json(userDetails);
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to retrieve user details' });
+    }
+  });
+  
 
 module.exports = router;
