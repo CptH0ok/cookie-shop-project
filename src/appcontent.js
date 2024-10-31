@@ -37,7 +37,6 @@ function AppContent() {
         <Route path="/login/success" element={<LoginSuccess />} />
         <Route path="/shop" element={<ShopPage />} />
         <Route path="/cookie/:name" element={<CookieDetailPage />} />
-        <Route path="/maps" element={<ProtectedRoute element={<Maps />} />} />
         <Route path="/branches" element={<Branches />} />
         <Route path="/reviews" element={<ProtectedRoute element={<Reviews />} />} />
         <Route path="/admin" element={<ProtectedRoute element={<Admin />} />} />
