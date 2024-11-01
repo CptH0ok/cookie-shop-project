@@ -33,7 +33,7 @@ const cookieSchema = new mongoose.Schema({
     type: Boolean,
     required: true,
   }
-}, { collection: 'cookie_shop' }); // Specify the collection name here
+}, { collection: 'cookie_shop' }); 
 
 
 const Cookie = mongoose.model('Cookie', cookieSchema);

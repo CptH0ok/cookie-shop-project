@@ -1,8 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom"; // for redirection 
 
 const HomePage = () => {
+  const navigate = useNavigate(); // Initialize useNavigate
+  const handleOrderNowClick = () => {
+    navigate("https://localhost:3000/shop"); // Redirect to /shop when the button is clicked
+  };
   return (
     <div className="relative flex flex-col z-10 min-h-screen h-auto">
       <div className="relative bg-unsplash-[1Gv_4RcljOE/lg] bg-no-repeat bg-cover z-10">
