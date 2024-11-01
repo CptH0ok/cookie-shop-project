@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import './shoppage.css';
@@ -60,8 +62,12 @@ const ShopPage = () => {
   return (
     <div className="shop-page">
       <header className="header">
-        <h1>Explore Our Delicious Cookies</h1>
-        <p>From classic favorites to unique creations, find your perfect cookie in our wide variety.</p>
+        <h1 className="relative text-balance z-10 text-white text-4xl font-bold font-serif tracking-tight sm:text-6xl">
+          Explore Our Delicious Cookies
+        </h1>
+        <p className="relative z-10 mt-6 text-lg leading-8 text-white font-serif">
+          From classic favorites to unique creations, find your perfect cookie in our wide variety.
+        </p>
       </header>
 
       {/* Filter Bar */}
