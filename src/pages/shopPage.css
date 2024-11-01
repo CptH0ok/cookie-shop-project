@@ -4,7 +4,7 @@
   align-items: center;
   font-family: 'Arial', sans-serif;
   padding: 100px; /* adds space for cookie land Navbar */
-  background-color: #323535; /* Dark background */
+  background-color: #2c2e2e; /* Dark background */
   color: #ecf0f1; /* Light text color */
 }
 
@@ -108,4 +108,29 @@
   color: #c0392b;
 }
 
+.breadcrumb-wrapper {
+  width: 100%; /* Full width */
+  padding-left: 20px; /* Add some left padding for aesthetics */
+  text-align: left; /* Align text to the left */
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+}
+
+.breadcrumb a {
+  text-decoration: none;
+  color: #9ca3af; /* Tailwind's gray-400 */
+}
+
+.breadcrumb a:hover {
+  color: #6b7280; /* Tailwind's gray-500 */
+}
+
+.breadcrumb svg {
+  width: 1em; /* Adjust icon size */
+  height: 1em; /* Adjust icon size */
+  margin: 0 0.5em; /* Space around the icon */
+}
 
