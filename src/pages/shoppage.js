@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import './shoppage.css';
 
 const ShopPage = () => {
@@ -61,6 +61,30 @@ const ShopPage = () => {
 
   return (
     <div className="shop-page">
+      {/* Breadcrumb */}
+      <div className="breadcrumb-wrapper">
+        <nav aria-label="Breadcrumb" className="breadcrumb">
+          <ol className="flex items-center space-x-2">
+            <li>
+              <Link to="/" className="text-sm font-medium text-gray-400 hover:text-gray-500">
+                Home
+              </Link>
+            </li>
+            <li>
+              <svg
+                className="h-5 w-5 text-gray-600 mx-2"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path d="M5.697 4.34L8.98 16.532h1.327L7.025 4.341H5.697z" />
+              </svg>
+            </li>
+            <li className="text-sm font-medium text-gray-500">Shop</li>
+          </ol>
+        </nav>
+      </div>
+
       <header className="header">
         <h1 className="relative text-balance z-10 text-white text-4xl font-bold font-serif tracking-tight sm:text-6xl">
           Explore Our Delicious Cookies
