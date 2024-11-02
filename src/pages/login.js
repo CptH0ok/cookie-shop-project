@@ -82,16 +82,14 @@ const Login = () => {
                 />
               </div>
             </div>
-
             <div>
-
+              {error && <p className='mt-6 text-center text-lg font-black text-red-600 drop-shadow-md animate-shake'>{error}</p>}
               <button
                 type="submit"
                 className="flex w-full justify-center mt-10 rounded-md bg-yellow-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-yellow-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-600"
               >
                 Log in
               </button>
-              {error && <p>{error}</p>}
               </div>
               </form>
               <div className='flex w-full justify-center mt-10 rounded-md mt-2'>

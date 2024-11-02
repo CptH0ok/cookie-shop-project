@@ -39,12 +39,12 @@ const Navbar = () => {
   const renderUserCircle = () => {
     if (userDetails?.picture) {
       return (
-        <img src={userDetails.picture} alt="profile" className="w-7 h-7 bg-gray-500 text-white rounded-full" />
+        <img src={userDetails.picture} alt="profile" className="absolute left-2 w-7 h-7 bg-gray-500 text-white rounded-full" />
     );
     }
     const initials = userDetails?.name.split(" ").map(n => n[0]).join("");
     return (
-      <div className="w-7 h-7 bg-gray-500 text-white rounded-full">
+      <div className="absolute left-2 w-7 h-7 bg-gray-500 text-white rounded-full">
         {initials}
       </div>
     );
@@ -59,9 +59,6 @@ const Navbar = () => {
     { name: 'Cart', description: 'See your cart', href: '#cart', icon: TruckIcon },
     { name: 'Purchase History', description: 'List all of your past purchases', href: '#phistory', icon: BanknotesIcon },
     { name: 'Security', description: "Change your E-Mail or Password", href: '#security', icon: FingerPrintIcon },,
-  ]
-  const callsToAction = [
-    { name: 'Contact sales', href: '#', icon: PhoneIcon },
   ]
 
   return (
@@ -95,21 +92,21 @@ const Navbar = () => {
       {userDetails ? (
         <div className="flex items-center mr-4 w-50">
           <Popover className="relative">
-          <PopoverButton className="items-center justify-center mr-4 mt-2 relative flex z-10 h-10 w-40 rounded-md ring-1 text-white/70 stroke-white/30 ring-white/30 bg-white/5 duration-500 hover:ring-white hover:stroke-black hover:text-black hover:bg-white px-2.5 py-2.5 drop-shadow-md duration-500">
+          <PopoverButton className="items-center justify-center mr-4 relative flex z-10 h-10 w-30 rounded-md ring-1 text-white/70 stroke-white/30 ring-white/30 bg-white/5 duration-500 hover:ring-white hover:stroke-black hover:text-black hover:bg-white px-2.5 py-2.5 drop-shadow-md duration-300">
               {renderUserCircle()}
-          <a className="text-sm font-sans text-nowrap font-semibold">Profile</a>
-          <ChevronDownIcon aria-hidden="true" className="h-5 w-5" />
+          <a className="relative pl-6 ml-2 mr-4 text-sm font-sans text-nowrap font-semibold">Profile</a>
+          <ChevronDownIcon aria-hidden="true" className="absolute right-1 h-5 w-5" />
           </PopoverButton>
           <PopoverPanel
         transition
-        className="absolute left-1/2 z-10 mt-5 flex w-screen max-w-sm -translate-x-1/2 px-4 transition data-[closed]:translate-y-1 data-[closed]:opacity-0 data-[enter]:duration-200 data-[leave]:duration-150 data-[enter]:ease-out data-[leave]:ease-in"
+        className="absolute left-1/2 z-10 mt-5 flex w-screen max-w-sm bg-transparent -translate-x-1/2 px-4 transition data-[closed]:translate-y-1 data-[closed]:opacity-0 data-[enter]:duration-200 data-[leave]:duration-150 data-[enter]:ease-out data-[leave]:ease-in"
       >
-        <div className="w-screen max-w-md flex-auto overflow-hidden rounded-2xl bg-white text-sm/6 shadow-lg ring-1 ring-gray-900/5">
+        <div className="w-screen max-w-md flex-auto overflow-hidden rounded-2xl bg-white text-sm/6 drop-shadow-md ring-1 ring-gray-900/5">
           <div className="p-4">
             {solutions.map((item) => (
-              <div key={item.name} className="group relative flex gap-x-6 rounded-lg p-4 hover:bg-gray-50">
-                <div className="mt-1 flex h-11 w-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
-                  <item.icon aria-hidden="true" className="h-6 w-6 text-gray-600 group-hover:text-indigo-600" />
+              <div key={item.name} className="group relative flex gap-x-4 rounded-lg p-4 hover:bg-gray-200 duration-300">
+                <div className="mt-1 flex h-10 w-8 flex-none items-center justify-center rounded-lg bg-gray-200 group-hover:bg-white">
+                  <item.icon aria-hidden="true" className="h-6 w-6 text-gray-600 group-hover:text-yellow-600 duration-300" />
                 </div>
                 <div>
                   <a onClick={handleButtonClick} href={item.href} className="font-semibold text-gray-900">
@@ -121,24 +118,12 @@ const Navbar = () => {
               </div>
             ))}
           </div>
-          <div className="grid grid-cols-2 divide-x divide-gray-900/5 bg-gray-50">
-            {callsToAction.map((item) => (
-              <a 
-                key={item.name}
-                href={item.href}
-                className="flex items-center justify-center gap-x-2.5 p-3 font-semibold text-gray-900 hover:bg-gray-100"
-              >
-                <item.icon aria-hidden="true" className="h-5 w-5 flex-none text-gray-400" />
-                {item.name}
-              </a>
-            ))}
-          </div>
         </div>
       </PopoverPanel>
       </Popover>
 
 
-          <button onClick={handleLogout} className="mr-4 mt-2 relative flex z-10 h-10 rounded-md bg-red-600 text-white stroke-white  duration-500 hover:bg-red-300 hover:backdrop-contrast-75 px-2.5 py-2.5 drop-shadow-md duration-500">
+          <button onClick={handleLogout} className="mr-4 relative flex z-10 h-10 rounded-md bg-red-600 text-white stroke-white duration-300 hover:bg-red-400 hover:backdrop-contrast-75 px-2.5 py-2.5 drop-shadow-md duration-500">
           <svg
             class="size-6 pb-1"
             xmlns="http://www.w3.org/2000/svg"

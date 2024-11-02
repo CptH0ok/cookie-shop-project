@@ -27,7 +27,7 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {dbName: 'cookie_DB'}
-   {dbName: "cookie_DB"}).then(() => console.log('MongoDB Connected'));
+  ).then(() => console.log('MongoDB Connected'));
 
 
 // Routes
