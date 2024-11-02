@@ -3,11 +3,12 @@ const client = new OAuth2Client(process.env.REACT_APP_GOOGLE_CLIENT_ID);
 const jwt = require('jsonwebtoken');
 
 const checkPermissions = async (req, res, next) => {
-    if (req.params.userId !== req.user?._id){
+    if (req.params.id !== req.user?.id){
         checkAdmin(req, res, (err) => {
-            if (err) return next(err);
+            if (err) res.sendStatus(403);
         });
     }
+    next();
   };
   
   const checkAdmin = async (req, res, next) => {

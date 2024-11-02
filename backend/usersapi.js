@@ -3,6 +3,7 @@
 const express = require('express');
 const User = require('./models/user');
 const PurchaseHistory = require('./models/purchasehistory');
+const bcrypt = require('bcryptjs');
 const router = express.Router();
 const {authenticateJWT, checkAdmin, checkPermissions} = require('./middlewares');
 
@@ -19,6 +20,12 @@ router.post('/create', authenticateJWT, checkAdmin, async (req, res) => {
 
 // 2. Update a user by ID
 router.put('/update/:id', authenticateJWT, checkPermissions, async (req, res) => {
+    if (req.body.password){
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(req.body.password, salt);
+        req.body.password = hashedPassword;
+    }
+
     try {
         const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!updatedUser) {
@@ -100,11 +107,15 @@ router.get('/getuserdetails', authenticateJWT, async(req, res) => {
         return res.status(401).json({ error: 'User not authenticated' });
       }
       
-      const { email, name, picture } = req.user;
-      const userDetails = { email, name };
+      const { id, email, name, picture, sub } = req.user;
+      const userDetails = { id, email, name };
       
       if (picture) {
         userDetails.picture = picture;
+      }
+
+      if (sub) {
+        userDetails.googleId = sub;
       }
   
       res.json(userDetails);
