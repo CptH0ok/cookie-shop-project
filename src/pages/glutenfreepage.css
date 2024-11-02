@@ -1,0 +1,41 @@
+.gluten-free-page {
+    font-family: 'Arial', sans-serif;
+    background-image: url('../assets/cookies_background_dark.jpg'); /* Update the path as needed */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh; /* Ensure it covers the full height of the viewport */
+    display: flex; /* Use flexbox for centering */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    padding: 100px; /* Adjust padding as needed */
+  }
+  
+  .content-container {
+    background-color: rgba(50, 53, 53, 0.8); /* Semi-transparent dark background */
+    padding: 10px; /* Space inside the dark box */
+    border-radius: 10px; /* Rounded corners */
+    max-width: 800px; /* Limit the width for better readability */
+    text-align: center; /* Center align the text */
+    color: #ecf0f1; /* Light text color for contrast */
+  }
+  
+  .title {
+    font-size: 2.5rem; /* Increase title size */
+    margin-bottom: 20px; /* Space below the title */
+  }
+  
+  .back-link {
+    margin-top: 20px; /* Space above the back link */
+    display: inline-block; /* Make it inline-block for padding */
+    padding: 10px 20px; /* Add some padding */
+    color: #ecf0f1; /* Light text color */
+    background-color: #486956; /* Green background for the button */
+    border-radius: 5px; /* Rounded corners */
+    text-decoration: none; /* Remove underline */
+  }
+  
+  .back-link:hover {
+    background-color: #219653; /* Darker green on hover */
+  }
+  
