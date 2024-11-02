@@ -21,7 +21,7 @@ app.use('/api/branches', branchesApi);
 app.use('/api/currency', convertCurrency);
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI,
+mongoose.connect(process.env.MONGO_URI, {dbName: 'cookie_DB'}
    {dbName: "cookie_DB"}).then(() => console.log('MongoDB Connected'));
 
 // Initialize the Google OAuth2 client
