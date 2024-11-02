@@ -3,16 +3,15 @@ require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const Product = require('./models/product');
 const FB = require('./facebookapi');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('./models/user');
 const branchesApi = require('./branchesapi');
 const usersApi = require('./usersapi');
-const convertCurrency = require('./currencyapi');
+const cookiesApi = require('./cookiesapi')
+const convertCurrency = require('./currencyapi')
 const {authenticateJWT, checkAdmin, checkPermissions} = require('./middlewares');
-
 const app = express();
 
 // Middleware
@@ -21,10 +20,15 @@ app.use(express.json());
 app.use('/api/branches', branchesApi);
 app.use('/api/users', usersApi);
 app.use('/api/currency', convertCurrency);
+app.use('/api/cookies', cookiesApi )
+
+// Serve static images from the "images" folder
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {dbName: 'cookie_DB'}
    {dbName: "cookie_DB"}).then(() => console.log('MongoDB Connected'));
+
 
 // Routes
 app.get('/api/products', async (req, res) => {
@@ -150,3 +154,5 @@ app.use((err, req, res, next) => {
 // Start server
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, "0.0.0.0", () => console.log(`Server running on port ${PORT}`));
+
+
