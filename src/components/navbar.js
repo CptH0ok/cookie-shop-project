@@ -1,19 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle, TransitionChild, Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
-import { XMarkIcon, TruckIcon, FingerPrintIcon, BanknotesIcon } from '@heroicons/react/24/outline'
-import { ChevronDownIcon, PhoneIcon, PlayCircleIcon } from '@heroicons/react/20/solid'
+import { XMarkIcon, TruckIcon, FingerPrintIcon, BanknotesIcon, AtSymbolIcon } from '@heroicons/react/24/outline'
+import { ChevronDownIcon, PhoneIcon } from '@heroicons/react/20/solid'
 import axios from 'axios';
 
 const Navbar = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [userDetails, setUserDetails] = useState(null);
+  const [error, setError] = useState('');
+  const [isEmailPopupVisible, setEmailPopupVisible] = useState(false);
+  const [isPasswdPopupVisible, setPasswdPopupVisible] = useState(false);
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-
     const parseUserDetails = async () => {
-    const token = localStorage.getItem("token");
     if (token) {
       const response = await axios.get('/api/users/getuserdetails', {
         headers: { Authorization: `Bearer ${token}` }
@@ -29,13 +31,6 @@ const Navbar = () => {
   parseUserDetails();
   }, []);
 
-
-  const handleLogout = () => {
-    localStorage.removeItem("token"); // Remove token on logout
-    setUserDetails(null);
-    navigate("/"); // Redirect to login page
-  };
-
   const renderUserCircle = () => {
     if (userDetails?.picture) {
       return (
@@ -50,21 +45,217 @@ const Navbar = () => {
     );
   };
   
-  // Function to focus or style the button
-  const handleButtonClick = () => {
-    navigate("/login");
-    };  
+  const handleButtonClick = (item) => {
+      // Check the href value and do different actions
+    if (item.href === '#cart') {
+      navigate("/cart");
+    } else if (item.href === '#phistory') {
+      navigate("/purchasehistory");
+    } else if (item.href === '#chngmail') {
+      setEmailPopupVisible(true); // Shows the popup
+    } else if (item.href === '#chngpasswd') {
+      setPasswdPopupVisible(true); // Shows the popup
+    } else {
+      // Default behavior: navigate to the href
+      window.location.href = item.href;
+    }
+    };
+    
+    const handleCloseModal = () => {
+      setEmailPopupVisible(false); // Hides the popup
+      setPasswdPopupVisible(false); // Hides the popup
+    };
+
+    const handleLogout = () => {
+      localStorage.removeItem("token"); // Remove token on logout
+      setUserDetails(null);
+      navigate("/"); // Redirect to login page
+    };
+
+    const handleChangePassword = async (e) => {
+      e.preventDefault();
+
+      const oldPassword = e.target.oldpasswd.value;
+      const newPassword = e.target.newpasswd.value;
+      const email = userDetails.email;
+
+      try {
+        await axios.post('http://localhost:3001/api/login', { email, password: oldPassword });
+        setError('');
+
+        try{
+          await axios.put(`http://localhost:3001/api/users/update/${userDetails.id}`,{ password: newPassword },  // JSON body
+            {
+              headers: {
+                'Authorization': `Bearer ${token}`,  // Token in headers
+                'Content-Type': 'application/json'
+              }
+            }
+          );
+          setError('');
+          handleCloseModal();
+
+        } catch (err){
+          setError("error in update");
+        }
+      } catch (err) {
+        setError("error in login");
+      }
+    };
+
+    const handleChangeEmail = async (e) => {
+      e.preventDefault();
+
+      const newEmail = e.target.newemail.value;
+      const oldEmail = e.target.oldemail.value;
+
+      if(newEmail === oldEmail){
+        try{
+          await axios.put(`http://localhost:3001/api/users/update/${userDetails.id}`,{ email: newEmail },  // JSON body
+            {
+              headers: {
+                'Authorization': `Bearer ${token}`,  // Token in headers
+                'Content-Type': 'application/json'
+              }
+            }
+          );
+          setError('');
+          handleCloseModal();
+
+        } catch (err){
+          setError("error in update");
+        }
+    }
+    };
 
   const solutions = [
     { name: 'Cart', description: 'See your cart', href: '#cart', icon: TruckIcon },
     { name: 'Purchase History', description: 'List all of your past purchases', href: '#phistory', icon: BanknotesIcon },
-    { name: 'Security', description: "Change your E-Mail or Password", href: '#security', icon: FingerPrintIcon },,
+    { name: 'Change Email', description: "Change your E-Mail", href: '#chngmail', icon: AtSymbolIcon },
+    { name: 'Change Password', description: "Change your Password", href: '#chngpasswd', icon: FingerPrintIcon }
   ]
   const callsToAction = [
     { name: 'Contact sales', href: '#', icon: PhoneIcon },
   ]
 
   return (
+    <>
+      {isEmailPopupVisible && (
+        <form onSubmit={handleChangeEmail}>
+        <div
+          id="info-popup"
+          tabIndex="-1"
+          className="fixed top-0 right-0 left-0 z-50 w-full h-modal md:h-full flex items-center justify-center bg-gray-800 bg-opacity-50"
+        >
+          <div className="relative p-4 w-full max-w-lg h-full md:h-auto">
+            <div className="relative p-4 bg-white rounded-lg shadow dark:bg-gray-800 md:p-8">
+              <div className="mb-4 text-sm font-light text-gray-500 dark:text-gray-400">
+                <h3 className="mb-3 text-2xl font-bold text-gray-900 dark:text-white">
+                  Update Email
+                </h3>
+
+                <div class="grid gap-4 mb-4 sm:grid-cols-2">
+                  <div>
+                      <label htmlFor="oldmail" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Current Email</label>
+                      <input type="email" name="oldmail" id="oldmail" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder={userDetails.email}/>
+                  </div>
+                  <div>
+                      <label htmlFor="newemail" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">New Email</label>
+                      <input type="email" name="newemail" id="newemail" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Ex. new@mail.com"/>
+                  </div>
+              </div>
+                
+              </div>
+              <div className="justify-between items-center pt-0 space-y-4 sm:flex sm:space-y-0">
+                <a
+                  href="#"
+                  className="mb-3 text-sm font-bold text-gray-100 dark:text-white hover:underline"
+                >
+                  Learn more about privacy
+                </a>
+                <div className="items-center space-y-4 sm:space-x-4 sm:flex sm:space-y-0">
+                  <button
+                    id="close-modal"
+                    type="button"
+                    onClick={handleCloseModal}
+                    className="py-2 px-4 w-full text-sm font-medium text-gray-500 bg-white rounded-lg border border-gray-200 sm:w-auto hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-primary-300 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    id="confirm-button"
+                    type="submit"
+                    className="py-2 px-4 w-full text-sm font-medium text-gray-500 bg-white rounded-lg border border-gray-200 sm:w-auto hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-primary-300 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
+                  >
+                    Update
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        </form>
+      )}
+
+      {isPasswdPopupVisible && (
+        <form onSubmit={handleChangePassword}>
+        <div
+          id="info-popup"
+          tabIndex="-1"
+          className="fixed top-0 right-0 left-0 z-50 w-full h-modal md:h-full flex items-center justify-center bg-gray-800 bg-opacity-50"
+        >
+          <div className="relative p-4 w-full max-w-lg h-full md:h-auto">
+            <div className="relative p-4 bg-white rounded-lg shadow dark:bg-gray-800 md:p-8">
+              <div className="mb-4 text-sm font-light text-gray-500 dark:text-gray-400">
+                <h3 className="mb-3 text-2xl font-bold text-gray-900 dark:text-white">
+                  Update Password
+                </h3>
+                  <div class="grid gap-4 mb-4 sm:grid-cols-2">
+                    <div>
+                        <label htmlFor="oldpasswd" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Current Password</label>
+                        <input type="text" name="oldpasswd" id="oldpasswd" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"/>
+                    </div>
+                    <div>
+                        <label htmlFor="newpasswd" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">New Password</label>
+                        <input type="password" name="newpasswd" id="newpasswd" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="SuperMemorablePassword"/>
+                    </div>
+                </div>
+              </div>
+                <div className="justify-between items-center pt-0 space-y-4 sm:flex sm:space-y-0">
+                  <a
+                    href="#"
+                    className="mb-3 text-sm font-bold text-gray-100 dark:text-white hover:underline"
+                  >
+                    Learn more about privacy
+                  </a>
+                  <div className="items-center space-y-4 sm:space-x-4 sm:flex sm:space-y-0">
+                    
+                    <button
+                      id="confirm-button"
+                      type="submit"
+                      className="py-2 px-4 w-full text-sm font-medium text-gray-500 bg-white rounded-lg border border-gray-200 sm:w-auto hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-primary-300 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
+                    >
+                      Update
+                    </button> 
+                    
+                    <button
+                      id="close-modal"
+                      type="button"
+                      onClick={handleCloseModal}
+                      className="py-2 px-4 w-full text-sm font-medium text-gray-500 bg-white rounded-lg border border-gray-200 sm:w-auto hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-primary-300 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
+                    >
+                      Cancel
+                    </button>
+                    {error && <p>{error}</p>}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        </form>
+      )}
+      
+    
     <nav className="flex absolute backdrop-blur-md backdrop-contrast-75 pt-3 pb-2 z-20 w-full drop-shadow-2xl">
       <button className="flex pl-4" onClick={() => setOpen(true)}>
         <svg
@@ -112,7 +303,7 @@ const Navbar = () => {
                   <item.icon aria-hidden="true" className="h-6 w-6 text-gray-600 group-hover:text-indigo-600" />
                 </div>
                 <div>
-                  <a onClick={handleButtonClick} href={item.href} className="font-semibold text-gray-900">
+                  <a onClick={() => handleButtonClick(item)} href={item.href} className="font-semibold text-gray-900">
                     {item.name}
                     <span className="absolute inset-0" />
                   </a>
@@ -240,6 +431,7 @@ const Navbar = () => {
       </div>
     </Dialog>
     </nav>
+    </>
   );
 };
 
