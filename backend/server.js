@@ -8,8 +8,9 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('./models/user');
 const branchesApi = require('./branchesapi');
+const usersApi = require('./usersapi');
+const cookiesApi = require('./cookiesapi')
 const convertCurrency = require('./currencyapi')
-const Cookie = require('./models/cookie.js');
 const {authenticateJWT, checkAdmin, checkPermissions} = require('./middlewares');
 const app = express();
 
@@ -19,6 +20,7 @@ app.use(express.json());
 app.use('/api/branches', branchesApi);
 app.use('/api/users', usersApi);
 app.use('/api/currency', convertCurrency);
+app.use('/api/cookies', cookiesApi )
 
 // Serve static images from the "images" folder
 app.use('/images', express.static(path.join(__dirname, 'images')));
@@ -64,65 +66,6 @@ app.get('/api/getlastdatacomments', async (req, res, next) => {
       next(error);
   }
 });
-
-//list all cookies
-app.get('/api/cookies', async (req, res) => {
-  console.log('Fetching cookies');
-  try {
-    const cookies = await Cookie.find({});
-    console.log('Fetched cookies:', cookies); // Log the cookies retrieved
-    res.json(cookies);
-  } catch (err) {
-    console.error('Error fetching cookies:', err); // Log any errors
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// Search and filter by category, name (in sensitive) and stock status - if we want to add more fields we can
-app.get('/api/cookies/search', async (req, res) => {
-  const { name, category, available } = req.query;
-
-  // Building the filter object based on query parameters
-  let filter = {};
-
-  // Search by name if provided
-  if (name) {
-      filter.name = { $regex: new RegExp(name, 'i') }; // Case-insensitive search
-  }
-
-  // Search by category if provided
-  if (category) {
-      filter.category = category; // Assuming exact match
-  }
-
-  // Search by availability if provided
-  if (available !== undefined) {
-      filter.available = available === 'true'; // Convert string to boolean
-  }
-
-  try {
-      const cookies = await Cookie.find(filter);
-      res.json(cookies);
-  } catch (err) {
-      console.error('Error fetching filtered cookies:', err);
-      res.status(500).json({ message: err.message });
-  }
-});
-
-
-// Fetch unique categories from cookies - for the filter bar.
-//can also do it staticly if we prefer and delete this
-app.get('/api/cookies/categories', async (req, res) => {
-  try {
-      const cookies = await Cookie.find({});
-      const uniqueCategories = [...new Set(cookies.map(cookie => cookie.category))];
-      res.json(uniqueCategories);
-  } catch (err) {
-      console.error('Error fetching categories:', err);
-      res.status(500).json({ message: err.message });
-  }
-});
-
 
 //using the authenticateJWT just to parse the token
 app.get('/api/googlelogin', authenticateJWT, async(req, res) => {
@@ -190,73 +133,6 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-/*create new cookie - only admins should be able to do it
-so it checks if the user is authenticated and is an admin*/
-app.post('/api/cookies', authenticateJWT, checkAdmin, async (req, res) => {
-  const { name, description, price, category, available, imageUrl } = req.body;
-
-  try {
-    const newCookie = new Cookie({
-      name,
-      description,
-      price,
-      category,
-      available,
-      imageUrl
-    });
-
-    await newCookie.save();
-    res.status(201).json(newCookie);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-/*updating an existing cookie - only admins should be able to do it
-doing it by the name of the cookie and not by _id (for the admins convenience)
-it is case-insensitive*/
-
-app.put('/api/cookies/:name', authenticateJWT, checkAdmin, async (req, res) => {
-  const cookieName = decodeURIComponent(req.params.name);
-  const updatedData = req.body;
-
-  try {
-    const updatedCookie = await Cookie.findOneAndUpdate(
-      { name: new RegExp(`^${cookieName}$`, 'i') }, // case-insensitive regex for name
-      updatedData,
-      { new: true }
-    );
-
-    if (!updatedCookie) {
-      return res.status(404).json({ message: 'Cookie not found' });
-    }
-
-    res.json(updatedCookie);
-  } catch (err) {
-    console.error('Error updating cookie:', err);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// delete a cookie by name (case-insensitive) - only for admins
-app.delete('/api/cookies/:name', authenticateJWT, checkAdmin, async (req, res) => {
-  try {
-    const cookieName = req.params.name;
-    const deletedCookie = await Cookie.findOneAndDelete({
-      name: { $regex: new RegExp(`^${cookieName}$`, "i") } // Case-insensitive match
-    });
-
-    if (!deletedCookie) {
-      return res.status(404).json({ message: "Cookie not found" });
-    }
-
-    res.json({ message: "Cookie deleted successfully", deletedCookie });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-
 app.get('/api/admin', authenticateJWT, checkAdmin, (req, res) => {
   res.json('Welcome "' + req.user.name + '" to admin panel!');
 });
@@ -279,38 +155,4 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, "0.0.0.0", () => console.log(`Server running on port ${PORT}`));
 
-
-//update cookie by id
-/*app.put('/api/cookies/:id', authenticateJWT, checkAdmin, async (req, res) => {
-  try {
-    const updatedCookie = await Cookie.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!updatedCookie) return res.status(404).json({ message: 'Cookie not found' });
-    res.json(updatedCookie);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-app.delete('/api/cookies/:id', authenticateJWT, checkAdmin, async (req, res) => {
-  try {
-    const deletedCookie = await Cookie.findByIdAndDelete(req.params.id);
-    if (!deletedCookie) return res.status(404).json({ message: 'Cookie not found' });
-    res.json({ message: 'Cookie deleted' });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-//search cookies by category
-app.get('/api/cookies/search', async (req, res) => {
-  const { category } = req.query;
-
-  try {
-    const cookies = await Cookie.find({ category });
-    res.json(cookies);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-*/
 
