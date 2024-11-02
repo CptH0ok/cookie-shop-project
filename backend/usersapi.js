@@ -107,11 +107,15 @@ router.get('/getuserdetails', authenticateJWT, async(req, res) => {
         return res.status(401).json({ error: 'User not authenticated' });
       }
       
-      const { id, email, name, picture } = req.user;
+      const { id, email, name, picture, sub } = req.user;
       const userDetails = { id, email, name };
       
       if (picture) {
         userDetails.picture = picture;
+      }
+
+      if (sub) {
+        userDetails.googleId = sub;
       }
   
       res.json(userDetails);

@@ -65,7 +65,7 @@ app.get('/api/getlastdatacomments', async (req, res, next) => {
 
 //using the authenticateJWT just to parse the token
 app.get('/api/googlelogin', authenticateJWT, async(req, res) => {
-  const [email, name] = [req.user.email, req.user.name];
+  const [googleId, email, name] = [req.user.sub, req.user.email, req.user.name];
 
   let user = await User.findOne({ email });
 
@@ -74,7 +74,7 @@ app.get('/api/googlelogin', authenticateJWT, async(req, res) => {
   }
 
   else{
-    user = new User({ email, name, role: 'admin' });
+    user = new User({ googleId, email, name, role: 'admin' });
     await user.save();
   }
 
