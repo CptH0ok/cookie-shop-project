@@ -2,6 +2,7 @@
 
 const express = require('express');
 const User = require('./models/user');
+const mongoose = require('mongoose');
 const PurchaseHistory = require('./models/purchasehistory');
 const bcrypt = require('bcryptjs');
 const router = express.Router();
@@ -94,11 +95,50 @@ router.get('/search', authenticateJWT, async (req, res) => {
 // 6. get purchase history of specific user
 router.get('/:userId/purchase-history', authenticateJWT, checkPermissions, async (req, res) => {
     try {
-        const purchases = await PurchaseHistory.find({ memberId: req.params.userId });
+        const { userId } = req.params;
+    
+        const purchases = await PurchaseHistory.aggregate([
+          { $match: { memberId: new mongoose.Types.ObjectId(userId) } },
+          {
+            $lookup: {
+              from: 'cookie_shop',
+              localField: 'items.cookieId',
+              foreignField: 'id',
+              as: 'itemDetails'
+            }
+          },
+          {
+            $project: {
+              items: {
+                $map: {
+                  input: "$items",
+                  as: "item",
+                  in: {
+                    quantity: "$$item.quantity",
+                    cookie: {
+                      $arrayElemAt: [
+                        {
+                          $filter: {
+                            input: "$itemDetails",
+                            as: "cookie",
+                            cond: { $eq: ["$$cookie.id", "$$item.cookieId"] }
+                          }
+                        },
+                        0
+                      ]
+                    }
+                  }
+                }
+              },
+              purchaseDate: 1
+            }
+          }
+        ]);
+    
         res.json(purchases);
-    } catch (error) {
-        res.status(500).json({ message: 'Error fetching purchase history', error });
-    }
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
 });
 
 router.get('/getuserdetails', authenticateJWT, async(req, res) => {
@@ -107,8 +147,10 @@ router.get('/getuserdetails', authenticateJWT, async(req, res) => {
         return res.status(401).json({ error: 'User not authenticated' });
       }
       
-      const { id, email, name, picture, sub } = req.user;
-      const userDetails = { id, email, name };
+      
+      const { email, name, picture, sub } = req.user;
+      const user = await User.findOne({email}); //get id from db
+      const userDetails = { id:user.id, email, name };
       
       if (picture) {
         userDetails.picture = picture;
