@@ -11,7 +11,7 @@ const ContactUs = () => {
           <div className="text-center">
             <h1 className="title">How Can We Help?</h1>
             <p className="title_opening">
-                Got a issue? Want to send feedback? 
+                Got an issue? Want to send feedback? 
 				Need details about our cookies? Let us know. 
             </p>
           </div>
