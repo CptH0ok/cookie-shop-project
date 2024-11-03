@@ -4,7 +4,6 @@ import Footer from './components/footer';
 import HomePage from './pages/homepage';
 import Login from './pages/login';
 import Signup from './pages/signup';
-import LoginSuccess from './components/loginsuccess';
 import ProtectedRoute from './components/protectedroute';
 import ShopPage from './pages/shoppage';
 import Branches from './pages/branches';
@@ -20,7 +19,7 @@ function AppContent() {
   const location = useLocation();
 
   const pathsWithLayout = [
-    "/", "/login/success",
+    "/",
     "/shop", "/branches", "/reviews", "/admin", "/glutenfree", "/aboutus", "/contactus"
   ];
 
@@ -37,7 +36,6 @@ function AppContent() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/login/success" element={<LoginSuccess />} />
         <Route path="/aboutus" element={<AboutUsPage />} />
         <Route path="/shop" element={<ShopPage />} />
         <Route path="/cookie/:name" element={<CookieDetailPage />} />
