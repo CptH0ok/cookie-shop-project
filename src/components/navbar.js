@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Dialog, DialogBackdrop, DialogPanel, DialogTitle, TransitionChild, Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
-import { XMarkIcon, TruckIcon, FingerPrintIcon, BanknotesIcon, AtSymbolIcon } from '@heroicons/react/24/outline'
-import { ChevronDownIcon, PhoneIcon } from '@heroicons/react/20/solid'
 import axios from 'axios';
+import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { ChevronDownIcon, PhoneIcon } from '@heroicons/react/20/solid'
+import { XMarkIcon, TruckIcon, FingerPrintIcon, BanknotesIcon, AtSymbolIcon } from '@heroicons/react/24/outline'
+import { Dialog, DialogBackdrop, DialogPanel, DialogTitle, TransitionChild, Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
 
 const Navbar = () => {
   const navigate = useNavigate();

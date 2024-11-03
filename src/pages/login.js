@@ -1,11 +1,11 @@
+import axios from 'axios';
 import React, { useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
-import axios from 'axios';
 import GoogleSignIn from '../components/googlesignin';
 
 const Login = () => {
-  const [error, setError] = useState('');
   const navigate = useNavigate();
+  const [error, setError] = useState('');
 
   const handleLogin = async (e) => {
     e.preventDefault();  // Prevent the default form submission behavior

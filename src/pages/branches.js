@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import './maps.css'; // Importing CSS for styles
+import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 
 const Branches = () => {
   const [branches, setBranches] = useState([]);
