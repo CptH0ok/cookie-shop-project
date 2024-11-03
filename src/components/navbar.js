@@ -1,27 +1,17 @@
-<<<<<<< HEAD
-=======
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle, TransitionChild, Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
 import { XMarkIcon, TruckIcon, ShoppingCartIcon, FingerPrintIcon, BanknotesIcon, AtSymbolIcon } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, PhoneIcon } from '@heroicons/react/20/solid'
->>>>>>> 1d5aaff (cart icon navbar)
 import axios from 'axios';
-import { Link, useNavigate } from "react-router-dom";
-import React, { useState, useEffect, useRef } from "react";
-import { ChevronDownIcon, PhoneIcon } from '@heroicons/react/20/solid'
-import { XMarkIcon, TruckIcon, FingerPrintIcon, BanknotesIcon, AtSymbolIcon } from '@heroicons/react/24/outline'
-import { Dialog, DialogBackdrop, DialogPanel, DialogTitle, TransitionChild, Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
 
 const Navbar = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [userDetails, setUserDetails] = useState(null);
-  const [purchases, setPurchases] = useState([]);
   const [error, setError] = useState('');
   const [isEmailPopupVisible, setEmailPopupVisible] = useState(false);
   const [isPasswdPopupVisible, setPasswdPopupVisible] = useState(false);
-  const [isPurchaseHistoryVisible, setPurchaseHistoryVisible] = useState(false);
   const token = localStorage.getItem("token");
   const [cartCount, setCartCount] = useState(0); //Holds the number of items in the cart
 
@@ -37,7 +27,7 @@ const Navbar = () => {
         localStorage.removeItem("token"); // Token is invalid
       });
     }
-  };
+  }
 
   parseUserDetails();
   }, []);
@@ -72,8 +62,7 @@ const Navbar = () => {
     if (item.href === '#cart') {
       navigate("/cart");
     } else if (item.href === '#phistory') {
-      setPurchaseHistoryVisible(true);
-      handleFetchPurchaseHistory();
+      navigate("/purchasehistory");
     } else if (item.href === '#chngmail') {
       setEmailPopupVisible(true); // Shows the popup
     } else if (item.href === '#chngpasswd') {
@@ -87,7 +76,6 @@ const Navbar = () => {
     const handleCloseModal = () => {
       setEmailPopupVisible(false); // Hides the popup
       setPasswdPopupVisible(false); // Hides the popup
-      setPurchaseHistoryVisible(false);
     };
 
     const handleLogout = () => {
@@ -104,7 +92,7 @@ const Navbar = () => {
       const email = userDetails.email;
 
       try {
-        await axios.post('http://localhost:3001/api/security/login', { email, password: oldPassword });
+        await axios.post('http://localhost:3001/api/login', { email, password: oldPassword });
         setError('');
 
         try{
@@ -132,9 +120,8 @@ const Navbar = () => {
 
       const newEmail = e.target.newemail.value;
       const oldEmail = e.target.oldemail.value;
-      const currEmail = userDetails.email;
 
-      if(currEmail === oldEmail){
+      if(newEmail === oldEmail){
         try{
           await axios.put(`http://localhost:3001/api/users/update/${userDetails.id}`,{ email: newEmail },  // JSON body
             {
@@ -150,20 +137,7 @@ const Navbar = () => {
         } catch (err){
           setError("error in update");
         }
-    } else {
-      setError("this is not your current email");
     }
-    };
-
-    const handleFetchPurchaseHistory = async () => {
-      try {
-        const response = await axios.get(`http://localhost:3001/api/users/${userDetails.id}/purchase-history`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setPurchases(response.data);
-      } catch (error) {
-        console.error('Error fetching purchase history:', error);
-      }
     };
 
   const solutions = [
@@ -179,77 +153,6 @@ const Navbar = () => {
 
   return (
     <>
-      {isPurchaseHistoryVisible && (
-        <div
-          id="info-popup"
-          tabIndex="-1"
-          className="fixed top-0 right-0 left-0 z-50 w-full h-modal md:h-full flex items-center justify-center bg-gray-800 bg-opacity-50"
-        >
-          <div className="relative p-4 w-full max-w-lg h-full md:h-auto">
-            <div className="relative p-4 bg-white rounded-lg shadow dark:bg-gray-800 md:p-8 max-h-[75vh] overflow-y-auto">
-              <div className="mb-4 text-sm font-light text-gray-500 dark:text-gray-400">
-                <h3 className="mb-3 text-2xl font-bold text-gray-900 dark:text-white">
-                  Purchase History
-                </h3>
-                <ul role="list" className="mb-3 text-2xl font-bold text-gray-900 dark:text-white">
-                  {purchases.map((purchase, idx) => {
-                    const totalOrderAmount = purchase.items.reduce(
-                      (sum, item) => sum + item.cookie.price * item.quantity,
-                      0
-                    );
-
-                    return (
-                      <li key={idx} className="py-6">
-                        <div className="mb-4 text-lg font-semibold text-white-900">
-                          Purchase Date: {new Date(purchase.purchaseDate).toLocaleDateString()}
-                        </div>
-                        {purchase.items.map((item, itemIdx) => {
-                          const { cookie } = item;
-                          const itemTotal = cookie.price * item.quantity;
-
-                          return (
-                            <div key={itemIdx} className="flex justify-between gap-x-6 overflow-hidden">
-                              <div className="flex min-w-0 gap-x-4">
-                                <img
-                                  alt={cookie.name}
-                                  src={cookie.imageUrl}
-                                  className="h-14 w-14 flex-none rounded-full bg-gray-50 ring-white"
-                                />
-                                <div className="min-w-0 flex-auto">
-                                  <a href={`/cookie/${encodeURIComponent(cookie.name)}`}
-                                  className="text-sm font-semibold text-blue-900 hover:text-blue-600">{cookie.name}</a>
-                                  <p className="mt-1 text-xs text-gray-500">
-                                    Quantity: {item.quantity}
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="text-sm text-green-900">
-                                Item Total: ${itemTotal.toFixed(2)}
-                              </div>
-                            </div>
-                          );
-                        })}
-                        <div className="text-lg font-semibold text-green-500 mt-4">
-                          Order Total: ${totalOrderAmount.toFixed(2)}
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
-                <button
-                  id="close-modal"
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="py-2 px-4 w-full text-sm font-medium text-gray-500 bg-white rounded-lg border border-gray-200 sm:w-auto hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-primary-300 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {isEmailPopupVisible && (
         <form onSubmit={handleChangeEmail}>
         <div
@@ -266,8 +169,8 @@ const Navbar = () => {
 
                 <div class="grid gap-4 mb-4 sm:grid-cols-2">
                   <div>
-                      <label htmlFor="oldemail" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Current Email</label>
-                      <input type="email" name="oldemail" id="oldemail" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder={userDetails.email}/>
+                      <label htmlFor="oldmail" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Current Email</label>
+                      <input type="email" name="oldmail" id="oldmail" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder={userDetails.email}/>
                   </div>
                   <div>
                       <label htmlFor="newemail" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">New Email</label>
