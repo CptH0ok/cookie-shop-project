@@ -9,16 +9,26 @@ import Branches from './pages/branches';
 import Footer from './components/footer';
 import Navbar from './components/navbar';
 import GlutenFreePage from './pages/glutenfreepage';
+<<<<<<< HEAD
 import ProtectedRoute from './components/protectedroute';
 import CookieDetailPage from './components/cookiedetailpage';
 import { Routes, Route, useLocation } from 'react-router-dom';
+=======
+import CartPage from './pages/cartpage';
+
+>>>>>>> 1d5aaff (cart icon navbar)
 
 function AppContent() {
   const location = useLocation();
 
   const pathsWithLayout = [
+<<<<<<< HEAD
     "/",
     "/shop", "/branches", "/reviews", "/admin", "/glutenfree"
+=======
+    "/", "/login/success",
+    "/shop", "/branches", "/reviews", "/admin", "/glutenfree", "/cart"
+>>>>>>> 1d5aaff (cart icon navbar)
   ];
 
   const showLayout = pathsWithLayout.includes(location.pathname);
@@ -37,6 +47,13 @@ function AppContent() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/shop" element={<ShopPage />} />
         <Route path="/branches" element={<Branches />} />
+<<<<<<< HEAD
+=======
+        <Route path="/reviews" element={<ProtectedRoute element={<Reviews />} />} />
+        <Route path="/admin" element={<ProtectedRoute element={<Admin />} />} />
+        <Route path="/cart" element={<ProtectedRoute element={<CartPage />} />} />
+        <Route path="*" element={<ErrorPage />} />
+>>>>>>> 1d5aaff (cart icon navbar)
         <Route path="/glutenfree" element={<GlutenFreePage />} />
         <Route path="/cookie/:name" element={<CookieDetailPage />} />
         <Route path="/admin" element={<ProtectedRoute element={<Admin />} />} />
