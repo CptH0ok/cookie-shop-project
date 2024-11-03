@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
 import axios from 'axios';
+import { Navigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 
 const ProtectedRoute = ({ element, ...rest }) => {
   const token = localStorage.getItem('token');

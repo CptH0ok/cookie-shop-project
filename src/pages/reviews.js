@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import './reviews.css'; // Custom CSS for styles
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 
 const Reviews = () => {
-  const [reviews, setReviews] = useState([]);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
   const [error, setError] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [isPaused, setIsPaused] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   // Fetch reviews from the API
   const fetchReviews = async () => {

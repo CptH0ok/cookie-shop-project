@@ -1,17 +1,17 @@
-import { Routes, Route, useLocation } from 'react-router-dom';
-import Navbar from './components/navbar';
-import Footer from './components/footer';
-import HomePage from './pages/homepage';
+import Admin from './pages/admin';
 import Login from './pages/login';
 import Signup from './pages/signup';
-import ProtectedRoute from './components/protectedroute';
+import ErrorPage from './pages/error';
+import Reviews from './pages/reviews';
+import HomePage from './pages/homepage';
 import ShopPage from './pages/shoppage';
 import Branches from './pages/branches';
-import Reviews from './pages/reviews';
-import Admin from './pages/admin';
-import ErrorPage from './pages/error';
-import CookieDetailPage from './components/cookiedetailpage';
+import Footer from './components/footer';
+import Navbar from './components/navbar';
 import GlutenFreePage from './pages/glutenfreepage';
+import ProtectedRoute from './components/protectedroute';
+import CookieDetailPage from './components/cookiedetailpage';
+import { Routes, Route, useLocation } from 'react-router-dom';
 
 function AppContent() {
   const location = useLocation();
@@ -32,15 +32,15 @@ function AppContent() {
       )}
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="*" element={<ErrorPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/shop" element={<ShopPage />} />
-        <Route path="/cookie/:name" element={<CookieDetailPage />} />
         <Route path="/branches" element={<Branches />} />
-        <Route path="/reviews" element={<ProtectedRoute element={<Reviews />} />} />
-        <Route path="/admin" element={<ProtectedRoute element={<Admin />} />} />
-        <Route path="*" element={<ErrorPage />} />
         <Route path="/glutenfree" element={<GlutenFreePage />} />
+        <Route path="/cookie/:name" element={<CookieDetailPage />} />
+        <Route path="/admin" element={<ProtectedRoute element={<Admin />} />} />
+        <Route path="/reviews" element={<ProtectedRoute element={<Reviews />} />} />
       </Routes>
       {showLayout && <Footer />}
     </>

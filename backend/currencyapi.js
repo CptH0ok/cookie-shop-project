@@ -1,7 +1,6 @@
-// currencyConverter.js
 const axios = require('axios');
-const express = require('express');
 const router = express.Router();
+const express = require('express');
 
 // Replace with your actual API key from Currency API
 const API_KEY = process.env.CURRENCY_API;
