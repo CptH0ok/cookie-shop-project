@@ -26,7 +26,7 @@ router.put('/update/:userId', authenticateJWT, checkPermissions, async (req, res
     }
 
     try {
-        const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const updatedUser = await User.findByIdAndUpdate(req.params.userId, req.body, { new: true });
         if (!updatedUser) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -39,7 +39,7 @@ router.put('/update/:userId', authenticateJWT, checkPermissions, async (req, res
 // 3. Delete a user by ID
 router.delete('/delete/:userId', authenticateJWT, checkPermissions, async (req, res) => {
     try {
-        const deletedUser = await User.findByIdAndDelete(req.params.id);
+        const deletedUser = await User.findByIdAndDelete(req.params.userId);
         if (!deletedUser) {
             return res.status(404).json({ message: 'User not found' });
         }
