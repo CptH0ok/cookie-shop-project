@@ -1,5 +1,5 @@
-const router = express.Router();
 const express = require('express');
+const router = express.Router();
 const Branch = require('./models/branch');
 const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 
