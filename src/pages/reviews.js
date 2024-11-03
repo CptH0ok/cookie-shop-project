@@ -18,7 +18,7 @@ const Reviews = () => {
       // Handle error
       if (err) {
         // Server responded with a status other than 2xx
-        setError(err);
+        setError(err.message);
       } else if (err.request) {
         // Request was made but no response received
         setError('No response from server');
