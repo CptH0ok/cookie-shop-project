@@ -10,15 +10,15 @@ const Reviews = () => {
 
   // Fetch reviews from the API
   const fetchReviews = async () => {
-    const response = await axios.get('/api/pagereviews')
+    const response = await axios.get('http://localhost:3001/api/pagereviews')
     .then((response) => {;
         setReviews(response.data);
     })
     .catch((err) => {
       // Handle error
-      if (err.response) {
+      if (err) {
         // Server responded with a status other than 2xx
-        setError(err.response.data.error.message);
+        setError(err);
       } else if (err.request) {
         // Request was made but no response received
         setError('No response from server');
