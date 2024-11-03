@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
 import axios from 'axios';
+import React, { useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 
 const Signup = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [name, setName] = useState('');
-    const [error, setError] = useState('');
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  const [name, setName] = useState('');
+  const [error, setError] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   
     const handleSignup = async (e) => {
       e.preventDefault();

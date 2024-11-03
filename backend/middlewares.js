@@ -1,7 +1,7 @@
-const { OAuth2Client } = require('google-auth-library');
-const client = new OAuth2Client(process.env.REACT_APP_GOOGLE_CLIENT_ID);
 const jwt = require('jsonwebtoken');
 const User = require('./models/user');
+const { OAuth2Client } = require('google-auth-library');
+const client = new OAuth2Client(process.env.REACT_APP_GOOGLE_CLIENT_ID);
 
 const checkPermissions = async (req, res, next) => {
     if (req.params.id !== req.user?.id){

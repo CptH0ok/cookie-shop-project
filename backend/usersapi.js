@@ -1,11 +1,9 @@
-// usersapi.js
-
-const express = require('express');
-const User = require('./models/user');
-const mongoose = require('mongoose');
-const PurchaseHistory = require('./models/purchasehistory');
-const bcrypt = require('bcryptjs');
 const router = express.Router();
+const bcrypt = require('bcryptjs');
+const express = require('express');
+const mongoose = require('mongoose');
+const User = require('./models/user');
+const PurchaseHistory = require('./models/purchasehistory');
 const {authenticateJWT, checkAdmin, checkPermissions} = require('./middlewares');
 
 // 1. Create a new user

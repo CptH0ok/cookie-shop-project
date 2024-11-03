@@ -1,25 +1,25 @@
-const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const FB = require('./facebookapi');
-const branchesApi = require('./branchesapi');
-const usersApi = require('./usersapi');
-const cookiesApi = require('./cookiesapi');
-const convertCurrency = require('./currencyapi');
-const securityApi = require('./security');
-const {authenticateJWT, checkAdmin} = require('./middlewares');
 const app = express();
+const cors = require('cors');
+const path = require('path');
+const express = require('express');
+const FB = require('./facebookapi');
+const mongoose = require('mongoose');
+const usersApi = require('./usersapi');
+const securityApi = require('./security');
+const cookiesApi = require('./cookiesapi');
+const branchesApi = require('./branchesapi');
+const convertCurrency = require('./currencyapi');
+const {authenticateJWT, checkAdmin} = require('./middlewares');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use('/api/branches', branchesApi);
-app.use('/api/users', usersApi);
-app.use('/api/currency', convertCurrency);
+app.use('/api/users', usersApi );
 app.use('/api/cookies', cookiesApi );
-app.use('/api/security', securityApi);
+app.use('/api/security', securityApi );
+app.use('/api/branches', branchesApi );
+app.use('/api/currency', convertCurrency );
 
 // Serve static images from the "images" folder
 app.use('/images', express.static(path.join(__dirname, 'images')));
