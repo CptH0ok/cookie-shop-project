@@ -9,9 +9,11 @@ const bcrypt = require('bcryptjs');
 const User = require('./models/user');
 const branchesApi = require('./branchesapi');
 const usersApi = require('./usersapi');
+const cartApi = require('./cartapi')
 const cookiesApi = require('./cookiesapi')
 const convertCurrency = require('./currencyapi')
 const {authenticateJWT, checkAdmin, checkPermissions} = require('./middlewares');
+const cartitem = require('./models/cartitem');
 const app = express();
 
 // Middleware
@@ -19,6 +21,7 @@ app.use(cors());
 app.use(express.json());
 app.use('/api/branches', branchesApi);
 app.use('/api/users', usersApi);
+app.use('/api/cart', cartApi);
 app.use('/api/currency', convertCurrency);
 app.use('/api/cookies', cookiesApi )
 
@@ -33,6 +36,11 @@ mongoose.connect(process.env.MONGO_URI, {dbName: 'cookie_DB'}
 // Routes
 app.get('/api/products', async (req, res) => {
   const products = await Product.find();
+  res.json(products);
+});
+
+app.get('/api/cart', async (req, res) => {
+  const cartIcon = await cartitem.find();  
   res.json(products);
 });
 
