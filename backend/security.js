@@ -1,13 +1,15 @@
+const router = express.Router();
+const bcrypt = require('bcryptjs');
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
 const User = require('./models/user');
-const router = express.Router();
 const { authenticateJWT } = require('./middlewares');
 
-// using the authenticateJWT just to parse the token
-// Remote google login using Google OAuth API
-// savev to DB also for later use
+/**  
+ * using the authenticateJWT just to parse the token
+ * Remote google login using Google OAuth API
+ * save to DB also for later use
+*/ 
 router.get('/googlelogin', authenticateJWT, async(req, res) => {
     const [googleId, email, name] = [req.user.sub, req.user.email, req.user.name];
 
