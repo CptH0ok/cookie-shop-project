@@ -31,10 +31,17 @@ const Admin = () => {
     checkAdmin();
 
     return(
-        <div className="page-container">
-            <h2 className="text-center text-xl">
-                {error === '' ? adminPageData : error}
-            </h2>
+        <div className='flex bg-unsplash-[avJ9uz9Qhcw/lg] h-dvh bg-center bg-cover pb-32'>
+            <div className='relative flex z-10 top-20 left-2 mr-4 mt-5 h-full w-1/5 h-auto backdrop-contrast-50 backdrop-blur-2xl rounded-2xl'>
+                <div className=''>Stats</div> 
+                <div className=''>Stock</div>
+                <div className=''>Branches</div>
+                <div className=''></div>
+                <div className=''></div>
+            </div>
+            <div className='relative flex z-10 top-20 mr-2 ml-4 mt-5 h-full w-4/5 h-auto backdrop-contrast-50 backdrop-blur-2xl rounded-2xl'>
+
+            </div>
         </div>
     )
 };
