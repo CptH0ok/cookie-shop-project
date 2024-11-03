@@ -18,7 +18,7 @@ router.post('/create', authenticateJWT, checkAdmin, async (req, res) => {
 });
 
 // 2. Update a user by ID
-router.put('/update/:id', authenticateJWT, checkPermissions, async (req, res) => {
+router.put('/update/:userId', authenticateJWT, checkPermissions, async (req, res) => {
     if (req.body.password){
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(req.body.password, salt);
@@ -37,7 +37,7 @@ router.put('/update/:id', authenticateJWT, checkPermissions, async (req, res) =>
 });
 
 // 3. Delete a user by ID
-router.delete('/delete/:id', authenticateJWT, checkPermissions, async (req, res) => {
+router.delete('/delete/:userId', authenticateJWT, checkPermissions, async (req, res) => {
     try {
         const deletedUser = await User.findByIdAndDelete(req.params.id);
         if (!deletedUser) {
@@ -139,6 +139,34 @@ router.get('/:userId/purchase-history', authenticateJWT, checkPermissions, async
       }
 });
 
+// 7. Update purchase history endpoint
+router.post('/:userId/purchase-history/create', authenticateJWT, checkPermissions, async (req, res) => {
+  const userId = req.params.userId;
+  const { items } = req.body;
+
+  if (!items || !Array.isArray(items) || items.length === 0) {
+    return res.status(400).json({ error: 'Items are required and should be an array' });
+  }
+
+  try {
+    // Create a new purchase record
+    const newPurchase = new PurchaseHistory({
+      memberId: userId,
+      items,
+      purchaseDate: new Date(), // Set the current date
+    });
+
+    // Save the new purchase history to the database
+    await newPurchase.save();
+
+    res.status(201).json({ message: 'Purchase history created successfully', purchase: newPurchase });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// 8. get user info for navbar
 router.get('/getuserdetails', authenticateJWT, async(req, res) => {
     try {
       if (!req.user) {
