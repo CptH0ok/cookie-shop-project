@@ -1,7 +1,8 @@
 const axios = require('axios');
+
+const accessToken = process.env.FACEBOOK_ACCESS_TOKEN;
 const pageId = process.env.FACEBOOK_PAGE_ID;
 const baseUrl = `https://graph.facebook.com/v21.0`;
-const accessToken = process.env.FACEBOOK_ACCESS_TOKEN;
 
 /**
  * Function to read all reviews of a Facebook Page
@@ -25,7 +26,7 @@ async function getFacebookPageReviews() {
     return response.data.data
   } catch (error) {
     console.error('Error retrieving Facebook page reviews:', error.response?.data);
-    res.status(500).json({ message: error.response?.data });
+    throw error;
   }
 }
 
@@ -50,7 +51,7 @@ async function postToFacebookPage(message) {
       return response.data.id;
     } catch (error) {
       console.error('Error posting to Facebook page:', error.response.data);
-      res.status(500).json({ message: error.response?.data });
+      throw error;
     }
   }
 
@@ -75,7 +76,7 @@ async function getLastFacebookPost() {
 
   } catch (error) {
     console.error('Error retrieving last Facebook page post:', error.response?.data);
-    res.status(500).json({ message: error.response?.data });
+    throw error;
   }
 }
 
@@ -99,7 +100,7 @@ async function getFacebookPostComments(postId) {
 
   } catch (error) {
     console.error('Error retrieving post comments:', error.response?.data);
-    res.status(500).json({ message: error.response?.data });
+    throw error;
   }
 }
 
@@ -124,7 +125,7 @@ async function getFacebookPostPicture(postId) {
 
   } catch (error) {
     console.error('Error retrieving picture link:', error.response?.data);
-    res.status(500).json({ message: error.response?.data });
+    throw error;
   }
 }
 
@@ -148,7 +149,7 @@ async function getFacebookPostLikes(postId) {
     return response.data.data;
   } catch (error) {
     console.error('Error retrieving post likes:', error.response?.data);
-    res.status(500).json({ message: error.response?.data });
+    throw error;
   }
 }
 
