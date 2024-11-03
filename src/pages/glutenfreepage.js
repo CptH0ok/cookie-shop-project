@@ -1,6 +1,6 @@
 import React from 'react';
-import './glutenfreepage.css';
 import { Link } from 'react-router-dom';
+import './glutenfreepage.css';
 
 const GlutenFreePage = () => {
   return (

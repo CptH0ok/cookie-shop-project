@@ -1,13 +1,15 @@
+// CookieDetailPage.js
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 
 const CookieDetailPage = () => {
     const { name } = useParams();
-    const navigate = useNavigate();
-    const [cookie, setCookie] = useState(null);
-    const [quantity, setQuantity] = useState(1);
-    const [loading, setLoading] = useState(true);
     const decodedName = decodeURIComponent(name);
+    const [cookie, setCookie] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [quantity, setQuantity] = useState(1);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchCookie = async () => {
