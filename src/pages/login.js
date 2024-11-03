@@ -1,11 +1,11 @@
-import axios from 'axios';
 import React, { useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
+import axios from 'axios';
 import GoogleSignIn from '../components/googlesignin';
 
 const Login = () => {
-  const navigate = useNavigate();
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();  // Prevent the default form submission behavior
@@ -15,7 +15,7 @@ const Login = () => {
     const password = e.target.password.value;
 
     try {
-      const res = await axios.post('http://localhost:3001/api/security/login', { email, password });
+      const res = await axios.post('http://localhost:3001/api/login', { email, password });
       localStorage.setItem('token', res.data.token);
       setError('');
       navigate('/');  // Redirect to home page after login
