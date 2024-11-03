@@ -1,5 +1,5 @@
-const router = express.Router();
 const express = require('express');
+const router = express.Router();
 const Cookie = require('./models/cookie.js');
 const {authenticateJWT, checkAdmin} = require('./middlewares');
 
