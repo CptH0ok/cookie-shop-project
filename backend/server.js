@@ -1,7 +1,8 @@
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const express = require('express');
 const app = express();
 const cors = require('cors');
-const path = require('path');
 const FB = require('./facebookapi');
 const mongoose = require('mongoose');
 const usersApi = require('./usersapi');
@@ -10,7 +11,6 @@ const cookiesApi = require('./cookiesapi');
 const branchesApi = require('./branchesapi');
 const convertCurrency = require('./currencyapi');
 const {authenticateJWT, checkAdmin} = require('./middlewares');
-require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 // Middleware
 app.use(cors());
