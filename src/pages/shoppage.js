@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import './shopPage.css';
+import './shoppage.css';
 
 const ShopPage = () => {
   const [cookies, setCookies] = useState([]);
