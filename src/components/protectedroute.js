@@ -20,7 +20,7 @@ const ProtectedRoute = ({ element, ...rest }) => {
 
       try {
         // Make a request to your backend to verify the JWT
-        const response = await axios.get('http://localhost:3001/api/verify-token', {
+        const response = await axios.get('http://localhost:3001/api/security/verify-token', {
           headers: {
             Authorization: `Bearer ${token}`,
           },

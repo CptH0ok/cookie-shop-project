@@ -84,7 +84,7 @@ const Navbar = () => {
       const email = userDetails.email;
 
       try {
-        await axios.post('http://localhost:3001/api/login', { email, password: oldPassword });
+        await axios.post('http://localhost:3001/api/security/login', { email, password: oldPassword });
         setError('');
 
         try{

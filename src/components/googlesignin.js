@@ -9,7 +9,7 @@ const GoogleSignIn = () => {
     const handleCredentialResponse = async (response) => {
       localStorage.setItem('token', response.credential);
       const token = response.credential;
-      const res = await axios.get('http://localhost:3001/api/googlelogin', {
+      const res = await axios.get('http://localhost:3001/api/security/googlelogin', {
         headers: {
             Authorization: `Bearer ${token}`,
         },
