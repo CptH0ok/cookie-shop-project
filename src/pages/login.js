@@ -15,7 +15,7 @@ const Login = () => {
     const password = e.target.password.value;
 
     try {
-      const res = await axios.post('http://localhost:3001/api/login', { email, password });
+      const res = await axios.post('http://localhost:3001/api/security/login', { email, password });
       localStorage.setItem('token', res.data.token);
       setError('');
       navigate('/');  // Redirect to home page after login
