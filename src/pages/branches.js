@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import './maps.css'; // Importing CSS for styles
+import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 
 const Branches = () => {
   const [branches, setBranches] = useState([]);
@@ -12,7 +12,7 @@ const Branches = () => {
       // Fetch branches from the API
       const fetchBranches = async () => {
           try {
-              const response = await axios.get('/api/branches/list');
+              const response = await axios.get('http://localhost:3001/api/branches/list');
               setBranches(response.data);
           } catch (err) {
               setError('Failed to load branches');
@@ -28,7 +28,7 @@ const Branches = () => {
     setLoading(true);
 
     try {
-      const response = await axios.get('/api/branches/map/' + branch._id);
+      const response = await axios.get('http://localhost:3001/api/branches/map/' + branch._id);
       setSelectedBranchMap(response.data.mapIframeHtml);
   } catch (err) {
       setError('Failed to load branches');

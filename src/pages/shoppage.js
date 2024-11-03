@@ -1,16 +1,14 @@
-"use client";
-
+import './shoppage.css';
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import './shoppage.css';
 
 const ShopPage = () => {
-  const [cookies, setCookies] = useState([]);
-  const [filteredCookies, setFilteredCookies] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [stockStatus, setStockStatus] = useState("");
   const navigate = useNavigate();
+  const [cookies, setCookies] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [stockStatus, setStockStatus] = useState("");
+  const [filteredCookies, setFilteredCookies] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   useEffect(() => {
     // Fetch all cookies from the server

@@ -1,15 +1,30 @@
+const jwt = require('jsonwebtoken');
+const User = require('./models/user');
 const { OAuth2Client } = require('google-auth-library');
 const client = new OAuth2Client(process.env.REACT_APP_GOOGLE_CLIENT_ID);
-const jwt = require('jsonwebtoken');
 
+/**
+ * Checks to see wether the caller is requested userId in the API call, or an admin user.
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ */
 const checkPermissions = async (req, res, next) => {
-    if (req.params.userId !== req.user?._id){
+    if (req.params.userId !== req.user?.id){
         checkAdmin(req, res, (err) => {
-            if (err) return next(err);
+            if (err) res.sendStatus(403);
         });
     }
+    next();
   };
   
+  /**
+   * Checks if the JWT token role is an admin
+   * @param {*} req 
+   * @param {*} res 
+   * @param {*} next 
+   * @returns 
+   */
   const checkAdmin = async (req, res, next) => {
     const email = req.user.email
     let user = await User.findOne({ email }); //add user role from database
@@ -27,7 +42,13 @@ const checkPermissions = async (req, res, next) => {
     }
   };
   
-  // Middleware to authenticate JWT
+  /**
+   * Middleware to verify JWT, locally or remote using googles verifyIdToken function.
+   * @param {*} req 
+   * @param {*} res 
+   * @param {*} next 
+   * @returns 
+   */
   const authenticateJWT = async (req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1]; // Get token from headers
   
