@@ -1,8 +1,6 @@
-// branchesapi.js
-
 const express = require('express');
-const Branch = require('./models/branch');
 const router = express.Router();
+const Branch = require('./models/branch');
 const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 
 // 1. Create a new branch

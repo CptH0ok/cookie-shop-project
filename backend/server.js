@@ -1,26 +1,25 @@
-const path = require('path')
+const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const express = require('express');
-const mongoose = require('mongoose');
+const app = express();
 const cors = require('cors');
 const FB = require('./facebookapi');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-const User = require('./models/user');
-const branchesApi = require('./branchesapi');
+const mongoose = require('mongoose');
 const usersApi = require('./usersapi');
-const cookiesApi = require('./cookiesapi')
-const convertCurrency = require('./currencyapi')
-const {authenticateJWT, checkAdmin, checkPermissions} = require('./middlewares');
-const app = express();
+const securityApi = require('./security');
+const cookiesApi = require('./cookiesapi');
+const branchesApi = require('./branchesapi');
+const convertCurrency = require('./currencyapi');
+const {authenticateJWT, checkAdmin} = require('./middlewares');
 
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use('/api/branches', branchesApi);
-app.use('/api/users', usersApi);
-app.use('/api/currency', convertCurrency);
-app.use('/api/cookies', cookiesApi )
+app.use('/api/users', usersApi );
+app.use('/api/cookies', cookiesApi );
+app.use('/api/security', securityApi );
+app.use('/api/branches', branchesApi );
+app.use('/api/currency', convertCurrency );
 
 // Serve static images from the "images" folder
 app.use('/images', express.static(path.join(__dirname, 'images')));
@@ -67,79 +66,8 @@ app.get('/api/getlastdatacomments', async (req, res, next) => {
   }
 });
 
-//using the authenticateJWT just to parse the token
-app.get('/api/googlelogin', authenticateJWT, async(req, res) => {
-  const [googleId, email, name] = [req.user.sub, req.user.email, req.user.name];
-
-  let user = await User.findOne({ email });
-
-  if (user) {
-    console.info('User already exists in db');
-  }
-
-  else{
-    user = new User({ googleId, email, name, role: 'admin' });
-    await user.save();
-  }
-
-  res.sendStatus('200');
-});
-
-// Email Sign Up
-app.post('/api/signup', async (req, res) => {
-  const { email, password, name } = req.body;
-
-  try {
-    let user = await User.findOne({ email });
-
-    if (user) {
-      return res.status(400).json({ message: 'User already exists' });
-    }
-
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    user = new User({ email, password: hashedPassword, name });
-    await user.save();
-
-    const token = jwt.sign({ id: user.id, name: user.name, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
-    res.json({ token });
-  } catch (err) {
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// Email Login
-app.post('/api/login', async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return res.status(400).json({ message: 'No such user' });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Wrong password' });
-    }
-
-    const token = jwt.sign({ id: user.id, name: user.name, email: user.email, role: user.role}, process.env.JWT_SECRET, { expiresIn: '1d' });
-    res.json({ token });
-  } catch (err) {
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
 app.get('/api/admin', authenticateJWT, checkAdmin, (req, res) => {
   res.json('Welcome "' + req.user.name + '" to admin panel!');
-});
-
-// Token verification route
-app.get('/api/verify-token', authenticateJWT, (req, res) => {
-  res.status(200).json({ name: req.user.name}); // Send 200 OK if the token is valid
 });
 
 // Error handling middleware
