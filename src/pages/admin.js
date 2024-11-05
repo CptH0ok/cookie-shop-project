@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import ErrorPage from './error';
 import './admin.css';
+import axios from 'axios';
+import React, { useState } from 'react';
 
 const Admin = () => {
     const token = localStorage.getItem('token');

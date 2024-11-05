@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Dialog, DialogBackdrop, DialogPanel, DialogTitle, TransitionChild, Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
-import { XMarkIcon, TruckIcon, FingerPrintIcon, BanknotesIcon, AtSymbolIcon } from '@heroicons/react/24/outline'
-import { ChevronDownIcon, PhoneIcon } from '@heroicons/react/20/solid'
 import axios from 'axios';
+import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { ChevronDownIcon, PhoneIcon } from '@heroicons/react/20/solid'
+import { XMarkIcon, TruckIcon, FingerPrintIcon, BanknotesIcon, AtSymbolIcon } from '@heroicons/react/24/outline'
+import { Dialog, DialogBackdrop, DialogPanel, DialogTitle, TransitionChild, Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -84,7 +84,7 @@ const Navbar = () => {
       const email = userDetails.email;
 
       try {
-        await axios.post('http://localhost:3001/api/login', { email, password: oldPassword });
+        await axios.post('http://localhost:3001/api/security/login', { email, password: oldPassword });
         setError('');
 
         try{
@@ -112,8 +112,9 @@ const Navbar = () => {
 
       const newEmail = e.target.newemail.value;
       const oldEmail = e.target.oldemail.value;
+      const currEmail = userDetails.email;
 
-      if(newEmail === oldEmail){
+      if(currEmail === oldEmail){
         try{
           await axios.put(`http://localhost:3001/api/users/update/${userDetails.id}`,{ email: newEmail },  // JSON body
             {
@@ -129,6 +130,8 @@ const Navbar = () => {
         } catch (err){
           setError("error in update");
         }
+    } else {
+      setError("this is not your current email");
     }
     };
 
@@ -242,8 +245,8 @@ const Navbar = () => {
 
                 <div class="grid gap-4 mb-4 sm:grid-cols-2">
                   <div>
-                      <label htmlFor="oldmail" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Current Email</label>
-                      <input type="email" name="oldmail" id="oldmail" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder={userDetails.email}/>
+                      <label htmlFor="oldemail" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Current Email</label>
+                      <input type="email" name="oldemail" id="oldemail" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder={userDetails.email}/>
                   </div>
                   <div>
                       <label htmlFor="newemail" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">New Email</label>
