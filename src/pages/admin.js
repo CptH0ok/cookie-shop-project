@@ -1,23 +1,18 @@
 import "./admin.css";
 import axios from "axios";
 import React, { useState } from "react";
+import * as d3 from "d3";
 
 const Admin = () => {
   const token = localStorage.getItem("token");
   const [error, setError] = useState("");
   const [adminPageData, setAdminPageData] = useState(null);
   const [selectedMenu, setSelectedMenu] = useState("home");
-  const [openDropdowns, setOpenDropdowns] = useState({
-    stock: false,
-    purchases: false,
-    branches: false,
-  });
+  const [openDropdown, setOpenDropdown] = useState(null);
 
   const toggleDropdown = (menu) => {
-    setOpenDropdowns((prev) => ({
-      ...prev,
-      [menu]: !prev[menu], // Toggle the specific dropdown
-    }));
+    // Set the open dropdown to the clicked one, or close it if it's already open
+    setOpenDropdown((prev) => (prev === menu ? null : menu));
   };
 
   const handleMenuClick = (Admin) => {
@@ -56,7 +51,7 @@ const Admin = () => {
           Header{" "}
         </div>
         <div name="home"
-          className="realtive z-10 p-5 m-2 rounded-md hover:drop-shadow-lg hover:text-black hover:bg-yellow-500 duration-300"
+          className={`realtive z-10 p-5 m-2 rounded-md hover:drop-shadow-lg hover:text-black hover:bg-yellow-500 duration-300`} 
           onClick={() => handleMenuClick("home")}
         >
           <div className="relative z-10 font-bold text-2xl text-center text-white">
@@ -66,7 +61,7 @@ const Admin = () => {
         <div name="stock">
           <div
             className={`realtive z-10 p-5 m-2 rounded-md hover:drop-shadow-lg hover:text-black hover:bg-yellow-500 duration-300 ${
-              openDropdowns.stock
+              openDropdown == "stock"
                 ? "realtive z-10 p-5 m-2 rounded-md drop-shadow-lg text-black bg-yellow-600"
                 : ""
             } `}
@@ -76,7 +71,7 @@ const Admin = () => {
               Stock
             </div>
           </div>
-          {openDropdowns.stock && (
+          {openDropdown == "stock" && (
             <div className="relative z-0 rounded-md ring-1 ring-white p-2 m-4">
               <div
                 className="relative z-0 text-gray-300 m-2 p-2 rounded-md font-bold text-xl text-center hover:bg-white hover:text-black duration-300"
@@ -96,7 +91,7 @@ const Admin = () => {
         <div name="purchases">
           <div
             className={`realtive z-10 p-5 m-2 rounded-md hover:drop-shadow-lg hover:text-black hover:bg-yellow-500 duration-300 ${
-              openDropdowns.purchases
+              openDropdown == "purchases"
                 ? "realtive z-10 p-5 m-2 rounded-md drop-shadow-lg text-black bg-yellow-600"
                 : ""
             } `}
@@ -106,7 +101,7 @@ const Admin = () => {
               Purchases
             </div>
           </div>
-          {openDropdowns.purchases && (
+          {openDropdown == "purchases" && (
             <div className="relative z-0 rounded-md ring-1 ring-white p-2 m-4">
               <div
                 className="relative z-0 text-gray-300 m-2 p-2 rounded-md font-bold text-xl text-center hover:bg-white hover:text-black duration-300"
@@ -126,7 +121,7 @@ const Admin = () => {
         <div name="branches">
           <div
             className={`realtive z-10 p-5 m-2 rounded-md hover:drop-shadow-lg hover:text-black hover:bg-yellow-500 duration-300 ${
-              openDropdowns.branches
+              openDropdown == "branches"
                 ? "realtive z-10 p-5 m-2 rounded-md drop-shadow-lg text-black bg-yellow-600"
                 : ""
             } `}
@@ -136,7 +131,7 @@ const Admin = () => {
               Branches
             </div>
           </div>
-          {openDropdowns.branches && (
+          {openDropdown == "branches" && (
             <div className="relative z-0 rounded-md ring-1 ring-white p-2 m-4">
               <div
                 className="relative z-0 text-gray-300 m-2 p-2 rounded-md font-bold text-xl text-center hover:bg-white hover:text-black duration-300"
@@ -156,6 +151,12 @@ const Admin = () => {
               >
                 Close Branches
               </div>
+              <div
+                className="relative z-0 text-gray-300 m-2 p-2 rounded-md font-bold text-xl text-center hover:bg-white hover:text-black duration-300"
+                onClick={() => handleMenuClick("updatebranches")}
+              >
+                Update Branches
+              </div>
             </div>
           )}
         </div>
@@ -169,6 +170,7 @@ const Admin = () => {
         {selectedMenu === "viewbranches" && <ViewBranchesContent />}
         {selectedMenu === "openbranches" && <OpenBranchesContent />}
         {selectedMenu === "closebranches" && <CloseBranchesContent />}
+        {selectedMenu === "updatebranches" && <UpdateBranchesContent />}
       </div>
     </div>
   );
@@ -184,5 +186,6 @@ const RemovePurchasesContent = () => (
 const ViewBranchesContent = () => <div className="p-4">View Branches</div>;
 const OpenBranchesContent = () => <div className="p-4">Open Branches</div>;
 const CloseBranchesContent = () => <div className="p-4">Close Branches</div>;
+const UpdateBranchesContent = () => <div className="p-4">Update Branches</div>;
 
 export default Admin;
