@@ -39,3 +39,17 @@
     background-color: #219653; /* Darker green on hover */
   }
   
+  .video-container {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically (if the video has height) */
+    margin-top: 30px; /* Add some margin above the video */
+  }
+  
+  .gluten-free-video {
+    max-width: 100%; /* Ensure video takes up full width of its container */
+    height: auto; /* Maintain the aspect ratio of the video */
+    border-radius: 10px; /* Optional: rounded corners for the video */
+    display: block; /* Remove inline behavior */
+    margin: 0 auto; /* Center the video horizontally */
+  }
