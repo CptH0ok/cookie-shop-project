@@ -12,13 +12,13 @@ const Admin = () => {
   const [openDropdown, setOpenDropdown] = useState(null);
 
   const HomeContent = () => <div className="p-4">Welcome to Home</div>;
-  const ViewStockContent = () => <div className="font-bold font-serif"><DataTable apiUrl={"http://localhost:3001/api/cookies"} /></div>;
+  const ViewStockContent = () => <div className="overflow-auto rounded-md text-md font-bold font-serif"><DataTable apiUrl={"http://localhost:3001/api/cookies"} /></div>;
   const UpdateStockContent = () => <div className="p-4">Update Stock</div>;
   const ViewPurchasesContent = () => <div className="p-4">View Purchases</div>;
   const RemovePurchasesContent = () => (
     <div className="p-4">Remove Purchases</div>
   );
-  const ViewBranchesContent = () => <div className="font-bold font-serif"><DataTable apiUrl={"http://localhost:3001/api/branches/list"} /></div>;
+  const ViewBranchesContent = () => <div className="overflow-auto rounded-md text-md font-bold font-serif"><DataTable apiUrl={"http://localhost:3001/api/branches/list"} /></div>;
   const OpenBranchesContent = () => <div className="p-4">Open Branches</div>;
   const CloseBranchesContent = () => <div className="p-4">Close Branches</div>;
   const UpdateBranchesContent = () => (

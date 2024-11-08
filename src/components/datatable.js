@@ -30,12 +30,12 @@ function DataTable({ apiUrl }) {
 
     return (
         <div id="d3-table-container" className="overflow-x-auto">
-            <table className="table-auto w-full border-collapse border border-gray-300">
+            <table className="table-auto w-full border-collapse border border-transparent drop-shadow-md">
                 <thead>
                     <tr>
                         {/* Render table headers dynamically based on the keys of the first object in data */}
                         {Object.keys(data[0]).map(header => (
-                            <th key={header} className="px-4 py-2 border bg-gray-200 text-left">{header}</th>
+                            <th key={header} className="px-4 py-2 border-2 border-inherit bg-yellow-600 text-left font-bold text-lg capitalize drop-shadow-lg">{header}</th>
                         ))}
                     </tr>
                 </thead>
