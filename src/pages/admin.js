@@ -1,28 +1,58 @@
 import "./admin.css";
-import DataTable from "../components/datatable"
+import DataTable from "../components/datatable";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import * as d3 from "d3";
 
 const Admin = () => {
   const token = localStorage.getItem("token");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
   const [adminPageData, setAdminPageData] = useState(null);
   const [selectedMenu, setSelectedMenu] = useState("home");
   const [openDropdown, setOpenDropdown] = useState(null);
 
+  const branchColumns = ["name", "address", "contact", "services"];
+  const stockColumns = [
+    "name",
+    "description",
+    "price",
+    "ingredients",
+    "category",
+    "available",
+  ];
+
   const HomeContent = () => <div className="p-4">Welcome to Home</div>;
-  const ViewStockContent = () => <div className="overflow-auto rounded-md text-md font-bold font-serif"><DataTable apiUrl={"http://localhost:3001/api/cookies"} /></div>;
+  const ViewStockContent = () => (
+    <div className="overflow-auto rounded-md text-md font-bold font-serif">
+      <DataTable
+        apiUrl={"http://localhost:3001/api/cookies"}
+        columnsToDisplay={stockColumns}
+        editable={false}
+      />
+    </div>
+  );
   const UpdateStockContent = () => <div className="p-4">Update Stock</div>;
   const ViewPurchasesContent = () => <div className="p-4">View Purchases</div>;
   const RemovePurchasesContent = () => (
     <div className="p-4">Remove Purchases</div>
   );
-  const ViewBranchesContent = () => <div className="overflow-auto rounded-md text-md font-bold font-serif"><DataTable apiUrl={"http://localhost:3001/api/branches/list"} /></div>;
-  const OpenBranchesContent = () => <div className="p-4">Open Branches</div>;
-  const CloseBranchesContent = () => <div className="p-4">Close Branches</div>;
+  const ViewBranchesContent = () => (
+    <div className="overflow-auto rounded-md text-md font-bold font-serif">
+      <DataTable
+        apiUrl={"http://localhost:3001/api/branches/list"}
+        columnsToDisplay={branchColumns}
+        editable={false}
+      />
+    </div>
+  );
   const UpdateBranchesContent = () => (
-    <div className="p-4">Update Branches</div>
+    <div className="overflow-auto rounded-md text-md font-bold font-serif">
+      <DataTable
+        apiUrl={"http://localhost:3001/api/branches/list"}
+        columnsToDisplay={branchColumns}
+        editable={true}
+      />
+    </div>
   );
 
   const toggleDropdown = (menu) => {
@@ -46,19 +76,15 @@ const Admin = () => {
       })
       .catch((err) => {
         // Handle error
-        if (err.response) {
-          // Server responded with a status other than 2xx
-          setError(err.response.data);
-        } else {
-          // Something happened in setting up the request
-          setError(err.response.data);
-        }
+          setError(true);
       });
-  };
+  }; 
 
   checkAdmin();
 
-  return (
+  return ( 
+    <>
+    { !error && (
     <div className="flex bg-unsplash-[avJ9uz9Qhcw/lg] h-dvh bg-center bg-cover pb-32">
       <div className="relative flex flex-col z-10 top-20 left-2 mr-4 mt-5 h-full w-1/5 h-auto backdrop-contrast-50 backdrop-blur-2xl rounded-2xl">
         <div className="relative z-10 mt-10 font-bold text-2xl text-center text-black">
@@ -157,18 +183,6 @@ const Admin = () => {
               </div>
               <div
                 className="relative z-0 text-gray-300 m-2 p-2 rounded-md font-bold text-xl text-center hover:bg-white hover:text-black duration-300"
-                onClick={() => handleMenuClick("openbranches")}
-              >
-                Open Branches
-              </div>
-              <div
-                className="relative z-0 text-gray-300 m-2 p-2 rounded-md font-bold text-xl text-center hover:bg-white hover:text-black duration-300"
-                onClick={() => handleMenuClick("closebranches")}
-              >
-                Close Branches
-              </div>
-              <div
-                className="relative z-0 text-gray-300 m-2 p-2 rounded-md font-bold text-xl text-center hover:bg-white hover:text-black duration-300"
                 onClick={() => handleMenuClick("updatebranches")}
               >
                 Update Branches
@@ -184,12 +198,11 @@ const Admin = () => {
         {selectedMenu === "viewpurchases" && <ViewPurchasesContent />}
         {selectedMenu === "removepurchases" && <RemovePurchasesContent />}
         {selectedMenu === "viewbranches" && <ViewBranchesContent />}
-        {selectedMenu === "openbranches" && <OpenBranchesContent />}
-        {selectedMenu === "closebranches" && <CloseBranchesContent />}
         {selectedMenu === "updatebranches" && <UpdateBranchesContent />}
       </div>
     </div>
-  );
+  )}
+  </>)
 };
 
 export default Admin;

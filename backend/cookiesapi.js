@@ -63,7 +63,7 @@ router.get('/categories', async (req, res) => {
 
 /*4. create new cookie - only admins should be able to do it
 so it checks if the user is authenticated and is an admin*/
-router.post('/', authenticateJWT, checkAdmin, async (req, res) => {
+router.post('/create', authenticateJWT, checkAdmin, async (req, res) => {
     const { name, description, price, category, available, imageUrl } = req.body;
   
     try {
@@ -87,7 +87,7 @@ router.post('/', authenticateJWT, checkAdmin, async (req, res) => {
   doing it by the name of the cookie and not by _id (for the admins convenience)
   it is case-insensitive*/
   
-router.put('/:name', authenticateJWT, checkAdmin, async (req, res) => {
+router.put('/update/:name', authenticateJWT, checkAdmin, async (req, res) => {
     const cookieName = decodeURIComponent(req.params.name);
     const updatedData = req.body;
   
@@ -110,7 +110,7 @@ router.put('/:name', authenticateJWT, checkAdmin, async (req, res) => {
   });
   
 //6. delete a cookie by name (case-insensitive) - only for admins
-router.delete('/:name', authenticateJWT, checkAdmin, async (req, res) => {
+router.delete('/delete/:name', authenticateJWT, checkAdmin, async (req, res) => {
     try {
       const cookieName = req.params.name;
       const deletedCookie = await Cookie.findOneAndDelete({
