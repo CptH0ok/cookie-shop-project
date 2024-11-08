@@ -5,6 +5,7 @@ import ErrorPage from './pages/error';
 import Reviews from './pages/reviews';
 import HomePage from './pages/homepage';
 import ShopPage from './pages/shoppage';
+import CartPage from './pages/cartpage';
 import Branches from './pages/branches';
 import Footer from './components/footer';
 import Navbar from './components/navbar';
@@ -39,6 +40,7 @@ function AppContent() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/shop" element={<ShopPage />} />
+        <Route path="/cart" element={<CartPage />} />
         <Route path="/branches" element={<Branches />} />
         <Route path="/glutenfree" element={<GlutenFreePage />} />
         <Route path="/cookie/:name" element={<CookieDetailPage />} />

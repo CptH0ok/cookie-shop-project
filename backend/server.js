@@ -9,11 +9,10 @@ const bcrypt = require('bcryptjs');
 const User = require('./models/user');
 const branchesApi = require('./branchesapi');
 const usersApi = require('./usersapi');
-const cartApi = require('./cartapi')
-const cookiesApi = require('./cookiesapi')
-const convertCurrency = require('./currencyapi')
+const cartApi = require('./cartapi');
+const cookiesApi = require('./cookiesapi');
+const convertCurrency = require('./currencyapi');
 const {authenticateJWT, checkAdmin, checkPermissions} = require('./middlewares');
-const cartitem = require('./models/cartitem');
 const app = express();
 
 // Middleware
@@ -27,6 +26,7 @@ app.use('/api/cookies', cookiesApi )
 
 // Serve static images from the "images" folder
 app.use('/images', express.static(path.join(__dirname, 'images')));
+
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {dbName: 'cookie_DB'}

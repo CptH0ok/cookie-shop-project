@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import axios from 'axios';
 
 const CookieDetailPage = () => {
     const { name } = useParams();
@@ -10,6 +11,7 @@ const CookieDetailPage = () => {
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
     const navigate = useNavigate();
+    const token = localStorage.getItem("token");
 
     useEffect(() => {
         const fetchCookie = async () => {
@@ -29,10 +31,128 @@ const CookieDetailPage = () => {
         fetchCookie();
     }, [decodedName]);
 
-    const handleAddToCart = () => {
-        console.log(`Added ${quantity} ${cookie.name}(s) to the cart`);
-    };
 
+    //   const handleAddToCart = async () => {
+    //     try {
+    //       // Fetch user details
+    //       const userResponse = await axios.get('http://localhost:3001/api/users/getuserdetails', {
+    //         headers: {
+    //           Authorization: `Bearer ${token}`,
+    //         }
+    //       });
+      
+    //       console.log("Token being sent:", localStorage.getItem('token'));
+      
+    //       if (!userResponse.data) {
+    //         console.error('User not authenticated');
+    //         alert('You must be logged in to add items to the cart');
+    //         return;
+    //       }
+      
+    //       const user = userResponse.data;
+      
+    //       // Validate that `cookie` object is available
+    //       if (!cookie || !cookie.id) {
+    //         console.error('Invalid cookie data');
+    //         alert('Error: Invalid item data');
+    //         return;
+    //       }
+      
+    //       // First, check if the item already exists in the cart
+    //       const cartResponse = await axios.get(`http://localhost:3001/api/cart/user/${user.id}`, {
+    //         headers: {
+    //             Authorization: `Bearer ${localStorage.getItem('token')}`,
+    //         }
+    //       });
+
+    //       // Add the item to the cart for the authenticated user
+    //       const response = await axios.post('http://localhost:3001/api/cart/add', {
+    //         userId: user.id,
+    //         cookieId: cookie.id,
+    //         quantity: quantity,
+    //       }, {
+    //         headers: {
+    //           'Content-Type': 'application/json',
+    //           Authorization: `Bearer ${localStorage.getItem('token')}`,
+    //         }
+    //       });
+      
+    //       if (response.status === 200) {
+    //         console.log(`Added ${quantity} ${cookie.name}(s) to the cart`);
+    //         alert(`Added ${quantity} ${cookie.name}(s) to the cart`);
+    //       } else {
+    //         console.error('Failed to add item to cart');
+    //         alert('Failed to add item to the cart');
+    //       }
+    //     } catch (error) {
+    //       console.error('Error adding to cart:', error);
+    //       alert('Error adding to cart, please try again');
+    //     }
+    //   };
+
+
+    const handleAddToCart = async () => {
+        try {
+          // Fetch user details
+          const userResponse = await axios.get('http://localhost:3001/api/users/getuserdetails', {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            }
+          });
+      
+          console.log("Token being sent:", localStorage.getItem('token'));
+      
+          if (!userResponse.data) {
+            console.error('User not authenticated');
+            alert('You must be logged in to add items to the cart');
+            return;
+          }
+      
+          const user = userResponse.data;
+      
+          // Validate that `cookie` object is available
+          if (!cookie || !cookie.id) {
+            console.error('Invalid cookie data');
+            alert('Error: Invalid item data');
+            return;
+          }
+      
+          // Get the user's cart items
+          const { data } = await axios.get(`http://localhost:3001/api/cart/${user.id}`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            }
+          });
+      
+          console.log("Cart data received:", data);
+      
+          // Add to cart (the backend will handle whether to update quantity or add new item)
+          const response = await axios.post('http://localhost:3001/api/cart/add', {
+            userId: user.id,
+            cookieId: cookie.id,
+            quantity: quantity,
+          }, {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            }
+          });
+      
+          if (response.status === 200) {
+            console.log(`Added ${quantity} ${cookie.name}(s) to the cart`);
+            alert(`Added ${quantity} ${cookie.name}(s) to the cart`);
+          } else {
+            console.error('Failed to add item to cart');
+            alert('Failed to add item to the cart');
+          }
+      
+        } catch (error) {
+          console.error('Error managing cart:', error.response?.data || error.message);
+          alert(`Error managing cart: ${error.response?.data?.error || error.message}`);
+        }
+      };
+      
+      
     if (loading) return <div className="text-white">Loading...</div>;
     if (!cookie) return <div className="text-white">Cookie not found!</div>;
 
