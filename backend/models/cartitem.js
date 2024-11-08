@@ -1,14 +1,17 @@
-const mongoose = require('mongoose');;
+const mongoose = require('mongoose');
+const Cookie = require('./cookie');  // Reference to Cookie model
 
 const cartItemSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  productId: { type: mongoose.Schema.Types.ObjectId, ref: 'cookie', required: true },
-  name: String,
-  size: String,
-  price: Number,
-  quantity: { type: Number, default: 1 },
-  image: String,
-}, { collection: 'cookie_shop' }); 
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  items: [
+    {
+      cookie: { type: mongoose.Schema.Types.ObjectId, ref: 'Cookie', required: true },
+      quantity: { type: Number, required: true, min: 1 }
+    }
+  ]
+}, { collection: 'cart' });
 
+const CartItem = mongoose.model('CartItem', cartItemSchema);
 
-module.exports = mongoose.model('CartItem', cartItemSchema);
+module.exports = CartItem;
+

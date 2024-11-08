@@ -33,15 +33,15 @@ const Navbar = () => {
   }, []);
 
   //Updates the cart count when cart items change
-  useEffect(() => {
-    // Assuming fetchCartCount is a function that returns the count of items in the cart
-    async function fetchCartCount() {
-      const response = await axios.get('http://localhost:3001/api/');
-      setCartCount(response.data.count);
-    }
+  // useEffect(() => {
+  //   // Assuming fetchCartCount is a function that returns the count of items in the cart
+  //   async function fetchCartCount() {
+  //     const response = await axios.get('http://localhost:3001/api/');
+  //     setCartCount(response.data.count);
+  //   }
   
-    fetchCartCount();
-  }, []);
+  //   fetchCartCount();
+  // }, []);
 
   const renderUserCircle = () => {
     if (userDetails?.picture) {
@@ -295,6 +295,8 @@ const Navbar = () => {
         </p>
       </div>
 
+      
+
       {/* Auth Buttons */}
       {userDetails ? (
         <div className="flex items-center mr-4 w-50">
@@ -434,17 +436,6 @@ const Navbar = () => {
       </div>
     </Dialog>
 
-    <div className="flex justify-between items-center px-4 py-4 bg-gray-800 text-white">
-      <div className="text-lg font-bold">Cookie Shop</div>
-      <div className="relative">
-        <ShoppingCartIcon className="h-8 w-8 text-white" />
-        {cartCount > 0 && (
-          <span className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full text-xs px-2">
-            {cartCount}
-          </span>
-        )}
-      </div>
-      </div>
     </nav>
     </>
   );
