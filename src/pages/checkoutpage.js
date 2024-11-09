@@ -311,6 +311,7 @@ const CheckoutPage = () => {
                   </select>
                 </div>
 
+                <div div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="phone-input-3" className="mb-2 block text-sm font-medium text-gray-900">
                     Phone Number*
@@ -331,8 +332,27 @@ const CheckoutPage = () => {
                         pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
                         placeholder="123-456-7890"
                         required
+                        onChange={handleInputChange}
+                        value={formData.phone}
                       />
                     </div>
+                  </div>
+                </div>
+
+                <div>
+                    <label htmlFor="address-input" className="mb-2 block text-sm font-medium text-gray-900">
+                      Address*
+                    </label>
+                    <input
+                      type="text"
+                      id="address-input"
+                      name="address"
+                      className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-primary-500 focus:ring-primary-500"
+                      placeholder="123 Main St"
+                      required
+                      onChange={handleInputChange}
+                      value={formData.address}
+                    />
                   </div>
                 </div>
               </div>
