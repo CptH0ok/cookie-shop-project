@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 const CheckoutPage = () => {
   const [formData, setFormData] = useState({
@@ -61,9 +62,9 @@ const CheckoutPage = () => {
     <div className="bg-white py-8 antialiased md:py-16">
       <form onSubmit={handleSubmit} className="mx-auto max-w-screen-xl px-4 2xl:px-0">
         <ol className="flex w-full max-w-2xl items-center text-center text-sm font-medium text-gray-500 sm:text-base">
-          <li className="flex items-center text-primary-700 after:mx-6 after:hidden after:h-1 after:w-full after:border-b after:border-gray-200 sm:after:inline-block sm:after:content-['']">
-            <span className="flex items-center after:mx-2 after:text-gray-200 after:content-['/'] sm:after:hidden">
-              <svg
+        <li className="flex items-center text-primary-700 after:mx-6 after:hidden after:h-1 after:w-full after:border-b after:border-gray-200 sm:after:inline-block sm:after:content-['']">
+            <Link to="/cart" className="flex items-center after:mx-2 after:text-gray-200 after:content-['/'] sm:after:hidden text-yellow-500">
+                <svg
                 className="me-2 h-4 w-4 sm:h-5 sm:w-5"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
@@ -71,19 +72,18 @@ const CheckoutPage = () => {
                 height="24"
                 fill="none"
                 viewBox="0 0 24 24"
-              >
+                >
                 <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M8.5 11.5 11 14l4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M8.5 11.5 11 14l4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
                 />
-              </svg>
-              Cart
-            </span>
-          </li>
-
+                </svg>
+                Cart
+            </Link>
+            </li>
           <li className="flex items-center text-primary-700 after:mx-6 after:hidden after:h-1 after:w-full after:border-b after:border-gray-200 sm:after:inline-block sm:after:content-['']">
             <span className="flex items-center after:mx-2 after:text-gray-200 after:content-['/'] sm:after:hidden">
               <svg
