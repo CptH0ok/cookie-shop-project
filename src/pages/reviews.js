@@ -1,12 +1,12 @@
-import './reviews.css'; // Custom CSS for styles
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import './reviews.css'; // Custom CSS for styles
 
 const Reviews = () => {
-  const [error, setError] = useState(null);
   const [reviews, setReviews] = useState([]);
-  const [isPaused, setIsPaused] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [error, setError] = useState(null);
 
   // Fetch reviews from the API
   const fetchReviews = async () => {
@@ -16,9 +16,9 @@ const Reviews = () => {
     })
     .catch((err) => {
       // Handle error
-      if (err) {
+      if (err.response) {
         // Server responded with a status other than 2xx
-        setError(err.message);
+        setError(err.response.data.error.message);
       } else if (err.request) {
         // Request was made but no response received
         setError('No response from server');
