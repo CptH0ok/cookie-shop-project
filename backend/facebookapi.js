@@ -1,4 +1,6 @@
 const axios = require('axios');
+const express = require('express');
+const router = express.Router();
 const pageId = process.env.FACEBOOK_PAGE_ID;
 const baseUrl = `https://graph.facebook.com/v21.0`;
 const accessToken = process.env.FACEBOOK_ACCESS_TOKEN;
@@ -152,9 +154,35 @@ async function getFacebookPostLikes(postId) {
   }
 }
 
-module.exports.getPostLikes = getFacebookPostLikes;
-module.exports.getPostComments = getFacebookPostComments;
-module.exports.getLastPost = getLastFacebookPost;
-module.exports.postToPage = postToFacebookPage;
-module.exports.getPageReviews = getFacebookPageReviews;
-module.exports.getPostPicture = getFacebookPostPicture;
+router.get('/pagereviews', async (req, res, next) => {
+  try {
+    const reviews = await getPageReviews();
+    res.json(reviews);
+  } catch (error) {
+    next(error);
+  }
+  
+});
+
+router.get('/getlastdataphoto', async (req, res, next) => {
+  try {
+    const lastPostId = await getLastPost();
+    const photo = await getPostPicture(lastPostId);
+    res.json(photo);
+  } catch (error) {
+    next(error);
+  }
+  
+});
+
+router.get('/getlastdatacomments', async (req, res, next) => {
+  try{
+    const lastPostId = await getLastPost();
+    const comments = await getPostComments(lastPostId);
+    res.json(comments);
+  } catch (error) {
+      next(error);
+  }
+});
+
+module.exports = router;
