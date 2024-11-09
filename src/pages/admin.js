@@ -114,16 +114,30 @@ const Admin = () => {
         longitude: formData.longitude,
         latitude: formData.latitude,
       };
-      const contact = {phone: formData.phone, email: formData.email};
-      const services = {delivery: formData.makesDeliveries, takeaway: formData.hasTakeaway, dineIn: formData.hasDineIn};
-  
-      const branchBody = { 
-        name: formData.name, 
-        address, 
-        contact, 
-        services 
+      const openingHours = {
+        monday: "8:00 AM - 10:00 PM",
+        tuesday: "8:00 AM - 10:00 PM",
+        wednesday: "8:00 AM - 10:00 PM",
+        thursday: "8:00 AM - 10:00 PM",
+        friday: "8:00 AM - 5:00 PM",
+        saturday: "closed",
+        sunday: "8:00 AM - 10:00 PM",
       };
-  
+      const contact = { phone: formData.phone, email: formData.email };
+      const services = {
+        delivery: formData.makesDeliveries,
+        takeaway: formData.hasTakeaway,
+        dineIn: formData.hasDineIn,
+      };
+
+      const branchBody = {
+        name: formData.name,
+        address,
+        contact,
+        services,
+        openingHours,
+      };
+
       const res = await axios.post(
         "http://localhost:3001/api/branches/create",
         branchBody
@@ -306,7 +320,7 @@ const Admin = () => {
                 type="checkbox"
                 checked={formData.takeaway}
                 onChange={handleInputChange}
-                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 duration-100"
+                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded duration-100"
               />
               <label
                 for="hasTakeaway"
@@ -321,7 +335,7 @@ const Admin = () => {
                 type="checkbox"
                 checked={formData.dinein}
                 onChange={handleInputChange}
-                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 duration-100"
+                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded duration-100"
               />
               <label
                 for="default-checkbox"
@@ -336,7 +350,7 @@ const Admin = () => {
                 type="checkbox"
                 checked={formData.delivery}
                 onChange={handleInputChange}
-                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 duration-100"
+                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded duration-100"
               />
               <label
                 for="default-checkbox"
