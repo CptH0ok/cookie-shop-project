@@ -1,7 +1,7 @@
 import "./admin.css";
 import DataTable from "../components/datatable";
 import axios from "axios";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import * as d3 from "d3";
 
 const Admin = () => {
@@ -13,82 +13,22 @@ const Admin = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRow, setEditingRow] = useState(null);
 
-  // Branch Inputs
-  const nameInputRef = useRef();
-  const emailInputRef = useRef();
-  const phoneInputRef = useRef();
-  const streetNumberInputRef = useRef();
-  const streetNameInputRef = useRef();
-  const cityInputRef = useRef();
-  const stateInputRef = useRef();
-  const zipCodeInputRef = useRef();
-  const countryInputRef = useRef();
-  const latitudeInputRef = useRef();
-  const longitudeInputRef = useRef();
-  const [name, setName] = useState("");
-  const [streetNumber, setStreetNumber] = useState("");
-  const [streetName, setStreetName] = useState("");
-  const [city, setCity] = useState("");
-  const [state, setState] = useState("");
-  const [zipCode, setZipCode] = useState("");
-  const [country, setCountry] = useState("");
-  const [latitude, setLatitude] = useState(0);
-  const [longitude, setLongitude] = useState(0);
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [delivery, setDelivery] = useState(false);
-  const [takeaway, setTakeaway] = useState(false);
-  const [dinein, setDinein] = useState(false);
-  const address = [
-    streetNumber,
-    streetName,
-    city,
-    state,
-    zipCode,
-    country,
-    latitude,
-    longitude,
-  ];
-  const contact = [phone, email];
-  const services = [delivery, takeaway, dinein];
-
-//   useEffect(() => {
-//     if (name !== "") {
-//       nameInputRef.current.focus();
-//     } else if (email !== "") {
-//       emailInputRef.current.focus();
-//     } else if (phone !== "") {
-//       phoneInputRef.current.focus();
-//     } else if (streetNumber !== "") {
-//       streetNumberInputRef.current.focus();
-//     } else if (streetName !== "") {
-//       streetNameInputRef.current.focus();
-//     } else if (city !== "") {
-//       cityInputRef.current.focus();
-//     } else if (state !== "") {
-//       stateInputRef.current.focus();
-//     } else if (zipCode !== "") {
-//       zipCodeInputRef.current.focus();
-//     } else if (country !== "") {
-//       countryInputRef.current.focus();
-//     } else if (latitude !== 0) {
-//       latitudeInputRef.current.focus();
-//     } else if (longitude !== 0) {
-//       longitudeInputRef.current.focus();
-//     }
-//   }, [
-//     name,
-//     email,
-//     phone,
-//     streetNumber,
-//     streetName,
-//     city,
-//     state,
-//     zipCode,
-//     country,
-//     latitude,
-//     longitude,
-//   ]);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    streetNumber: "",
+    streetName: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    country: "",
+    latitude: 0,
+    longitude: 0,
+    makesDeliveries: false,
+    hasTakeaway: false,
+    hasDineIn: false,
+  });
 
   const handleEditSubmit = async () => {
     try {
@@ -151,33 +91,46 @@ const Admin = () => {
     axios.delete();
   };
 
+  // Create a single handler for all input changes
+  const handleInputChange = (e) => {
+    const { id, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [id]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  // Update your handleAddBranch function
   const handleAddBranch = async (e) => {
     e.preventDefault();
-    setName(nameInputRef.current.value);
-    setEmail(emailInputRef.current.value);
-    setPhone(phoneInputRef.current.value);
-    setEmail(emailInputRef.current.value);
-    setStreetNumber(streetNumberInputRef.current.value);
-    setStreetName(streetNameInputRef.current.value);
-    setCity(cityInputRef.current.value);
-    setZipCode(zipCodeInputRef.current.value);
-    setCountry(countryInputRef.current.value);
-    setLatitude(latitudeInputRef.current.value);
-    setLongitude(longitudeInputRef.current.value);
-
-
     try {
-        
-      const branchBody = { name, address, contact, services };
+      const address = {
+        streetNumber: formData.streetNumber,
+        streetName: formData.streetName,
+        city: formData.city,
+        state: formData.state,
+        zipCode: formData.zipCode,
+        country: formData.country,
+        longitude: formData.longitude,
+        latitude: formData.latitude,
+      };
+      const contact = {phone: formData.phone, email: formData.email};
+      const services = {delivery: formData.makesDeliveries, takeaway: formData.hasTakeaway, dineIn: formData.hasDineIn};
+  
+      const branchBody = { 
+        name: formData.name, 
+        address, 
+        contact, 
+        services 
+      };
+  
       const res = await axios.post(
         "http://localhost:3001/api/branches/create",
-        {}
+        branchBody
       );
-      localStorage.setItem("token", res.data.token);
-      setError("");
-      // Redirect to protected page
+      console.log(res.status);
     } catch (err) {
-      setError("Error creating account");
+      alert(err);
     }
   };
 
@@ -222,7 +175,6 @@ const Admin = () => {
             <div>
               <label>Name: </label>
               <input
-                ref={nameInputRef}
                 type="text"
                 value={editingRow.name}
                 onChange={(e) =>
@@ -303,229 +255,217 @@ const Admin = () => {
       )}
     </div>
   );
-  const AddBranchContent = () => (
-    <div className="relative flex-col w-screen p-6 pl-10 pt-10 text-6xl text-gray-950 font-serif font-bold drop-shadow-lg">
-      Create A Branch
-      <form onSubmit={handleAddBranch} className="relative flex">
-        <div className="relative left-0 w-full h-auto ml-10">
-          <label htmlFor="name" className="relative pt-10 text-2xl">
-            Store Name
-          </label>
-          <div className="mt-2">
-            <input
-              ref={nameInputRef}
-              id="name"
-              type="text"
-              value={name}
-              placeholder="name"
-              onChange={(e) => setName(e.target.value)}
-              className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
-            />
-          </div>
-          <label htmlFor="phone" className="relative pt-10 text-2xl">
-            Phone
-          </label>
-          <div className="mt-2">
-            <input
-              ref={phoneInputRef}
-              id="phone"
-              type="tel"
-              value={phone}
-              placeholder="Phone"
-              onChange={(e) => setPhone(e.target.value)}
-              className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
-            />
-          </div>
-          <label htmlFor="email" className="relative pt-10 text-2xl">
-            E-mail
-          </label>
-          <div className="mt-2">
-            <input
-              ref={emailInputRef}
-              id="email"
-              type="email"
-              value={email}
-              placeholder="E-mail"
-              onChange={(e) => setEmail(e.target.value)}
-              className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
-            />
-          </div>
-          <div class="flex items-center mt-10">
-            <input
-              id="hasTakeaway"
-              type="checkbox"
-              checked={takeaway}
-              onChange={(e) => setTakeaway(e.target.takeaway)}
-              value=""
-              class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 duration-100"
-            />
-            <label
-              for="default-checkbox"
-              class="ms-2 text-xl font-medium text-gray-950"
-            >
-              Serves Takeaway
+  const AddBranchContent = useMemo(() => {
+    return (
+      <div className="relative flex-col w-screen p-6 pl-10 pt-10 text-6xl text-gray-950 font-serif font-bold drop-shadow-lg">
+        Create A Branch
+        <form onSubmit={handleAddBranch} className="relative flex">
+          <div className="relative left-0 w-full h-auto ml-10">
+            <label htmlFor="name" className="relative pt-10 text-2xl">
+              Store Name
             </label>
-          </div>
-          <div class="flex items-center mt-10">
-            <input
-              id="hasDineIn"
-              type="checkbox"
-              checked={dinein}
-              onChange={(e) => setDinein(e.target.dinein)}
-              value=""
-              class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 duration-100"
-            />
-            <label
-              for="default-checkbox"
-              class="ms-2 text-xl font-medium text-gray-950"
-            >
-              Has Dine In
+            <div className="mt-2">
+              <input
+                id="name"
+                type="text"
+                value={formData.name}
+                placeholder="name"
+                onChange={handleInputChange}
+                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+            <label htmlFor="phone" className="relative pt-10 text-2xl">
+              Phone
             </label>
-          </div>
-          <div class="flex items-center mt-10">
-            <input
-              id="makesDeliveries"
-              type="checkbox"
-              checked={delivery}
-              onChange={(e) => setDelivery(e.target.delivery)}
-              value=""
-              class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 duration-100"
-            />
-            <label
-              for="default-checkbox"
-              class="ms-2 text-xl font-medium text-gray-950"
-            >
-              Makes Deliveries
+            <div className="mt-2">
+              <input
+                id="phone"
+                type="tel"
+                value={formData.phone}
+                placeholder="Phone"
+                onChange={handleInputChange}
+                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+            <label htmlFor="email" className="relative pt-10 text-2xl">
+              E-mail
             </label>
+            <div className="mt-2">
+              <input
+                id="email"
+                type="email"
+                value={formData.email}
+                placeholder="E-mail"
+                onChange={handleInputChange}
+                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+            <div class="flex items-center mt-10">
+              <input
+                id="hasTakeaway"
+                type="checkbox"
+                checked={formData.takeaway}
+                onChange={handleInputChange}
+                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 duration-100"
+              />
+              <label
+                for="hasTakeaway"
+                class="ms-2 text-xl font-medium text-gray-950"
+              >
+                Serves Takeaway
+              </label>
+            </div>
+            <div class="flex items-center mt-10">
+              <input
+                id="hasDineIn"
+                type="checkbox"
+                checked={formData.dinein}
+                onChange={handleInputChange}
+                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 duration-100"
+              />
+              <label
+                for="default-checkbox"
+                class="ms-2 text-xl font-medium text-gray-950"
+              >
+                Has Dine In
+              </label>
+            </div>
+            <div class="flex items-center mt-10">
+              <input
+                id="makesDeliveries"
+                type="checkbox"
+                checked={formData.delivery}
+                onChange={handleInputChange}
+                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 duration-100"
+              />
+              <label
+                for="default-checkbox"
+                class="ms-2 text-xl font-medium text-gray-950"
+              >
+                Makes Deliveries
+              </label>
+            </div>
           </div>
-        </div>
-        <div className="relative right-0 w-full h-auto">
-          <label htmlFor="streetNumber" className="relative pt-10 text-2xl">
-            Street Number
-          </label>
-          <div className="relative mt-2">
-            <input
-              ref={streetNumberInputRef}
-              id="streetNumber"
-              type="text"
-              value={streetNumber}
-              placeholder="Street Number"
-              onChange={(e) => setStreetNumber(e.target.value)}
-              className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
-            />
+          <div className="relative right-0 w-full h-auto">
+            <label htmlFor="streetNumber" className="relative pt-10 text-2xl">
+              Street Number
+            </label>
+            <div className="relative mt-2">
+              <input
+                id="streetNumber"
+                type="text"
+                value={formData.streetNumber}
+                placeholder="Street Number"
+                onChange={handleInputChange}
+                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+            <label htmlFor="streetName" className="relative pt-10 text-2xl">
+              Street Name
+            </label>
+            <div className="relative mt-2">
+              <input
+                id="streetName"
+                type="text"
+                value={formData.streetName}
+                placeholder="Street Name"
+                onChange={handleInputChange}
+                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+            <label htmlFor="city" className="relative pt-10 text-2xl">
+              City
+            </label>
+            <div className="relative mt-2">
+              <input
+                id="city"
+                type="text"
+                value={formData.city}
+                placeholder="City"
+                onChange={handleInputChange}
+                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+            <label htmlFor="state" className="relative pt-10 text-2xl">
+              State
+            </label>
+            <div className="relative mt-2">
+              <input
+                id="state"
+                type="text"
+                value={formData.state}
+                placeholder="State"
+                onChange={handleInputChange}
+                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+            <label htmlFor="zipCode" className="relative pt-10 text-2xl">
+              Zip Code
+            </label>
+            <div className="relative mt-2">
+              <input
+                id="zipCode"
+                type="text"
+                value={formData.zipCode}
+                placeholder="Zip Code"
+                onChange={handleInputChange}
+                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+            <label htmlFor="country" className="relative pt-10 text-2xl">
+              Country
+            </label>
+            <div className="relative mt-2">
+              <input
+                id="country"
+                type="text"
+                value={formData.country}
+                placeholder="Country"
+                onChange={handleInputChange}
+                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+            <label htmlFor="latitude" className="relative pt-10 text-2xl">
+              latitude
+            </label>
+            <div className="relative mt-2">
+              <input
+                id="latitude"
+                type="number"
+                value={formData.latitude}
+                placeholder="0"
+                onChange={handleInputChange}
+                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+            <label htmlFor="longitude" className="relative pt-10 text-2xl">
+              Longitude
+            </label>
+            <div className="relative mt-2">
+              <input
+                id="longitude"
+                type="number"
+                value={formData.longitude}
+                placeholder="Longitude"
+                onChange={handleInputChange}
+                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+              />
+            </div>
           </div>
-          <label htmlFor="streetName" className="relative pt-10 text-2xl">
-            Street Name
-          </label>
-          <div className="relative mt-2">
-            <input
-              ref={streetNameInputRef}
-              id="streetName"
-              type="text"
-              value={streetName}
-              placeholder="Street Name"
-              onChange={(e) => setStreetName(e.target.value)}
-              className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
-            />
+          <div className="absolute bottom-0 h-1 ml-10">
+            <button
+              type="submit"
+              className="relative w-mt-8 bg-green-600 rounded hover:bg-green-500 hover:ring-1 hover:ring-white duration-300"
+            >
+              <p className="text-2xl px-3 py-2 text-white drop-shadow-md">
+                Submit
+              </p>
+            </button>
           </div>
-          <label htmlFor="city" className="relative pt-10 text-2xl">
-            City
-          </label>
-          <div className="relative mt-2">
-            <input
-              ref={cityInputRef}
-              id="city"
-              type="text"
-              value={city}
-              placeholder="City"
-              onChange={(e) => setCity(e.target.value)}
-              className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
-            />
-          </div>
-          <label htmlFor="state" className="relative pt-10 text-2xl">
-            State
-          </label>
-          <div className="relative mt-2">
-            <input
-              ref={stateInputRef}
-              id="state"
-              type="text"
-              value={state}
-              placeholder="State"
-              onChange={(e) => setState(e.target.value)}
-              className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
-            />
-          </div>
-          <label htmlFor="zipCode" className="relative pt-10 text-2xl">
-            Zip Code
-          </label>
-          <div className="relative mt-2">
-            <input
-              ref={zipCodeInputRef}
-              id="zipCode"
-              type="text"
-              value={zipCode}
-              placeholder="Zip Code"
-              onChange={(e) => setZipCode(e.target.value)}
-              className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
-            />
-          </div>
-          <label htmlFor="country" className="relative pt-10 text-2xl">
-            Country
-          </label>
-          <div className="relative mt-2">
-            <input
-              ref={countryInputRef}
-              id="country"
-              type="text"
-              value={country}
-              placeholder="Country"
-              onChange={(e) => setCountry(e.target.value)}
-              className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
-            />
-          </div>
-          <label htmlFor="latitude" className="relative pt-10 text-2xl">
-            latitude
-          </label>
-          <div className="relative mt-2">
-            <input
-              ref={latitudeInputRef}
-              id="latitude"
-              type="number"
-              value={latitude}
-              placeholder="0"
-              onChange={(e) => setLatitude(e.target.value)}
-              className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
-            />
-          </div>
-          <label htmlFor="longitude" className="relative pt-10 text-2xl">
-            Longitude
-          </label>
-          <div className="relative mt-2">
-            <input
-              ref={longitudeInputRef}
-              id="longitude"
-              type="number"
-              value={longitude}
-              placeholder="Longitude"
-              onChange={(e) => setLongitude(e.target.value)}
-              className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
-            />
-          </div>
-        </div>
-        <div className="absolute bottom-0 h-1 ml-10">
-          <button
-            type="submit"
-            className="relative w-mt-8 bg-green-600 rounded hover:bg-green-500 hover:ring-1 hover:ring-white duration-300"
-          >
-            <p className="text-2xl px-3 py-2 text-white drop-shadow-md">
-              Submit
-            </p>
-          </button>
-        </div>
-      </form>
-    </div>
-  );
+        </form>
+      </div>
+    );
+  });
 
   // Menus
   const toggleDropdown = (menu) => {
@@ -533,8 +473,8 @@ const Admin = () => {
     setOpenDropdown((prev) => (prev === menu ? null : menu));
   };
 
-  const handleMenuClick = (Admin) => {
-    setSelectedMenu(Admin);
+  const handleMenuClick = (e) => {
+    setSelectedMenu(e);
   };
 
   const checkAdmin = async () => {
@@ -576,7 +516,7 @@ const Admin = () => {
             <div name="stock">
               <div
                 className={`realtive z-10 p-5 m-2 rounded-md hover:drop-shadow-lg hover:text-black hover:bg-yellow-500 duration-300 ${
-                  openDropdown == "stock"
+                  openDropdown === "stock"
                     ? "realtive z-10 p-5 m-2 rounded-md drop-shadow-lg text-black bg-yellow-600"
                     : ""
                 } `}
@@ -586,7 +526,7 @@ const Admin = () => {
                   Stock
                 </div>
               </div>
-              {openDropdown == "stock" && (
+              {openDropdown === "stock" && (
                 <div className="relative z-0 rounded-md ring-1 ring-white p-2 m-4">
                   <div
                     className="relative z-0 text-gray-300 m-2 p-2 rounded-md font-bold text-xl text-center hover:bg-white hover:text-black duration-300"
@@ -606,7 +546,7 @@ const Admin = () => {
             <div name="purchases">
               <div
                 className={`realtive z-10 p-5 m-2 rounded-md hover:drop-shadow-lg hover:text-black hover:bg-yellow-500 duration-300 ${
-                  openDropdown == "purchases"
+                  openDropdown === "purchases"
                     ? "realtive z-10 p-5 m-2 rounded-md drop-shadow-lg text-black bg-yellow-600"
                     : ""
                 } `}
@@ -616,7 +556,7 @@ const Admin = () => {
                   Purchases
                 </div>
               </div>
-              {openDropdown == "purchases" && (
+              {openDropdown === "purchases" && (
                 <div className="relative z-0 rounded-md ring-1 ring-white p-2 m-4">
                   <div
                     className="relative z-0 text-gray-300 m-2 p-2 rounded-md font-bold text-xl text-center hover:bg-white hover:text-black duration-300"
@@ -636,7 +576,7 @@ const Admin = () => {
             <div name="branches">
               <div
                 className={`realtive z-10 p-5 m-2 rounded-md hover:drop-shadow-lg hover:text-black hover:bg-yellow-500 duration-300 ${
-                  openDropdown == "branches"
+                  openDropdown === "branches"
                     ? "realtive z-10 p-5 m-2 rounded-md drop-shadow-lg text-black bg-yellow-600"
                     : ""
                 } `}
@@ -677,7 +617,7 @@ const Admin = () => {
             {selectedMenu === "viewpurchases" && <ViewPurchasesContent />}
             {selectedMenu === "removepurchases" && <RemovePurchasesContent />}
             {selectedMenu === "viewbranches" && <ViewBranchesContent />}
-            {selectedMenu === "addbranch" && <AddBranchContent />}
+            {selectedMenu === "addbranch" && AddBranchContent}
             {selectedMenu === "updatebranches" && <UpdateBranchesContent />}
           </div>
         </div>

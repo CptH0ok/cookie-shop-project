@@ -10,6 +10,7 @@ router.post('/create', async (req, res) => {
         const savedBranch = await newBranch.save();
         res.status(201).json(savedBranch);
     } catch (error) {
+        console.log(error)
         res.status(400).json({ message: 'Error creating branch', error });
     }
 });

@@ -9,7 +9,7 @@ import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import * as d3 from "d3";
 import axios from "axios";
 
-function DataTable({ apiUrl, columnsToDisplay, editable ,onEdit, onDelete }) {
+function DataTable({ apiUrl, columnsToDisplay, editable, onEdit, onDelete }) {
   const [open, setOpen] = useState(true);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
