@@ -74,6 +74,7 @@ const Admin = () => {
 
     console.log("Deleting", row.name); // Replace with actual delete logic
     axios.delete("http://localhost:3001/api/branches/delete/" + row._id);
+    window.location.reload();
   };
   const stockHandleEdit = (row) => {
     console.log("Editing", row); // Replace with actual edit logic
@@ -142,7 +143,7 @@ const Admin = () => {
         "http://localhost:3001/api/branches/create",
         branchBody
       );
-      console.log(res.status);
+      window.location.reload();
     } catch (err) {
       alert(err);
     }
