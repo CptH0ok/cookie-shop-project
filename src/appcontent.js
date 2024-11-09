@@ -23,7 +23,7 @@ function AppContent() {
 
   const pathsWithLayout = [
     "/",
-    "/shop", "/branches", "/reviews", "/admin", "/glutenfree"
+    "/shop", "/branches", "/reviews", "/admin", "/glutenfree", "/cart", "/checkout"
   ];
 
   const showLayout = pathsWithLayout.includes(location.pathname);
