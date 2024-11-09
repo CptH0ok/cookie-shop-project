@@ -1,17 +1,15 @@
 const path = require('path')
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const express = require('express');
+const app = express();
 const mongoose = require('mongoose');
 const cors = require('cors');
-const boom = require('@hapi/boom');
+//const boom = require('@hapi/boom');
 const facebookApi = require('./facebookapi');
-const mongoose = require('mongoose');
 const usersApi = require('./usersapi');
 const cartApi = require('./cartapi');
 const cookiesApi = require('./cookiesapi');
 const branchesApi = require('./branchesapi');
-const usersApi = require('./usersapi');
-const cookiesApi = require('./cookiesapi')
 const convertCurrency = require('./currencyapi')
 const {authenticateJWT, checkAdmin, checkPermissions} = require('./middlewares');
 const purchaseHistory = require('./purchasehistoryapi');
