@@ -46,25 +46,34 @@ const Admin = () => {
     console.log("Deleting", row); // Replace with actual delete logic
     axios.delete();
   };
-  const [name, setName] = useState('');
-  const [address, setAddress] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
+  const [name, setName] = useState("");
+  const [address, setAddress] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [delivery, setDelivery] = useState(false);
   const [takeaway, setTakeaway] = useState(false);
   const [dinein, setDinein] = useState(false);
-  
-    const handleAddBranch = async (e) => {
-      e.preventDefault();
-      try {
-        const res = await axios.post('http://localhost:3001/api/security/signup', { });
-        localStorage.setItem('token', res.data.token);
-        setError('');
-        // Redirect to protected page
-      } catch (err) {
-        setError('Error creating account');
-      }
-    };
+  const contact = [phone,email];
+  const services = [delivery,takeaway,dinein];
+
+  // Requests
+  const branchBody = {name, address, contact, services}
+
+  const handleAddBranch = async (e) => {
+    e.preventDefault();
+    try {
+        
+      const res = await axios.post(
+        "http://localhost:3001/api/branches/create",
+        {}
+      );
+      localStorage.setItem("token", res.data.token);
+      setError("");
+      // Redirect to protected page
+    } catch (err) {
+      setError("Error creating account");
+    }
+  };
 
   // Page Contents
   const HomeContent = () => <div className="p-4">Welcome to Home</div>;
@@ -103,33 +112,113 @@ const Admin = () => {
     </div>
   );
   const AddBranchContent = () => (
-    <div className="relative p-6 pl-10 pt-10 text-6xl font-serif font-bold drop-shadow-lg">
+    <div className="relative p-6 pl-10 pt-10 text-6xl text-gray-950 font-serif font-bold drop-shadow-lg">
       Create A Branch
-      <form onSubmit={""} className="relative ">
+      <form onSubmit={handleAddBranch} className="relative ">
         <label htmlFor="name" className="relative pt-10 text-2xl">
           Name
         </label>
         <div className="mt-2">
-        <input
-                  type="text"
-                  value={name}
-                  placeholder="name"
-                  onChange={(e) => setName(e.target.value)}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
-                />
+          <input
+            type="text"
+            value={name}
+            placeholder="name"
+            onChange={(e) => setName(e.target.value)}
+            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+          />
         </div>
         <label htmlFor="name" className="relative pt-10 text-2xl">
           Address
         </label>
         <div className="mt-2">
-        <input
-                  type="text"
-                  value={address}
-                  placeholder="Address"
-                  onChange={(e) => setAddress(e.target.value)}
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
-                />
+          <input
+            type="text"
+            value={address}
+            placeholder="Address"
+            onChange={(e) => setAddress(e.target.value)}
+            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+          />
         </div>
+        <label htmlFor="name" className="relative pt-10 text-2xl">
+          Phone
+        </label>
+        <div className="mt-2">
+          <input
+            type="tel"
+            value={phone}
+            placeholder="Phone"
+            onChange={(e) => setPhone(e.target.value)}
+            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+          />
+        </div>
+        <label htmlFor="name" className="relative pt-10 text-2xl">
+          E-mail
+        </label>
+        <div className="mt-2">
+          <input
+            type="email"
+            value={email}
+            placeholder="E-mail"
+            onChange={(e) => setEmail(e.target.value)}
+            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+          />
+        </div>
+        <div class="flex items-center mt-10">
+          <input
+            id="default-checkbox"
+            type="checkbox"
+            checked={takeaway}
+            onChange={(e) => setTakeaway(e.target.takeaway)}
+            value=""
+            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 duration-100"
+          />
+          <label
+            for="default-checkbox"
+            class="ms-2 text-xl font-medium text-gray-950"
+          >
+            Serves Takeaway
+          </label>
+        </div>
+        <div class="flex items-center mt-10">
+          <input
+            id="default-checkbox"
+            type="checkbox"
+            checked={dinein}
+            onChange={(e) => setDinein(e.target.delivery)}
+            value=""
+            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 duration-100"
+          />
+          <label
+            for="default-checkbox"
+            class="ms-2 text-xl font-medium text-gray-950"
+          >
+            Has Dine In
+          </label>
+        </div>
+        <div class="flex items-center mt-10">
+          <input
+            id="default-checkbox"
+            type="checkbox"
+            checked={delivery}
+            onChange={(e) => setDelivery(e.target.delivery)}
+            value=""
+            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 duration-100"
+          />
+          <label
+            for="default-checkbox"
+            class="ms-2 text-xl font-medium text-gray-950"
+          >
+            Makes Deliveries
+          </label>
+        </div>
+        <button
+        type="submit"
+        className="relative mt-8 bg-green-600 rounded hover:bg-green-500 hover:ring-1 hover:ring-white duration-300"
+      >
+        <p className="text-2xl px-3 py-2 text-white drop-shadow-md">
+            Submit
+        </p>
+      </button>
       </form>
     </div>
   );
