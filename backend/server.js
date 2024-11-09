@@ -15,6 +15,19 @@ const convertCurrency = require('./currencyapi');
 const {authenticateJWT, checkAdmin, checkPermissions} = require('./middlewares');
 const app = express();
 
+// Add request logging middleware before your routes
+app.use((req, res, next) => {
+  console.log('Incoming request:', {
+    method: req.method,
+    path: req.path,
+    headers: {
+      authorization: req.headers.authorization ? 'Bearer ...' : 'none',
+      'content-type': req.headers['content-type']
+    }
+  });
+  next();
+});
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -39,10 +52,10 @@ app.get('/api/products', async (req, res) => {
   res.json(products);
 });
 
-app.get('/api/cart', async (req, res) => {
-  const cartIcon = await cartitem.find();  
-  res.json(products);
-});
+// app.get('/api/cart', async (req, res) => {
+//   const cartIcon = await cartitem.find();  
+//   res.json(products);
+// });
 
 app.get('/api/pagereviews', async (req, res, next) => {
   try {
