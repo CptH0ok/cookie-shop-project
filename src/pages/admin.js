@@ -10,38 +10,111 @@ const Admin = () => {
   const [adminPageData, setAdminPageData] = useState(null);
   const [selectedMenu, setSelectedMenu] = useState("home");
   const [openDropdown, setOpenDropdown] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingRow, setEditingRow] = useState(null);
+
+  // Branch Inputs
   const nameInputRef = useRef(null);
   const emailInputRef = useRef(null);
   const phoneInputRef = useRef(null);
-  const addressInputRef = useRef(null);
+  const streetNumberInputRef = useRef(null);
+  const streetNameInputRef = useRef(null);
+  const cityInputRef = useRef(null);
+  const stateInputRef = useRef(null);
+  const zipCodeInputRef = useRef(null);
+  const countryInputRef = useRef(null);
+  const latitudeInputRef = useRef(null);
+  const longitudeInputRef = useRef(null);
   const [name, setName] = useState("");
-  const [address, setAddress] = useState("");
+  const [streetNumber, setStreetNumber] = useState("");
+  const [streetName, setStreetName] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [zipCode, setZipCode] = useState("");
+  const [country, setCountry] = useState("");
+  const [latitude, setLatitude] = useState(0);
+  const [longitude, setLongitude] = useState(0);
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [delivery, setDelivery] = useState(false);
   const [takeaway, setTakeaway] = useState(false);
   const [dinein, setDinein] = useState(false);
-  const contact = [phone,email];
-  const services = [delivery,takeaway,dinein];  
+  const address = [
+    streetNumber,
+    streetName,
+    city,
+    state,
+    zipCode,
+    country,
+    latitude,
+    longitude,
+  ];
+  const contact = [phone, email];
+  const services = [delivery, takeaway, dinein];
 
   useEffect(() => {
-    if (name !== '') {
+    if (name !== "") {
       nameInputRef.current.focus();
-    } else if (email !== '') {
+    } else if (email !== "") {
       emailInputRef.current.focus();
-    } else if (phone !== '') {
+    } else if (phone !== "") {
       phoneInputRef.current.focus();
+    } else if (streetNumber !== "") {
+      streetNumberInputRef.current.focus();
+    } else if (streetName !== "") {
+        streetNameInputRef.current.focus();
+    } else if (city !== "") {
+        cityInputRef.current.focus();
+    } else if (state !== "") {
+        stateInputRef.current.focus();
+    } else if (zipCode !== "") {
+        zipCodeInputRef.current.focus();
+    } else if (country !== "") {
+        countryInputRef.current.focus();
+    } else if (latitude !== "") {
+        streetNumberInputRef.current.focus();
+    } else if (longitude !== "") {
+        longitudeInputRef.current.focus();
+    } 
+  }, [name, email, phone, streetNumber, streetName, city, state, zipCode, country, latitude, longitude]);
+
+  const handleEditSubmit = async () => {
+    try {
+      // Update the backend with the edited data
+      const response = await fetch(`/api/update-row/${editingRow.id}`, {
+        method: "PUT",
+        body: JSON.stringify(editingRow),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        handleMenuClick(selectedMenu);
+
+        setIsModalOpen(false); // Close the modal after the update
+      } else {
+        alert("Error updating row");
+      }
+    } catch (error) {
+      console.error("Error:", error);
     }
-    else if (address !== ''){
-        addressInputRef.current.focus();
-    }
-  }, [name, email, phone,address]);
+  };
 
   // Consts
   const branchColumns = ["_id", "name", "address", "contact", "services"];
-  const stockColumns = ["name","description","price","ingredients","category","available"];
+  const stockColumns = [
+    "name",
+    "description",
+    "price",
+    "ingredients",
+    "category",
+    "available",
+  ];
 
   const branchHandleEdit = (row) => {
+    setEditingRow({ ...row }); // Create a copy of the row for editing
+    setIsModalOpen(true);
     console.log("Editing", row); // Replace with actual edit logic
   };
   const branchHandleDelete = (row) => {
@@ -69,7 +142,7 @@ const Admin = () => {
   const handleAddBranch = async (e) => {
     e.preventDefault();
     try {
-    const branchBody = {name, address, contact, services}        
+      const branchBody = { name, address, contact, services };
       const res = await axios.post(
         "http://localhost:3001/api/branches/create",
         {}
@@ -81,7 +154,6 @@ const Admin = () => {
       setError("Error creating account");
     }
   };
-
 
   // Page Contents
   const HomeContent = () => <div className="p-4">Welcome to Home</div>;
@@ -117,120 +189,244 @@ const Admin = () => {
         onEdit={branchHandleEdit}
         onDelete={branchHandleDelete}
       />
+      {isModalOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2>Edit Row</h2>
+            <div>
+              <label>Name: </label>
+              <input
+                type="text"
+                value={editingRow.name}
+                onChange={(e) =>
+                  setEditingRow({ ...editingRow, name: e.target.value })
+                }
+              />
+            </div>
+            <div>
+              <label>Address: </label>
+              <input
+                type="text"
+                value={editingRow.address}
+                onChange={(e) =>
+                  setEditingRow({ ...editingRow, address: e.target.value })
+                }
+              />
+            </div>
+            <button onClick={handleEditSubmit}>Submit</button>
+            <button onClick={() => setIsModalOpen(false)}>Cancel</button>
+          </div>
+        </div>
+      )}
     </div>
   );
   const AddBranchContent = () => (
-    <div className="relative p-6 pl-10 pt-10 text-6xl text-gray-950 font-serif font-bold drop-shadow-lg">
+    <div className="relative flex-col w-screen p-6 pl-10 pt-10 text-6xl text-gray-950 font-serif font-bold drop-shadow-lg">
       Create A Branch
-      <form onSubmit={handleAddBranch} className="relative ">
-        <label htmlFor="name" className="relative pt-10 text-2xl">
-          Name
-        </label>
-        <div className="mt-2">
-          <input
-            ref={nameInputRef}
-            type="text"
-            value={name}
-            placeholder="name"
-            onChange={(e) => setName(e.target.value)}
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
-          />
-        </div>
-        <label htmlFor="name" className="relative pt-10 text-2xl">
-          Address
-        </label>
-        <div className="mt-2">
-          <input
-            ref={addressInputRef}
-            type="text"
-            value={address}
-            placeholder="Address"
-            onChange={(e) => setAddress(e.target.value)}
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
-          />
-        </div>
-        <label htmlFor="name" className="relative pt-10 text-2xl">
-          Phone
-        </label>
-        <div className="mt-2">
-          <input
-            ref={phoneInputRef}
-            type="tel"
-            value={phone}
-            placeholder="Phone"
-            onChange={(e) => setPhone(e.target.value)}
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
-          />
-        </div>
-        <label htmlFor="name" className="relative pt-10 text-2xl">
-          E-mail
-        </label>
-        <div className="mt-2">
-          <input
-            ref={emailInputRef}
-            type="email"
-            value={email}
-            placeholder="E-mail"
-            onChange={(e) => setEmail(e.target.value)}
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
-          />
-        </div>
-        <div class="flex items-center mt-10">
-          <input
-            id="default-checkbox"
-            type="checkbox"
-            checked={takeaway}
-            onChange={(e) => setTakeaway(e.target.takeaway)}
-            value=""
-            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 duration-100"
-          />
-          <label
-            for="default-checkbox"
-            class="ms-2 text-xl font-medium text-gray-950"
-          >
-            Serves Takeaway
+      <form onSubmit={handleAddBranch} className="relative flex">
+        <div className="relative left-0 w-full h-auto ml-10">
+          <label htmlFor="name" className="relative pt-10 text-2xl">
+            Store Name
           </label>
-        </div>
-        <div class="flex items-center mt-10">
-          <input
-            id="default-checkbox"
-            type="checkbox"
-            checked={dinein}
-            onChange={(e) => setDinein(e.target.dinein)}
-            value=""
-            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 duration-100"
-          />
-          <label
-            for="default-checkbox"
-            class="ms-2 text-xl font-medium text-gray-950"
-          >
-            Has Dine In
+          <div className="mt-2">
+            <input
+              ref={nameInputRef}
+              type="text"
+              value={name}
+              placeholder="name"
+              onChange={(e) => setName(e.target.value)}
+              className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+            />
+          </div>
+          <label htmlFor="name" className="relative pt-10 text-2xl">
+            Phone
           </label>
-        </div>
-        <div class="flex items-center mt-10">
-          <input
-            id="default-checkbox"
-            type="checkbox"
-            checked={delivery}
-            onChange={(e) => setDelivery(e.target.delivery)}
-            value=""
-            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 duration-100"
-          />
-          <label
-            for="default-checkbox"
-            class="ms-2 text-xl font-medium text-gray-950"
-          >
-            Makes Deliveries
+          <div className="mt-2">
+            <input
+              ref={phoneInputRef}
+              type="tel"
+              value={phone}
+              placeholder="Phone"
+              onChange={(e) => setPhone(e.target.value)}
+              className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+            />
+          </div>
+          <label htmlFor="name" className="relative pt-10 text-2xl">
+            E-mail
           </label>
+          <div className="mt-2">
+            <input
+              ref={emailInputRef}
+              type="email"
+              value={email}
+              placeholder="E-mail"
+              onChange={(e) => setEmail(e.target.value)}
+              className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+            />
+          </div>
+          <div class="flex items-center mt-10">
+            <input
+              id="default-checkbox"
+              type="checkbox"
+              checked={takeaway}
+              onChange={(e) => setTakeaway(e.target.takeaway)}
+              value=""
+              class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 duration-100"
+            />
+            <label
+              for="default-checkbox"
+              class="ms-2 text-xl font-medium text-gray-950"
+            >
+              Serves Takeaway
+            </label>
+          </div>
+          <div class="flex items-center mt-10">
+            <input
+              id="default-checkbox"
+              type="checkbox"
+              checked={dinein}
+              onChange={(e) => setDinein(e.target.dinein)}
+              value=""
+              class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 duration-100"
+            />
+            <label
+              for="default-checkbox"
+              class="ms-2 text-xl font-medium text-gray-950"
+            >
+              Has Dine In
+            </label>
+          </div>
+          <div class="flex items-center mt-10">
+            <input
+              id="default-checkbox"
+              type="checkbox"
+              checked={delivery}
+              onChange={(e) => setDelivery(e.target.delivery)}
+              value=""
+              class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 duration-100"
+            />
+            <label
+              for="default-checkbox"
+              class="ms-2 text-xl font-medium text-gray-950"
+            >
+              Makes Deliveries
+            </label>
+          </div>
         </div>
+        <div className="relative right-0 w-full h-auto">
+        <label htmlFor="streetNumber" className="relative pt-10 text-2xl">
+            Street Number
+          </label>
+          <div className="relative mt-2">
+            <input
+              ref={streetNumberInputRef}
+              type="text"
+              value={streetNumber}
+              placeholder="Street Number"
+              onChange={(e) => setStreetNumber(e.target.value)}
+              className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+            />
+          </div>
+          <label htmlFor="streetName" className="relative pt-10 text-2xl">
+            Street Name
+          </label>
+          <div className="relative mt-2">
+            <input
+              ref={streetNameInputRef}
+              type="text"
+              value={streetName}
+              placeholder="Street Name"
+              onChange={(e) => setStreetName(e.target.value)}
+              className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+            />
+          </div>
+          <label htmlFor="city" className="relative pt-10 text-2xl">
+            City
+          </label>
+          <div className="relative mt-2">
+            <input
+              ref={cityInputRef}
+              type="text"
+              value={city}
+              placeholder="City"
+              onChange={(e) => setCity(e.target.value)}
+              className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+            />
+          </div>
+          <label htmlFor="state" className="relative pt-10 text-2xl">
+            State
+          </label>
+          <div className="relative mt-2">
+            <input
+              ref={stateInputRef}
+              type="text"
+              value={state}
+              placeholder="State"
+              onChange={(e) => setState(e.target.value)}
+              className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+            />
+          </div>
+          <label htmlFor="zipCode" className="relative pt-10 text-2xl">
+            Zip Code
+          </label>
+          <div className="relative mt-2">
+            <input
+              ref={zipCodeInputRef}
+              type="text"
+              value={zipCode}
+              placeholder="Zip Code"
+              onChange={(e) => setZipCode(e.target.value)}
+              className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+            />
+          </div>
+          <label htmlFor="country" className="relative pt-10 text-2xl">
+            Country
+          </label>
+          <div className="relative mt-2">
+            <input
+              ref={countryInputRef}
+              type="text"
+              value={country}
+              placeholder="Country"
+              onChange={(e) => setCountry(e.target.value)}
+              className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+            />
+          </div>
+          <label htmlFor="latitude" className="relative pt-10 text-2xl">
+            latitude
+          </label>
+          <div className="relative mt-2">
+            <input
+              ref={latitudeInputRef}
+              type="number"
+              value={latitude}
+              placeholder="0"
+              onChange={(e) => setLatitude(e.target.value)}
+              className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+            />
+          </div>
+          <label htmlFor="longitude" className="relative pt-10 text-2xl">
+            Longitude
+          </label>
+          <div className="relative mt-2">
+            <input
+              ref={longitudeInputRef}
+              type="number"
+              value={longitude}
+              placeholder="Longitude"
+              onChange={(e) => setLongitude(e.target.value)}
+              className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+            />
+          </div>
+        </div>
+        <div className="absolute bottom-0 h-1 ml-10">
         <button
-        type="submit"
-        className="relative mt-8 bg-green-600 rounded hover:bg-green-500 hover:ring-1 hover:ring-white duration-300"
-      >
-        <p className="text-2xl px-3 py-2 text-white drop-shadow-md">
-            Submit
-        </p>
-      </button>
+          type="submit"
+          className="relative w-mt-8 bg-green-600 rounded hover:bg-green-500 hover:ring-1 hover:ring-white duration-300"
+        >
+          <p className="text-2xl px-3 py-2 text-white drop-shadow-md">Submit</p>
+        </button>
+        </div>
       </form>
     </div>
   );
