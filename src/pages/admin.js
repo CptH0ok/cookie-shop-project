@@ -1,7 +1,7 @@
 import "./admin.css";
 import DataTable from "../components/datatable";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import * as d3 from "d3";
 
 const Admin = () => {
@@ -10,17 +10,36 @@ const Admin = () => {
   const [adminPageData, setAdminPageData] = useState(null);
   const [selectedMenu, setSelectedMenu] = useState("home");
   const [openDropdown, setOpenDropdown] = useState(null);
+  const nameInputRef = useRef(null);
+  const emailInputRef = useRef(null);
+  const phoneInputRef = useRef(null);
+  const addressInputRef = useRef(null);
+  const [name, setName] = useState("");
+  const [address, setAddress] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [delivery, setDelivery] = useState(false);
+  const [takeaway, setTakeaway] = useState(false);
+  const [dinein, setDinein] = useState(false);
+  const contact = [phone,email];
+  const services = [delivery,takeaway,dinein];  
+
+  useEffect(() => {
+    if (name !== '') {
+      nameInputRef.current.focus();
+    } else if (email !== '') {
+      emailInputRef.current.focus();
+    } else if (phone !== '') {
+      phoneInputRef.current.focus();
+    }
+    else if (address !== ''){
+        addressInputRef.current.focus();
+    }
+  }, [name, email, phone,address]);
 
   // Consts
   const branchColumns = ["_id", "name", "address", "contact", "services"];
-  const stockColumns = [
-    "name",
-    "description",
-    "price",
-    "ingredients",
-    "category",
-    "available",
-  ];
+  const stockColumns = ["name","description","price","ingredients","category","available"];
 
   const branchHandleEdit = (row) => {
     console.log("Editing", row); // Replace with actual edit logic
@@ -46,23 +65,11 @@ const Admin = () => {
     console.log("Deleting", row); // Replace with actual delete logic
     axios.delete();
   };
-  const [name, setName] = useState("");
-  const [address, setAddress] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [delivery, setDelivery] = useState(false);
-  const [takeaway, setTakeaway] = useState(false);
-  const [dinein, setDinein] = useState(false);
-  const contact = [phone,email];
-  const services = [delivery,takeaway,dinein];
-
-  // Requests
-  const branchBody = {name, address, contact, services}
 
   const handleAddBranch = async (e) => {
     e.preventDefault();
     try {
-        
+    const branchBody = {name, address, contact, services}        
       const res = await axios.post(
         "http://localhost:3001/api/branches/create",
         {}
@@ -74,6 +81,7 @@ const Admin = () => {
       setError("Error creating account");
     }
   };
+
 
   // Page Contents
   const HomeContent = () => <div className="p-4">Welcome to Home</div>;
@@ -120,6 +128,7 @@ const Admin = () => {
         </label>
         <div className="mt-2">
           <input
+            ref={nameInputRef}
             type="text"
             value={name}
             placeholder="name"
@@ -132,6 +141,7 @@ const Admin = () => {
         </label>
         <div className="mt-2">
           <input
+            ref={addressInputRef}
             type="text"
             value={address}
             placeholder="Address"
@@ -144,6 +154,7 @@ const Admin = () => {
         </label>
         <div className="mt-2">
           <input
+            ref={phoneInputRef}
             type="tel"
             value={phone}
             placeholder="Phone"
@@ -156,6 +167,7 @@ const Admin = () => {
         </label>
         <div className="mt-2">
           <input
+            ref={emailInputRef}
             type="email"
             value={email}
             placeholder="E-mail"
@@ -184,7 +196,7 @@ const Admin = () => {
             id="default-checkbox"
             type="checkbox"
             checked={dinein}
-            onChange={(e) => setDinein(e.target.delivery)}
+            onChange={(e) => setDinein(e.target.dinein)}
             value=""
             class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 duration-100"
           />
