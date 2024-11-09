@@ -130,6 +130,30 @@ router.delete('/remove', authenticateJWT, async (req, res) => {
   }
 });
 
+router.post('/clear', authenticateJWT, async (req, res) => {
+  try {
+      const { userId } = req.body;
+      
+      // Assuming you have a Cart model with a userId field
+      await Cart.findOneAndUpdate(
+          { userId },
+          { $set: { items: [] } },  // Clear all items
+          { new: true }
+      );
+
+      res.json({
+          success: true,
+          message: 'Cart cleared successfully'
+      });
+  } catch (error) {
+      console.error('Error clearing cart:', error);
+      res.status(500).json({
+          success: false,
+          message: 'Error clearing cart',
+          error: error.message
+      });
+  }
+});
 
 router.get('/:userId', authenticateJWT, async (req, res) => {
   try {

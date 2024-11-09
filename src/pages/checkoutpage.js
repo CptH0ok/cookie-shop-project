@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const CheckoutPage = () => {
@@ -23,6 +23,9 @@ const CheckoutPage = () => {
   const [convertedShipping, setConvertedShipping] = useState(0);
   const [convertedTotal, setConvertedTotal] = useState(0);
   const token = localStorage.getItem('token');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const api = axios.create({
     headers: {
@@ -148,17 +151,52 @@ const CheckoutPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/api/checkout', {
-        ...formData,
-        items: cartItems,
-        total: convertedTotal,
-        currency: selectedCurrency
-      });
-      // Handle successful checkout (redirect to success page, clear cart, etc.)
+        // Get user details
+        const userResponse = await axios.get('http://localhost:3001/api/users/getuserdetails', {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        const userId = userResponse.data.id;
+
+        // Prepare purchase data
+        const purchaseData = {
+            userId: userId,
+            items: cartItems.map(item => ({
+                itemName: item.name,
+                quantity: item.quantity,
+                price: item.price,
+            })),
+            totalAmount: selectedCurrency === 'USD' 
+                ? (subtotal + shipping + 2) // Adding tax
+                : convertedTotal
+        };
+
+        console.log('Sending purchase data:', purchaseData);
+
+        // Save purchase history
+        const response = await axios.post(
+            'http://localhost:3001/api/purchasehistory/create',
+            purchaseData,
+            {
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+
+        console.log('Purchase response:', response.data);
+
+        if (response.data.success) {
+            alert('Order placed successfully!');
+            // Optionally redirect or clear cart
+        }
+
     } catch (error) {
-      console.error('Error processing payment:', error);
+        console.error('Error:', error);
+        alert('Error processing your order. Please try again.');
     }
-  };
+};
 
   // Currency selector component
   const CurrencySelector = () => (
@@ -443,11 +481,18 @@ const CheckoutPage = () => {
             </div>
 
             <button
-              type="submit"
-              className="bg-yellow-500 mt-6 w-full rounded-lg bg-primary-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300"
-            >
-              Place Order
-            </button>
+                type="submit"
+                disabled={isLoading}
+                className={`bg-yellow-500 mt-6 w-full rounded-lg px-5 py-2.5 text-sm font-medium text-white hover:bg-primary-800 focus:outline-none focus:ring-4 focus:ring-primary-300 ${
+                    isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+                >
+                {isLoading ? 'Processing...' : 'Place Order'}
+                </button>
+
+                {error && (
+                <p className="mt-2 text-red-600 text-sm">{error}</p>
+                )}
           </div>
         </div>
       </form>
