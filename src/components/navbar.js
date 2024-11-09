@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle, TransitionChild, Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
-import { XMarkIcon, TruckIcon, ShoppingCartIcon, FingerPrintIcon, BanknotesIcon, AtSymbolIcon } from '@heroicons/react/24/outline'
+import { XMarkIcon, TruckIcon, HomeIcon, ShoppingBagIcon, ClockIcon, UserIcon, ShoppingCartIcon, FingerPrintIcon, BanknotesIcon, AtSymbolIcon } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, PhoneIcon } from '@heroicons/react/20/solid'
 import axios from 'axios';
 
@@ -14,6 +14,15 @@ const Navbar = () => {
   const [isPasswdPopupVisible, setPasswdPopupVisible] = useState(false);
   const token = localStorage.getItem("token");
   const [cartCount, setCartCount] = useState(0); //Holds the number of items in the cart
+
+  const navigationItems = [
+    { name: 'Home', href: '/', icon: HomeIcon },
+    { name: 'Shop', href: '/shop', icon: ShoppingBagIcon },
+    { name: 'Cart', href: '/cart', icon: ShoppingCartIcon },
+    { name: 'Orders', href: '/purchasehistory', icon: ClockIcon },
+    { name: 'Profile', href: '/profile', icon: UserIcon },
+  ];
+
 
   useEffect(() => {
     const parseUserDetails = async () => {
@@ -447,43 +456,98 @@ const Navbar = () => {
       )}
 
 
-      <Dialog open={open} onClose={setOpen} className="relative z-20">
-      <DialogBackdrop
-        transition
-        className="fixed inset-0 backdrop-blur-2xl bg-contrast-75 transition-opacity drop-shadow-2xl duration-500 ease-in-out data-[closed]:opacity-0"
-      />
+<Dialog open={open} onClose={setOpen} className="relative z-20">
+  <DialogBackdrop
+    transition
+    className="fixed inset-0 backdrop-blur-2xl bg-contrast-75 transition-opacity drop-shadow-2xl duration-500 ease-in-out data-[closed]:opacity-0"
+  />
 
-      <div className="fixed inset-0 overflow-hidden">
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="pointer-events-none fixed inset-y-0 left-0 flex max-w-full ">
-            <DialogPanel
-              transition
-              className="pointer-events-auto relative w-screen max-w-xs transform transition duration-500 ease-in-out data-[closed]:-translate-x-full sm:duration-500"
-            >
-              <TransitionChild>
-                <div className="absolute right-2 top-0 -ml-8 flex pl-2 pt-2 duration-500 ease-in-out data-[closed]:opacity-0 sm:-mr-10 sm:pl-0">
+  <div className="fixed inset-0 overflow-hidden">
+    <div className="absolute inset-0 overflow-hidden">
+      <div className="pointer-events-none fixed inset-y-0 left-0 flex max-w-full">
+        <DialogPanel
+          transition
+          className="pointer-events-auto relative w-screen max-w-xs transform transition duration-500 ease-in-out data-[closed]:-translate-x-full sm:duration-500"
+        >
+          <TransitionChild>
+            <div className="absolute right-2 top-0 -ml-8 flex pl-2 pt-2 duration-500 ease-in-out data-[closed]:opacity-0 sm:-mr-10 sm:pl-0">
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="relative rounded-md text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+              >
+                <span className="absolute -inset-2.5" />
+                <span className="sr-only">Close panel</span>
+                <XMarkIcon aria-hidden="true" className="h-6 w-6" />
+              </button>
+            </div>
+          </TransitionChild>
+          <div className="flex h-full flex-col overflow-y-scroll bg-black py-6 shadow-xl">
+            <div className="px-4 sm:px-6">
+              <DialogTitle className="text-2xl font-bold leading-6 text-white">
+                Menu
+              </DialogTitle>
+            </div>
+            
+            {/* Navigation Links */}
+            <div className="relative mt-6 flex-1 px-4 sm:px-6">
+              <nav className="flex flex-col space-y-2">
+                {navigationItems.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.name}
+                      to={item.href}
+                      onClick={() => setOpen(false)}
+                      className="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 rounded-lg transition-colors duration-200"
+                    >
+                      <Icon className="h-6 w-6 mr-3" />
+                      <span className="text-lg font-medium">{item.name}</span>
+                    </Link>
+                  );
+                })}
+              </nav>
+
+              {/* User Section at bottom */}
+              {userDetails ? (
+                <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-800">
+                  <div className="flex items-center space-x-3 px-4 py-3 text-gray-300">
+                    <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center">
+                      {userDetails.name.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="font-medium">{userDetails.name}</p>
+                      <p className="text-sm text-gray-400">{userDetails.email}</p>
+                    </div>
+                  </div>
                   <button
-                    type="button"
-                    onClick={() => setOpen(false)}
-                    className="relative rounded-md text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+                    onClick={() => {
+                      handleLogout();
+                      setOpen(false);
+                    }}
+                    className="w-full mt-2 px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors duration-200"
                   >
-                    <span className="absolute -inset-2.5" />
-                    <span className="sr-only">Close panel</span>
-                    <XMarkIcon aria-hidden="true" className="h-6 w-6" />
+                    Logout
                   </button>
                 </div>
-              </TransitionChild>
-              <div className="flex h-full flex-col overflow-y-scroll bg-black py-6 shadow-xl">
-                <div className="px-4 sm:px-6">
-                  <DialogTitle className="text-base font-semibold leading-6 text-white">Panel title</DialogTitle>
+              ) : (
+                <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-800">
+                  <Link
+                    to="/login"
+                    onClick={() => setOpen(false)}
+                    className="flex justify-center items-center px-4 py-2 text-white bg-yellow-500 hover:bg-yellow-600 rounded-lg transition-colors duration-200"
+                  >
+                    Login
+                  </Link>
                 </div>
-                <div className="relative mt-6 flex-1 px-4 sm:px-6">{/* Your content */}</div>
-              </div>
-            </DialogPanel>
+              )}
+            </div>
           </div>
-        </div>
+        </DialogPanel>
       </div>
-    </Dialog>
+    </div>
+  </div>
+</Dialog>
 
     </nav>
     </>
