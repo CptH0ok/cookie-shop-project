@@ -14,17 +14,17 @@ const Admin = () => {
   const [editingRow, setEditingRow] = useState(null);
 
   // Branch Inputs
-  const nameInputRef = useRef(null);
-  const emailInputRef = useRef(null);
-  const phoneInputRef = useRef(null);
-  const streetNumberInputRef = useRef(null);
-  const streetNameInputRef = useRef(null);
-  const cityInputRef = useRef(null);
-  const stateInputRef = useRef(null);
-  const zipCodeInputRef = useRef(null);
-  const countryInputRef = useRef(null);
-  const latitudeInputRef = useRef(null);
-  const longitudeInputRef = useRef(null);
+  const nameInputRef = useRef();
+  const emailInputRef = useRef();
+  const phoneInputRef = useRef();
+  const streetNumberInputRef = useRef();
+  const streetNameInputRef = useRef();
+  const cityInputRef = useRef();
+  const stateInputRef = useRef();
+  const zipCodeInputRef = useRef();
+  const countryInputRef = useRef();
+  const latitudeInputRef = useRef();
+  const longitudeInputRef = useRef();
   const [name, setName] = useState("");
   const [streetNumber, setStreetNumber] = useState("");
   const [streetName, setStreetName] = useState("");
@@ -52,31 +52,43 @@ const Admin = () => {
   const contact = [phone, email];
   const services = [delivery, takeaway, dinein];
 
-  useEffect(() => {
-    if (name !== "") {
-      nameInputRef.current.focus();
-    } else if (email !== "") {
-      emailInputRef.current.focus();
-    } else if (phone !== "") {
-      phoneInputRef.current.focus();
-    } else if (streetNumber !== "") {
-      streetNumberInputRef.current.focus();
-    } else if (streetName !== "") {
-        streetNameInputRef.current.focus();
-    } else if (city !== "") {
-        cityInputRef.current.focus();
-    } else if (state !== "") {
-        stateInputRef.current.focus();
-    } else if (zipCode !== "") {
-        zipCodeInputRef.current.focus();
-    } else if (country !== "") {
-        countryInputRef.current.focus();
-    } else if (latitude !== "") {
-        streetNumberInputRef.current.focus();
-    } else if (longitude !== "") {
-        longitudeInputRef.current.focus();
-    } 
-  }, [name, email, phone, streetNumber, streetName, city, state, zipCode, country, latitude, longitude]);
+//   useEffect(() => {
+//     if (name !== "") {
+//       nameInputRef.current.focus();
+//     } else if (email !== "") {
+//       emailInputRef.current.focus();
+//     } else if (phone !== "") {
+//       phoneInputRef.current.focus();
+//     } else if (streetNumber !== "") {
+//       streetNumberInputRef.current.focus();
+//     } else if (streetName !== "") {
+//       streetNameInputRef.current.focus();
+//     } else if (city !== "") {
+//       cityInputRef.current.focus();
+//     } else if (state !== "") {
+//       stateInputRef.current.focus();
+//     } else if (zipCode !== "") {
+//       zipCodeInputRef.current.focus();
+//     } else if (country !== "") {
+//       countryInputRef.current.focus();
+//     } else if (latitude !== 0) {
+//       latitudeInputRef.current.focus();
+//     } else if (longitude !== 0) {
+//       longitudeInputRef.current.focus();
+//     }
+//   }, [
+//     name,
+//     email,
+//     phone,
+//     streetNumber,
+//     streetName,
+//     city,
+//     state,
+//     zipCode,
+//     country,
+//     latitude,
+//     longitude,
+//   ]);
 
   const handleEditSubmit = async () => {
     try {
@@ -141,7 +153,21 @@ const Admin = () => {
 
   const handleAddBranch = async (e) => {
     e.preventDefault();
+    setName(nameInputRef.current.value);
+    setEmail(emailInputRef.current.value);
+    setPhone(phoneInputRef.current.value);
+    setEmail(emailInputRef.current.value);
+    setStreetNumber(streetNumberInputRef.current.value);
+    setStreetName(streetNameInputRef.current.value);
+    setCity(cityInputRef.current.value);
+    setZipCode(zipCodeInputRef.current.value);
+    setCountry(countryInputRef.current.value);
+    setLatitude(latitudeInputRef.current.value);
+    setLongitude(longitudeInputRef.current.value);
+
+
     try {
+        
       const branchBody = { name, address, contact, services };
       const res = await axios.post(
         "http://localhost:3001/api/branches/create",
@@ -196,6 +222,7 @@ const Admin = () => {
             <div>
               <label>Name: </label>
               <input
+                ref={nameInputRef}
                 type="text"
                 value={editingRow.name}
                 onChange={(e) =>
@@ -204,12 +231,68 @@ const Admin = () => {
               />
             </div>
             <div>
-              <label>Address: </label>
+              <label>Street Number: </label>
               <input
                 type="text"
-                value={editingRow.address}
+                value={editingRow.address.streetNumber}
                 onChange={(e) =>
-                  setEditingRow({ ...editingRow, address: e.target.value })
+                  setEditingRow({ ...editingRow, streetNumber: e.target.value })
+                }
+              />
+              <label>Street Name: </label>
+              <input
+                type="text"
+                value={editingRow.address.streetName}
+                onChange={(e) =>
+                  setEditingRow({ ...editingRow, streetName: e.target.value })
+                }
+              />
+              <label>City: </label>
+              <input
+                type="text"
+                value={editingRow.address.city}
+                onChange={(e) =>
+                  setEditingRow({ ...editingRow, city: e.target.value })
+                }
+              />
+              <label>State: </label>
+              <input
+                type="text"
+                value={editingRow.address.state}
+                onChange={(e) =>
+                  setEditingRow({ ...editingRow, state: e.target.value })
+                }
+              />
+              <label>Zip Code: </label>
+              <input
+                type="text"
+                value={editingRow.address.zipCode}
+                onChange={(e) =>
+                  setEditingRow({ ...editingRow, zipCode: e.target.value })
+                }
+              />
+              <label>Country: </label>
+              <input
+                type="text"
+                value={editingRow.address.country}
+                onChange={(e) =>
+                  setEditingRow({ ...editingRow, country: e.target.value })
+                }
+              />
+              <label>Latitude: </label>
+              <input
+                type="number"
+                value={editingRow.address.latitude}
+                onChange={(e) =>
+                  setEditingRow({ ...editingRow, latitude: e.target.value })
+                }
+              />
+              <label>Longitude: </label>
+              <input
+                type="number"
+                value={editingRow.address.longitude}
+                onChange={(e) =>
+                  setEditingRow({ ...editingRow, longitude: e.target.value })
                 }
               />
             </div>
@@ -231,6 +314,7 @@ const Admin = () => {
           <div className="mt-2">
             <input
               ref={nameInputRef}
+              id="name"
               type="text"
               value={name}
               placeholder="name"
@@ -238,12 +322,13 @@ const Admin = () => {
               className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
             />
           </div>
-          <label htmlFor="name" className="relative pt-10 text-2xl">
+          <label htmlFor="phone" className="relative pt-10 text-2xl">
             Phone
           </label>
           <div className="mt-2">
             <input
               ref={phoneInputRef}
+              id="phone"
               type="tel"
               value={phone}
               placeholder="Phone"
@@ -251,12 +336,13 @@ const Admin = () => {
               className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
             />
           </div>
-          <label htmlFor="name" className="relative pt-10 text-2xl">
+          <label htmlFor="email" className="relative pt-10 text-2xl">
             E-mail
           </label>
           <div className="mt-2">
             <input
               ref={emailInputRef}
+              id="email"
               type="email"
               value={email}
               placeholder="E-mail"
@@ -266,7 +352,7 @@ const Admin = () => {
           </div>
           <div class="flex items-center mt-10">
             <input
-              id="default-checkbox"
+              id="hasTakeaway"
               type="checkbox"
               checked={takeaway}
               onChange={(e) => setTakeaway(e.target.takeaway)}
@@ -282,7 +368,7 @@ const Admin = () => {
           </div>
           <div class="flex items-center mt-10">
             <input
-              id="default-checkbox"
+              id="hasDineIn"
               type="checkbox"
               checked={dinein}
               onChange={(e) => setDinein(e.target.dinein)}
@@ -298,7 +384,7 @@ const Admin = () => {
           </div>
           <div class="flex items-center mt-10">
             <input
-              id="default-checkbox"
+              id="makesDeliveries"
               type="checkbox"
               checked={delivery}
               onChange={(e) => setDelivery(e.target.delivery)}
@@ -314,12 +400,13 @@ const Admin = () => {
           </div>
         </div>
         <div className="relative right-0 w-full h-auto">
-        <label htmlFor="streetNumber" className="relative pt-10 text-2xl">
+          <label htmlFor="streetNumber" className="relative pt-10 text-2xl">
             Street Number
           </label>
           <div className="relative mt-2">
             <input
               ref={streetNumberInputRef}
+              id="streetNumber"
               type="text"
               value={streetNumber}
               placeholder="Street Number"
@@ -333,6 +420,7 @@ const Admin = () => {
           <div className="relative mt-2">
             <input
               ref={streetNameInputRef}
+              id="streetName"
               type="text"
               value={streetName}
               placeholder="Street Name"
@@ -346,6 +434,7 @@ const Admin = () => {
           <div className="relative mt-2">
             <input
               ref={cityInputRef}
+              id="city"
               type="text"
               value={city}
               placeholder="City"
@@ -359,6 +448,7 @@ const Admin = () => {
           <div className="relative mt-2">
             <input
               ref={stateInputRef}
+              id="state"
               type="text"
               value={state}
               placeholder="State"
@@ -372,6 +462,7 @@ const Admin = () => {
           <div className="relative mt-2">
             <input
               ref={zipCodeInputRef}
+              id="zipCode"
               type="text"
               value={zipCode}
               placeholder="Zip Code"
@@ -385,6 +476,7 @@ const Admin = () => {
           <div className="relative mt-2">
             <input
               ref={countryInputRef}
+              id="country"
               type="text"
               value={country}
               placeholder="Country"
@@ -398,6 +490,7 @@ const Admin = () => {
           <div className="relative mt-2">
             <input
               ref={latitudeInputRef}
+              id="latitude"
               type="number"
               value={latitude}
               placeholder="0"
@@ -411,6 +504,7 @@ const Admin = () => {
           <div className="relative mt-2">
             <input
               ref={longitudeInputRef}
+              id="longitude"
               type="number"
               value={longitude}
               placeholder="Longitude"
@@ -420,12 +514,14 @@ const Admin = () => {
           </div>
         </div>
         <div className="absolute bottom-0 h-1 ml-10">
-        <button
-          type="submit"
-          className="relative w-mt-8 bg-green-600 rounded hover:bg-green-500 hover:ring-1 hover:ring-white duration-300"
-        >
-          <p className="text-2xl px-3 py-2 text-white drop-shadow-md">Submit</p>
-        </button>
+          <button
+            type="submit"
+            className="relative w-mt-8 bg-green-600 rounded hover:bg-green-500 hover:ring-1 hover:ring-white duration-300"
+          >
+            <p className="text-2xl px-3 py-2 text-white drop-shadow-md">
+              Submit
+            </p>
+          </button>
         </div>
       </form>
     </div>
