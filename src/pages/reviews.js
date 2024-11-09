@@ -10,7 +10,7 @@ const Reviews = () => {
 
   // Fetch reviews from the API
   const fetchReviews = async () => {
-    const response = await axios.get('http://localhost:3001/api/pagereviews')
+    const response = await axios.get('http://localhost:3001/api/facebook/pagereviews')
     .then((response) => {;
         setReviews(response.data);
     })
