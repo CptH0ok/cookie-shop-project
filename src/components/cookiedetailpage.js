@@ -111,25 +111,19 @@ const CookieDetailPage = () => {
           const user = userResponse.data;
       
           // Validate that `cookie` object is available
-          if (!cookie || !cookie.id) {
+          if (!cookie) {
             console.error('Invalid cookie data');
             alert('Error: Invalid item data');
             return;
           }
       
-          // Get the user's cart items
-          const { data } = await axios.get(`http://localhost:3001/api/cart/${user.id}`, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-            }
-          });
+          // Log cookie data to verify what we're working with
+          console.log('Cookie data:', cookie);
       
-          console.log("Cart data received:", data);
-      
-          // Add to cart (the backend will handle whether to update quantity or add new item)
+          // Add to cart
           const response = await axios.post('http://localhost:3001/api/cart/add', {
             userId: user.id,
-            cookieId: cookie.id,
+            cookieId: cookie._id, // Send MongoDB _id instead of numeric id
             quantity: quantity,
           }, {
             headers: {
@@ -141,17 +135,24 @@ const CookieDetailPage = () => {
           if (response.status === 200) {
             console.log(`Added ${quantity} ${cookie.name}(s) to the cart`);
             alert(`Added ${quantity} ${cookie.name}(s) to the cart`);
-          } else {
-            console.error('Failed to add item to cart');
-            alert('Failed to add item to the cart');
+            
+            // Optionally refresh cart data after adding
+            const cartResponse = await axios.get(`http://localhost:3001/api/cart/${user.id}`, {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+              }
+            });
+            console.log("Updated cart data:", cartResponse.data);
           }
       
         } catch (error) {
-          console.error('Error managing cart:', error.response?.data || error.message);
-          alert(`Error managing cart: ${error.response?.data?.error || error.message}`);
+          console.error('Error managing cart:', error);
+          if (error.response) {
+            console.error('Error response:', error.response.data);
+          }
+          alert(`Error adding to cart: ${error.response?.data?.error || error.message}`);
         }
       };
-      
       
     if (loading) return <div className="text-white">Loading...</div>;
     if (!cookie) return <div className="text-white">Cookie not found!</div>;
