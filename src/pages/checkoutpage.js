@@ -213,6 +213,8 @@ const CheckoutPage = () => {
   );
 
   return (
+    <div className="pt-5">  {/* Adjust this padding based on your navbar height */}
+        <div className="mx-auto max-w-5xl justify-center px-6 md:flex md:space-x-6 xl:px-0"></div>
     <div className="bg-white py-8 antialiased md:py-16">
       <form onSubmit={handleSubmit} className="mx-auto max-w-screen-xl px-4 2xl:px-0">
         <ol className="flex w-full max-w-2xl items-center text-center text-sm font-medium text-gray-500 sm:text-base">
@@ -497,6 +499,7 @@ const CheckoutPage = () => {
         </div>
       </form>
     </div>
+</div>
   );
 };
 
