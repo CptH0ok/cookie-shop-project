@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from "react";
+import {
+  Dialog,
+  DialogBackdrop,
+  DialogPanel,
+  DialogTitle,
+} from "@headlessui/react";
+import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import * as d3 from "d3";
+import axios from "axios";
 
-function DataTable({ apiUrl, columnsToDisplay, editable }) {
+function DataTable({ apiUrl, columnsToDisplay, editable ,onEdit, onDelete }) {
+  const [open, setOpen] = useState(true);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -23,7 +32,7 @@ function DataTable({ apiUrl, columnsToDisplay, editable }) {
   }, [apiUrl]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="p-4 font-semibold text-lg">Loading...</div>;
   }
 
   // Filter the columns if `columnsToDisplay` is passed
@@ -36,14 +45,6 @@ function DataTable({ apiUrl, columnsToDisplay, editable }) {
     });
     return filteredRow;
   });
-
-  const handleEdit = (row) => {
-    console.log("Editing", row); // Replace with actual edit logic
-  };
-
-  const handleDelete = (row) => {
-    console.log("Deleting", row); // Replace with actual delete logic
-  };
 
   if (editable) {
     return (
@@ -78,13 +79,13 @@ function DataTable({ apiUrl, columnsToDisplay, editable }) {
                   ))}
                   <td className="px-4 py-2 border">
                     <button
-                      onClick={() => handleEdit(row.id)}
+                      onClick={() => onEdit(row)}
                       className="realtive px-3 py-1 mb-2 bg-blue-500 text-white drop-shadow-md rounded mr-2 hover:bg-blue-600 hover:ring-1 hover:ring-white duration-300"
                     >
                       Edit
                     </button>
                     <button
-                      onClick={() => handleDelete(row.id)}
+                      onClick={() => onDelete(row)}
                       className="realtive px-3 py-1 bg-red-500 text-white drop-shadow-md rounded hover:bg-red-600 hover:ring-1 hover:ring-white duration-300"
                     >
                       Delete

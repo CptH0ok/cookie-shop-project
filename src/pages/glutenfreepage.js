@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 const GlutenFreePage = () => {
   return (
     <div className="gluten-free-page">
-      <div className="content-container">
+      <div className="content-container backdrop-blur-2xl backdrop-contrast-75 backdrop-brightness-75 drop-shadow-2xl">
       <h1 className="relative text-balance z-10 text-white text-4xl font-bold font-serif tracking-tight sm:text-6xl">
         Discover the Delight of Gluten-Free Cookies!</h1>
         <p className="relative z-10 mt-6 text-lg leading-8 text-white font-serif">
@@ -15,7 +15,7 @@ const GlutenFreePage = () => {
           <br /><br />
           With endless possibilities for flavor combinations and textures, gluten-free cookies can be a delightful treat for everyone, regardless of dietary restrictions. So, whether you're gluten-sensitive or simply looking to explore new flavors, gluten-free cookies are a wonderful way to indulge guilt-free!
         </p>
-        <Link to="/" className="back-link">Back to Home Page</Link>
+        <Link to="/" className="back-link hover:bg-emerald-950 duration-300">Back to Home Page</Link>
       </div>
     </div>
   );

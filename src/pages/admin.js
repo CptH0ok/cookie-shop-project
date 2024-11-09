@@ -11,7 +11,8 @@ const Admin = () => {
   const [selectedMenu, setSelectedMenu] = useState("home");
   const [openDropdown, setOpenDropdown] = useState(null);
 
-  const branchColumns = ["name", "address", "contact", "services"];
+  // Consts
+  const branchColumns = ["_id", "name", "address", "contact", "services"];
   const stockColumns = [
     "name",
     "description",
@@ -21,6 +22,51 @@ const Admin = () => {
     "available",
   ];
 
+  const branchHandleEdit = (row) => {
+    console.log("Editing", row); // Replace with actual edit logic
+  };
+  const branchHandleDelete = (row) => {
+    // Placeholder for dialog
+
+    console.log("Deleting", row.name); // Replace with actual delete logic
+    axios.delete("http://localhost:3001/api/branches/delete/" + row._id);
+  };
+  const stockHandleEdit = (row) => {
+    console.log("Editing", row); // Replace with actual edit logic
+  };
+  const stockHandleDelete = (row) => {
+    // Placeholder for dialog
+
+    console.log("Deleting", row); // Replace with actual delete logic
+    axios.delete();
+  };
+  const purchaseHandleDelete = (row) => {
+    // Placeholder for dialog
+
+    console.log("Deleting", row); // Replace with actual delete logic
+    axios.delete();
+  };
+  const [name, setName] = useState('');
+  const [address, setAddress] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [delivery, setDelivery] = useState(false);
+  const [takeaway, setTakeaway] = useState(false);
+  const [dinein, setDinein] = useState(false);
+  
+    const handleAddBranch = async (e) => {
+      e.preventDefault();
+      try {
+        const res = await axios.post('http://localhost:3001/api/security/signup', { });
+        localStorage.setItem('token', res.data.token);
+        setError('');
+        // Redirect to protected page
+      } catch (err) {
+        setError('Error creating account');
+      }
+    };
+
+  // Page Contents
   const HomeContent = () => <div className="p-4">Welcome to Home</div>;
   const ViewStockContent = () => (
     <div className="overflow-auto rounded-md text-md font-bold font-serif">
@@ -51,10 +97,44 @@ const Admin = () => {
         apiUrl={"http://localhost:3001/api/branches/list"}
         columnsToDisplay={branchColumns}
         editable={true}
+        onEdit={branchHandleEdit}
+        onDelete={branchHandleDelete}
       />
     </div>
   );
+  const AddBranchContent = () => (
+    <div className="relative p-6 pl-10 pt-10 text-6xl font-serif font-bold drop-shadow-lg">
+      Create A Branch
+      <form onSubmit={""} className="relative ">
+        <label htmlFor="name" className="relative pt-10 text-2xl">
+          Name
+        </label>
+        <div className="mt-2">
+        <input
+                  type="text"
+                  value={name}
+                  placeholder="name"
+                  onChange={(e) => setName(e.target.value)}
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+                />
+        </div>
+        <label htmlFor="name" className="relative pt-10 text-2xl">
+          Address
+        </label>
+        <div className="mt-2">
+        <input
+                  type="text"
+                  value={address}
+                  placeholder="Address"
+                  onChange={(e) => setAddress(e.target.value)}
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+                />
+        </div>
+      </form>
+    </div>
+  );
 
+  // Menus
   const toggleDropdown = (menu) => {
     // Set the open dropdown to the clicked one, or close it if it's already open
     setOpenDropdown((prev) => (prev === menu ? null : menu));
@@ -76,133 +156,141 @@ const Admin = () => {
       })
       .catch((err) => {
         // Handle error
-          setError(true);
+        setError(true);
       });
-  }; 
+  };
 
   checkAdmin();
 
-  return ( 
+  return (
     <>
-    { !error && (
-    <div className="flex bg-unsplash-[avJ9uz9Qhcw/lg] h-dvh bg-center bg-cover pb-32">
-      <div className="relative flex flex-col z-10 top-20 left-2 mr-4 mt-5 h-full w-1/5 h-auto backdrop-contrast-50 backdrop-blur-2xl rounded-2xl">
-        <div className="relative z-10 mt-10 font-bold text-2xl text-center text-black">
-          {" "}
-          Header{" "}
-        </div>
-        <div
-          name="home"
-          className={`realtive z-10 p-5 m-2 rounded-md hover:drop-shadow-lg hover:text-black hover:bg-yellow-500 duration-300`}
-          onClick={() => handleMenuClick("home")}
-        >
-          <div className="relative z-10 font-bold text-2xl text-center text-white">
-            Home
-          </div>
-        </div>
-        <div name="stock">
-          <div
-            className={`realtive z-10 p-5 m-2 rounded-md hover:drop-shadow-lg hover:text-black hover:bg-yellow-500 duration-300 ${
-              openDropdown == "stock"
-                ? "realtive z-10 p-5 m-2 rounded-md drop-shadow-lg text-black bg-yellow-600"
-                : ""
-            } `}
-            onClick={() => toggleDropdown("stock")}
-          >
-            <div className="relative z-10 font-bold text-2xl text-center text-white">
-              Stock
+      {!error && (
+        <div className="flex bg-unsplash-[avJ9uz9Qhcw/lg] h-dvh bg-center bg-cover pb-32">
+          <div className="relative flex flex-col z-10 top-20 left-2 mr-4 mt-5 h-full w-1/5 h-auto backdrop-contrast-50 backdrop-blur-2xl rounded-2xl">
+            <div className="relative z-10 mt-10 font-bold text-2xl text-center text-black">
+              {" "}
+              Header{" "}
+            </div>
+            <div
+              name="home"
+              className={`realtive z-10 p-5 m-2 rounded-md hover:drop-shadow-lg hover:text-black hover:bg-yellow-500 duration-300`}
+              onClick={() => handleMenuClick("home")}
+            >
+              <div className="relative z-10 font-bold text-2xl text-center text-white">
+                Home
+              </div>
+            </div>
+            <div name="stock">
+              <div
+                className={`realtive z-10 p-5 m-2 rounded-md hover:drop-shadow-lg hover:text-black hover:bg-yellow-500 duration-300 ${
+                  openDropdown == "stock"
+                    ? "realtive z-10 p-5 m-2 rounded-md drop-shadow-lg text-black bg-yellow-600"
+                    : ""
+                } `}
+                onClick={() => toggleDropdown("stock")}
+              >
+                <div className="relative z-10 font-bold text-2xl text-center text-white">
+                  Stock
+                </div>
+              </div>
+              {openDropdown == "stock" && (
+                <div className="relative z-0 rounded-md ring-1 ring-white p-2 m-4">
+                  <div
+                    className="relative z-0 text-gray-300 m-2 p-2 rounded-md font-bold text-xl text-center hover:bg-white hover:text-black duration-300"
+                    onClick={() => handleMenuClick("viewstock")}
+                  >
+                    View Stock
+                  </div>
+                  <div
+                    className="relative z-0 text-gray-300 m-2 p-2 rounded-md font-bold text-xl text-center hover:bg-white hover:text-black duration-300"
+                    onClick={() => handleMenuClick("updatestock")}
+                  >
+                    Update Stock
+                  </div>
+                </div>
+              )}
+            </div>
+            <div name="purchases">
+              <div
+                className={`realtive z-10 p-5 m-2 rounded-md hover:drop-shadow-lg hover:text-black hover:bg-yellow-500 duration-300 ${
+                  openDropdown == "purchases"
+                    ? "realtive z-10 p-5 m-2 rounded-md drop-shadow-lg text-black bg-yellow-600"
+                    : ""
+                } `}
+                onClick={() => toggleDropdown("purchases")}
+              >
+                <div className="relative z-10 font-bold text-2xl text-center text-white">
+                  Purchases
+                </div>
+              </div>
+              {openDropdown == "purchases" && (
+                <div className="relative z-0 rounded-md ring-1 ring-white p-2 m-4">
+                  <div
+                    className="relative z-0 text-gray-300 m-2 p-2 rounded-md font-bold text-xl text-center hover:bg-white hover:text-black duration-300"
+                    onClick={() => handleMenuClick("viewpurchases")}
+                  >
+                    View Purchases
+                  </div>
+                  <div
+                    className="relative z-0 text-gray-300 m-2 p-2 rounded-md font-bold text-xl text-center hover:bg-white hover:text-black duration-300"
+                    onClick={() => handleMenuClick("removepurchases")}
+                  >
+                    Remove Purchases
+                  </div>
+                </div>
+              )}
+            </div>
+            <div name="branches">
+              <div
+                className={`realtive z-10 p-5 m-2 rounded-md hover:drop-shadow-lg hover:text-black hover:bg-yellow-500 duration-300 ${
+                  openDropdown == "branches"
+                    ? "realtive z-10 p-5 m-2 rounded-md drop-shadow-lg text-black bg-yellow-600"
+                    : ""
+                } `}
+                onClick={() => toggleDropdown("branches")}
+              >
+                <div className="relative z-10 font-bold text-2xl text-center text-white">
+                  Branches
+                </div>
+              </div>
+              {openDropdown === "branches" && (
+                <div className="relative z-0 rounded-md ring-1 ring-white p-2 m-4">
+                  <div
+                    className="relative z-0 text-gray-300 m-2 p-2 rounded-md font-bold text-xl text-center hover:bg-white hover:text-black duration-300"
+                    onClick={() => handleMenuClick("viewbranches")}
+                  >
+                    View Branches
+                  </div>
+                  <div
+                    className="relative z-0 text-gray-300 m-2 p-2 rounded-md font-bold text-xl text-center hover:bg-white hover:text-black duration-300"
+                    onClick={() => handleMenuClick("addbranch")}
+                  >
+                    Add Branch
+                  </div>
+                  <div
+                    className="relative z-0 text-gray-300 m-2 p-2 rounded-md font-bold text-xl text-center hover:bg-white hover:text-black duration-300"
+                    onClick={() => handleMenuClick("updatebranches")}
+                  >
+                    Update Branches
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-          {openDropdown == "stock" && (
-            <div className="relative z-0 rounded-md ring-1 ring-white p-2 m-4">
-              <div
-                className="relative z-0 text-gray-300 m-2 p-2 rounded-md font-bold text-xl text-center hover:bg-white hover:text-black duration-300"
-                onClick={() => handleMenuClick("viewstock")}
-              >
-                View Stock
-              </div>
-              <div
-                className="relative z-0 text-gray-300 m-2 p-2 rounded-md font-bold text-xl text-center hover:bg-white hover:text-black duration-300"
-                onClick={() => handleMenuClick("updatestock")}
-              >
-                Update Stock
-              </div>
-            </div>
-          )}
-        </div>
-        <div name="purchases">
-          <div
-            className={`realtive z-10 p-5 m-2 rounded-md hover:drop-shadow-lg hover:text-black hover:bg-yellow-500 duration-300 ${
-              openDropdown == "purchases"
-                ? "realtive z-10 p-5 m-2 rounded-md drop-shadow-lg text-black bg-yellow-600"
-                : ""
-            } `}
-            onClick={() => toggleDropdown("purchases")}
-          >
-            <div className="relative z-10 font-bold text-2xl text-center text-white">
-              Purchases
-            </div>
+          <div className="relative flex z-10 top-20 mr-2 ml-4 mt-5 h-full w-4/5 h-auto backdrop-contrast-50 backdrop-blur-2xl rounded-2xl">
+            {selectedMenu === "home" && <HomeContent />}
+            {selectedMenu === "viewstock" && <ViewStockContent />}
+            {selectedMenu === "updatestock" && <UpdateStockContent />}
+            {selectedMenu === "viewpurchases" && <ViewPurchasesContent />}
+            {selectedMenu === "removepurchases" && <RemovePurchasesContent />}
+            {selectedMenu === "viewbranches" && <ViewBranchesContent />}
+            {selectedMenu === "addbranch" && <AddBranchContent />}
+            {selectedMenu === "updatebranches" && <UpdateBranchesContent />}
           </div>
-          {openDropdown == "purchases" && (
-            <div className="relative z-0 rounded-md ring-1 ring-white p-2 m-4">
-              <div
-                className="relative z-0 text-gray-300 m-2 p-2 rounded-md font-bold text-xl text-center hover:bg-white hover:text-black duration-300"
-                onClick={() => handleMenuClick("viewpurchases")}
-              >
-                View Purchases
-              </div>
-              <div
-                className="relative z-0 text-gray-300 m-2 p-2 rounded-md font-bold text-xl text-center hover:bg-white hover:text-black duration-300"
-                onClick={() => handleMenuClick("removepurchases")}
-              >
-                Remove Purchases
-              </div>
-            </div>
-          )}
         </div>
-        <div name="branches">
-          <div
-            className={`realtive z-10 p-5 m-2 rounded-md hover:drop-shadow-lg hover:text-black hover:bg-yellow-500 duration-300 ${
-              openDropdown == "branches"
-                ? "realtive z-10 p-5 m-2 rounded-md drop-shadow-lg text-black bg-yellow-600"
-                : ""
-            } `}
-            onClick={() => toggleDropdown("branches")}
-          >
-            <div className="relative z-10 font-bold text-2xl text-center text-white">
-              Branches
-            </div>
-          </div>
-          {openDropdown == "branches" && (
-            <div className="relative z-0 rounded-md ring-1 ring-white p-2 m-4">
-              <div
-                className="relative z-0 text-gray-300 m-2 p-2 rounded-md font-bold text-xl text-center hover:bg-white hover:text-black duration-300"
-                onClick={() => handleMenuClick("viewbranches")}
-              >
-                View Branches
-              </div>
-              <div
-                className="relative z-0 text-gray-300 m-2 p-2 rounded-md font-bold text-xl text-center hover:bg-white hover:text-black duration-300"
-                onClick={() => handleMenuClick("updatebranches")}
-              >
-                Update Branches
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-      <div className="relative flex z-10 top-20 mr-2 ml-4 mt-5 h-full w-4/5 h-auto backdrop-contrast-50 backdrop-blur-2xl rounded-2xl">
-        {selectedMenu === "home" && <HomeContent />}
-        {selectedMenu === "viewstock" && <ViewStockContent />}
-        {selectedMenu === "updatestock" && <UpdateStockContent />}
-        {selectedMenu === "viewpurchases" && <ViewPurchasesContent />}
-        {selectedMenu === "removepurchases" && <RemovePurchasesContent />}
-        {selectedMenu === "viewbranches" && <ViewBranchesContent />}
-        {selectedMenu === "updatebranches" && <UpdateBranchesContent />}
-      </div>
-    </div>
-  )}
-  </>)
+      )}
+    </>
+  );
 };
 
 export default Admin;

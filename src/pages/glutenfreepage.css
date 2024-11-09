@@ -12,8 +12,8 @@
   }
   
   .content-container {
-    background-color: rgba(50, 53, 53, 0.8); /* Semi-transparent dark background */
-    padding: 10px; /* Space inside the dark box */
+    /* background-color: rgba(50, 53, 53, 0.8); Semi-transparent dark background */
+    padding: 20px; /* Space inside the dark box */
     border-radius: 10px; /* Rounded corners */
     max-width: 800px; /* Limit the width for better readability */
     text-align: center; /* Center align the text */
