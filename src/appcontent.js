@@ -15,8 +15,6 @@ import Navbar from './components/navbar';
 import GlutenFreePage from './pages/glutenfreepage';
 import ProtectedRoute from './components/protectedroute';
 import CookieDetailPage from './components/cookiedetailpage';
-import AboutUsPage from './pages/aboutus';
-import ContactUsPage from './pages/contactus';
 import { Routes, Route, useLocation } from 'react-router-dom';
 
 
