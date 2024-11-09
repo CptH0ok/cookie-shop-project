@@ -32,16 +32,6 @@ const Navbar = () => {
   parseUserDetails();
   }, []);
 
-  //Updates the cart count when cart items change
-  // useEffect(() => {
-  //   // Assuming fetchCartCount is a function that returns the count of items in the cart
-  //   async function fetchCartCount() {
-  //     const response = await axios.get('http://localhost:3001/api/');
-  //     setCartCount(response.data.count);
-  //   }
-  
-  //   fetchCartCount();
-  // }, []);
 
   const renderUserCircle = () => {
     if (userDetails?.picture) {
@@ -149,6 +139,49 @@ const Navbar = () => {
   const callsToAction = [
     { name: 'Contact sales', href: '#', icon: PhoneIcon },
   ]
+
+  useEffect(() => {
+    const fetchCartCount = async () => {
+      if (token) {
+        try {
+          const userResponse = await axios.get('http://localhost:3001/api/users/getuserdetails', {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          
+          const userId = userResponse.data.id;
+          
+          const cartResponse = await axios.get(`http://localhost:3001/api/cart/${userId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+
+          if (cartResponse.data.cart && cartResponse.data.cart.items) {
+            const itemCount = cartResponse.data.cart.items.reduce((total, item) => total + item.quantity, 0);
+            setCartCount(itemCount);
+          }
+        } catch (error) {
+          console.error('Error fetching cart count:', error);
+        }
+      }
+    };
+
+    fetchCartCount();
+  }, [token]);
+
+  const CartIcon = () => (
+    <div className="relative inline-block">
+      <button
+        onClick={() => navigate('/cart')}
+        className="relative p-2 text-gray-600 hover:text-yellow-500 transition-colors duration-200"
+      >
+        <ShoppingCartIcon className="h-6 w-6" />
+        {cartCount > 0 && (
+          <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-yellow-500 rounded-full">
+            {cartCount}
+          </span>
+        )}
+      </button>
+    </div>
+  );
 
 
   return (
@@ -295,7 +328,23 @@ const Navbar = () => {
         </p>
       </div>
 
-      
+      <div className="flex items-center space-x-4">
+            <CartIcon />
+            {/* Your existing navigation items */}
+            {userDetails ? (
+              <Popover className="relative">
+                {/* ... rest of your existing navbar code ... */}
+              </Popover>
+            ) : (
+              <Link
+                to="/login"
+                className="text-gray-600 hover:text-yellow-500 transition-colors duration-200"
+              >
+                Login
+              </Link>
+            )}
+          </div>
+
 
       {/* Auth Buttons */}
       {userDetails ? (
