@@ -11,6 +11,7 @@ const cartApi = require('./cartapi');
 const cookiesApi = require('./cookiesapi');
 const branchesApi = require('./branchesapi');
 const convertCurrency = require('./currencyapi')
+const securityApi = require('./security');
 const {authenticateJWT, checkAdmin, checkPermissions} = require('./middlewares');
 const purchaseHistory = require('./purchasehistoryapi');
 
@@ -24,6 +25,7 @@ app.use('/api/facebook', facebookApi );
 app.use('/api/currency', convertCurrency);
 app.use('/api/cookies', cookiesApi )
 app.use('/api/purchasehistory', purchaseHistory);
+app.use('/api/security', securityApi );
 
 // Serve static images from the "images" folder
 app.use('/images', express.static(path.join(__dirname, 'images')));
