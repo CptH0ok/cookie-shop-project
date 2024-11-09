@@ -5,13 +5,14 @@ import ErrorPage from './pages/error';
 import Reviews from './pages/reviews';
 import HomePage from './pages/homepage';
 import ShopPage from './pages/shoppage';
+import AboutUsPage from './pages/aboutus';
+import ContactUsPage from './pages/contactus';
 import CartPage from './pages/cartpage';
 import CheckoutPage from './pages/checkoutpage';
 import Branches from './pages/branches';
 import Footer from './components/footer';
 import Navbar from './components/navbar';
 import GlutenFreePage from './pages/glutenfreepage';
-
 import ProtectedRoute from './components/protectedroute';
 import CookieDetailPage from './components/cookiedetailpage';
 import { Routes, Route, useLocation } from 'react-router-dom';
@@ -23,7 +24,8 @@ function AppContent() {
 
   const pathsWithLayout = [
     "/",
-    "/shop", "/branches", "/reviews", "/admin", "/glutenfree", "/cart", "/checkout"
+    "/shop", "/branches", "/reviews", "/admin", "/glutenfree", "/cart", "/checkout",
+    "/aboutus", "/contactus"
   ];
 
   const showLayout = pathsWithLayout.includes(location.pathname);
@@ -41,6 +43,8 @@ function AppContent() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/shop" element={<ShopPage />} />
+        <Route path="/aboutus" element={<AboutUsPage />} />
+        <Route path="/contactus" element={<ContactUsPage />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/branches" element={<Branches />} />
