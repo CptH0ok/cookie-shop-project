@@ -78,12 +78,12 @@ function DataTable({ apiUrl, columnsToDisplay, editable, onEdit, onDelete }) {
                     </td>
                   ))}
                   <td className="px-4 py-2 border">
-                    <button
+                    {onEdit != "" && (<button
                       onClick={() => onEdit(row)}
                       className="realtive px-3 py-1 mb-2 bg-blue-500 text-white drop-shadow-md rounded mr-2 hover:bg-blue-600 hover:ring-1 hover:ring-white duration-300"
                     >
                       Edit
-                    </button>
+                    </button> )}
                     <button
                       onClick={() => onDelete(row)}
                       className="realtive px-3 py-1 bg-red-500 text-white drop-shadow-md rounded hover:bg-red-600 hover:ring-1 hover:ring-white duration-300"

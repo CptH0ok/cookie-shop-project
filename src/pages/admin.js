@@ -63,6 +63,8 @@ const Admin = () => {
     "category",
     "available",
   ];
+  const purchaseColumns = ["_id", "memberId", "items", "purchaseDate"]
+
 
   const branchHandleEdit = (row) => {
     setEditingRow({ ...row }); // Create a copy of the row for editing
@@ -160,10 +162,35 @@ const Admin = () => {
       />
     </div>
   );
-  const UpdateStockContent = () => <div className="p-4">Update Stock</div>;
-  const ViewPurchasesContent = () => <div className="p-4">View Purchases</div>;
+  const UpdateStockContent = () => (
+    <div className="overflow-auto rounded-md text-md font-bold font-serif">
+      <DataTable
+        apiUrl={"http://localhost:3001/api/cookies/"}
+        columnsToDisplay={stockColumns}
+        editable={true}
+        onEdit={branchHandleEdit}
+        onDelete={branchHandleDelete}
+      />
+    </div>
+  );
+  const ViewPurchasesContent = () => (
+    <div className="overflow-auto rounded-md text-md font-bold font-serif">
+    <DataTable
+      apiUrl={"http://localhost:3001/api/purchases/list"}
+      columnsToDisplay={purchaseColumns}
+      editable={false}
+    />
+  </div>
+  );
   const RemovePurchasesContent = () => (
-    <div className="p-4">Remove Purchases</div>
+    <div className="overflow-auto rounded-md text-md font-bold font-serif">
+      <DataTable
+        apiUrl={"http://localhost:3001/api/purchases/list"}
+        columnsToDisplay={purchaseColumns}
+        editable={true}
+        onEdit={""}
+        onDelete={branchHandleDelete}
+      /></div>
   );
   const ViewBranchesContent = () => (
     <div className="overflow-auto rounded-md text-md font-bold font-serif">
