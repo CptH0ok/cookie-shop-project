@@ -8,8 +8,8 @@ const ContactUs = () => {
         <div className="absolute inset-0 bg-black bg-opacity-75 z-0"></div>
         <div className="mx-auto max-w-2xl mt-10 sm:py-48 lg:py-36">
           <div className="text-center">
-            <h1 className="title">How Can We Help?</h1>
-            <p className="title_opening">
+            <h1 className="relative text-balance z-10 text-white text-4xl font-bold font-serif tracking-tight sm:text-6xl">How Can We Help?</h1>
+            <p className="relative z-10 mt-6 text-lg leading-8 text-white font-serif">
                 Got an issue? Want to send feedback? 
 				Need details about our cookies? Let us know. 
             </p>

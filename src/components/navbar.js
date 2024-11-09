@@ -1,20 +1,28 @@
-import axios from 'axios';
-import { Link, useNavigate } from "react-router-dom";
 import React, { useState, useEffect, useRef } from "react";
-import { ChevronDownIcon, PhoneIcon } from '@heroicons/react/20/solid'
-import { XMarkIcon, TruckIcon, FingerPrintIcon, BanknotesIcon, AtSymbolIcon } from '@heroicons/react/24/outline'
+import { Link, useNavigate } from "react-router-dom";
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle, TransitionChild, Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
+import { XMarkIcon, TruckIcon, HomeIcon, ShoppingBagIcon, ClockIcon, UserIcon, ShoppingCartIcon, FingerPrintIcon, BanknotesIcon, AtSymbolIcon } from '@heroicons/react/24/outline'
+import { ChevronDownIcon, PhoneIcon } from '@heroicons/react/20/solid'
+import axios from 'axios';
 
 const Navbar = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [userDetails, setUserDetails] = useState(null);
-  const [purchases, setPurchases] = useState([]);
   const [error, setError] = useState('');
   const [isEmailPopupVisible, setEmailPopupVisible] = useState(false);
   const [isPasswdPopupVisible, setPasswdPopupVisible] = useState(false);
-  const [isPurchaseHistoryVisible, setPurchaseHistoryVisible] = useState(false);
   const token = localStorage.getItem("token");
+  const [cartCount, setCartCount] = useState(0); //Holds the number of items in the cart
+
+  const navigationItems = [
+    { name: 'Home', href: '/', icon: HomeIcon },
+    { name: 'Shop', href: '/shop', icon: ShoppingBagIcon },
+    { name: 'Cart', href: '/cart', icon: ShoppingCartIcon },
+    { name: 'Orders', href: '/purchasehistory', icon: ClockIcon },
+    { name: 'Profile', href: '/profile', icon: UserIcon },
+  ];
+
 
   useEffect(() => {
     const parseUserDetails = async () => {
@@ -28,10 +36,11 @@ const Navbar = () => {
         localStorage.removeItem("token"); // Token is invalid
       });
     }
-  };
+  }
 
   parseUserDetails();
   }, []);
+
 
   const renderUserCircle = () => {
     if (userDetails?.picture) {
@@ -52,8 +61,7 @@ const Navbar = () => {
     if (item.href === '#cart') {
       navigate("/cart");
     } else if (item.href === '#phistory') {
-      setPurchaseHistoryVisible(true);
-      handleFetchPurchaseHistory();
+      navigate("/purchasehistory");
     } else if (item.href === '#chngmail') {
       setEmailPopupVisible(true); // Shows the popup
     } else if (item.href === '#chngpasswd') {
@@ -67,7 +75,6 @@ const Navbar = () => {
     const handleCloseModal = () => {
       setEmailPopupVisible(false); // Hides the popup
       setPasswdPopupVisible(false); // Hides the popup
-      setPurchaseHistoryVisible(false);
     };
 
     const handleLogout = () => {
@@ -84,7 +91,7 @@ const Navbar = () => {
       const email = userDetails.email;
 
       try {
-        await axios.post('http://localhost:3001/api/security/login', { email, password: oldPassword });
+        await axios.post('http://localhost:3001/api/login', { email, password: oldPassword });
         setError('');
 
         try{
@@ -112,9 +119,8 @@ const Navbar = () => {
 
       const newEmail = e.target.newemail.value;
       const oldEmail = e.target.oldemail.value;
-      const currEmail = userDetails.email;
 
-      if(currEmail === oldEmail){
+      if(newEmail === oldEmail){
         try{
           await axios.put(`http://localhost:3001/api/users/update/${userDetails.id}`,{ email: newEmail },  // JSON body
             {
@@ -130,20 +136,7 @@ const Navbar = () => {
         } catch (err){
           setError("error in update");
         }
-    } else {
-      setError("this is not your current email");
     }
-    };
-
-    const handleFetchPurchaseHistory = async () => {
-      try {
-        const response = await axios.get(`http://localhost:3001/api/users/${userDetails.id}/purchase-history`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setPurchases(response.data);
-      } catch (error) {
-        console.error('Error fetching purchase history:', error);
-      }
     };
 
   const solutions = [
@@ -156,79 +149,52 @@ const Navbar = () => {
     { name: 'Contact sales', href: '#', icon: PhoneIcon },
   ]
 
+  useEffect(() => {
+    const fetchCartCount = async () => {
+      if (token) {
+        try {
+          const userResponse = await axios.get('http://localhost:3001/api/users/getuserdetails', {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          
+          const userId = userResponse.data.id;
+          
+          const cartResponse = await axios.get(`http://localhost:3001/api/cart/${userId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+
+          if (cartResponse.data.cart && cartResponse.data.cart.items) {
+            const itemCount = cartResponse.data.cart.items.reduce((total, item) => total + item.quantity, 0);
+            setCartCount(itemCount);
+          }
+        } catch (error) {
+          console.error('Error fetching cart count:', error);
+        }
+      }
+    };
+
+    fetchCartCount();
+  }, [token]);
+
+  const CartIcon = () => (
+    <div className="relative inline-block">
+      <button
+        onClick={() => navigate('/cart')}
+        className="relative p-2 text-gray-600 hover:text-yellow-500 transition-colors duration-200"
+      >
+        <ShoppingCartIcon className="h-6 w-6" />
+        {cartCount > 0 && (
+          <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-yellow-500 rounded-full">
+            {cartCount}
+          </span>
+        )}
+      </button>
+    </div>
+  );
+
+
   return (
     <>
-      {isPurchaseHistoryVisible && (
-        <div
-          id="info-popup"
-          tabIndex="-1"
-          className="fixed top-0 right-0 left-0 z-50 w-full h-modal md:h-full flex items-center justify-center bg-gray-800 bg-opacity-50"
-        >
-          <div className="relative p-4 w-full max-w-lg h-full md:h-auto">
-            <div className="relative p-4 bg-white rounded-lg shadow dark:bg-gray-800 md:p-8 max-h-[75vh] overflow-y-auto">
-              <div className="mb-4 text-sm font-light text-gray-500 dark:text-gray-400">
-                <h3 className="mb-3 text-2xl font-bold text-gray-900 dark:text-white">
-                  Purchase History
-                </h3>
-                <ul role="list" className="mb-3 text-2xl font-bold text-gray-900 dark:text-white">
-                  {purchases.map((purchase, idx) => {
-                    const totalOrderAmount = purchase.items.reduce(
-                      (sum, item) => sum + item.cookie.price * item.quantity,
-                      0
-                    );
-
-                    return (
-                      <li key={idx} className="py-6">
-                        <div className="mb-4 text-lg font-semibold text-white-900">
-                          Purchase Date: {new Date(purchase.purchaseDate).toLocaleDateString()}
-                        </div>
-                        {purchase.items.map((item, itemIdx) => {
-                          const { cookie } = item;
-                          const itemTotal = cookie.price * item.quantity;
-
-                          return (
-                            <div key={itemIdx} className="flex justify-between gap-x-6 overflow-hidden">
-                              <div className="flex min-w-0 gap-x-4">
-                                <img
-                                  alt={cookie.name}
-                                  src={cookie.imageUrl}
-                                  className="h-14 w-14 flex-none rounded-full bg-gray-50 ring-white"
-                                />
-                                <div className="min-w-0 flex-auto">
-                                  <a href={`/cookie/${encodeURIComponent(cookie.name)}`}
-                                  className="text-sm font-semibold text-blue-900 hover:text-blue-600">{cookie.name}</a>
-                                  <p className="mt-1 text-xs text-gray-500">
-                                    Quantity: {item.quantity}
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="text-sm text-green-900">
-                                Item Total: ${itemTotal.toFixed(2)}
-                              </div>
-                            </div>
-                          );
-                        })}
-                        <div className="text-lg font-semibold text-green-500 mt-4">
-                          Order Total: ${totalOrderAmount.toFixed(2)}
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
-                <button
-                  id="close-modal"
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="py-2 px-4 w-full text-sm font-medium text-gray-500 bg-white rounded-lg border border-gray-200 sm:w-auto hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-primary-300 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {isEmailPopupVisible && (
         <form onSubmit={handleChangeEmail}>
         <div
@@ -245,8 +211,8 @@ const Navbar = () => {
 
                 <div class="grid gap-4 mb-4 sm:grid-cols-2">
                   <div>
-                      <label htmlFor="oldemail" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Current Email</label>
-                      <input type="email" name="oldemail" id="oldemail" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder={userDetails.email}/>
+                      <label htmlFor="oldmail" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Current Email</label>
+                      <input type="email" name="oldmail" id="oldmail" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder={userDetails.email}/>
                   </div>
                   <div>
                       <label htmlFor="newemail" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">New Email</label>
@@ -371,6 +337,24 @@ const Navbar = () => {
         </p>
       </div>
 
+      <div className="flex items-center space-x-4">
+            <CartIcon />
+            {/* Your existing navigation items */}
+            {userDetails ? (
+              <Popover className="relative">
+                {/* ... rest of your existing navbar code ... */}
+              </Popover>
+            ) : (
+              <Link
+                to="/login"
+                className="text-gray-600 hover:text-yellow-500 transition-colors duration-200"
+              >
+                Login
+              </Link>
+            )}
+          </div>
+
+
       {/* Auth Buttons */}
       {userDetails ? (
         <div className="flex items-center mr-4 w-50">
@@ -472,43 +456,99 @@ const Navbar = () => {
       )}
 
 
-      <Dialog open={open} onClose={setOpen} className="relative z-20">
-      <DialogBackdrop
-        transition
-        className="fixed inset-0 backdrop-blur-2xl bg-contrast-75 transition-opacity drop-shadow-2xl duration-500 ease-in-out data-[closed]:opacity-0"
-      />
+<Dialog open={open} onClose={setOpen} className="relative z-20">
+  <DialogBackdrop
+    transition
+    className="fixed inset-0 backdrop-blur-2xl bg-contrast-75 transition-opacity drop-shadow-2xl duration-500 ease-in-out data-[closed]:opacity-0"
+  />
 
-      <div className="fixed inset-0 overflow-hidden">
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="pointer-events-none fixed inset-y-0 left-0 flex max-w-full ">
-            <DialogPanel
-              transition
-              className="pointer-events-auto relative w-screen max-w-xs transform transition duration-500 ease-in-out data-[closed]:-translate-x-full sm:duration-500"
-            >
-              <TransitionChild>
-                <div className="absolute right-2 top-0 -ml-8 flex pl-2 pt-2 duration-500 ease-in-out data-[closed]:opacity-0 sm:-mr-10 sm:pl-0">
+  <div className="fixed inset-0 overflow-hidden">
+    <div className="absolute inset-0 overflow-hidden">
+      <div className="pointer-events-none fixed inset-y-0 left-0 flex max-w-full">
+        <DialogPanel
+          transition
+          className="pointer-events-auto relative w-screen max-w-xs transform transition duration-500 ease-in-out data-[closed]:-translate-x-full sm:duration-500"
+        >
+          <TransitionChild>
+            <div className="absolute right-2 top-0 -ml-8 flex pl-2 pt-2 duration-500 ease-in-out data-[closed]:opacity-0 sm:-mr-10 sm:pl-0">
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="relative rounded-md text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+              >
+                <span className="absolute -inset-2.5" />
+                <span className="sr-only">Close panel</span>
+                <XMarkIcon aria-hidden="true" className="h-6 w-6" />
+              </button>
+            </div>
+          </TransitionChild>
+          <div className="flex h-full flex-col overflow-y-scroll bg-black py-6 shadow-xl">
+            <div className="px-4 sm:px-6">
+              <DialogTitle className="text-2xl font-bold leading-6 text-white">
+                Menu
+              </DialogTitle>
+            </div>
+            
+            {/* Navigation Links */}
+            <div className="relative mt-6 flex-1 px-4 sm:px-6">
+              <nav className="flex flex-col space-y-2">
+                {navigationItems.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.name}
+                      to={item.href}
+                      onClick={() => setOpen(false)}
+                      className="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 rounded-lg transition-colors duration-200"
+                    >
+                      <Icon className="h-6 w-6 mr-3" />
+                      <span className="text-lg font-medium">{item.name}</span>
+                    </Link>
+                  );
+                })}
+              </nav>
+
+              {/* User Section at bottom */}
+              {userDetails ? (
+                <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-800">
+                  <div className="flex items-center space-x-3 px-4 py-3 text-gray-300">
+                    <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center">
+                      {userDetails.name.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="font-medium">{userDetails.name}</p>
+                      <p className="text-sm text-gray-400">{userDetails.email}</p>
+                    </div>
+                  </div>
                   <button
-                    type="button"
-                    onClick={() => setOpen(false)}
-                    className="relative rounded-md text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white"
+                    onClick={() => {
+                      handleLogout();
+                      setOpen(false);
+                    }}
+                    className="w-full mt-2 px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors duration-200"
                   >
-                    <span className="absolute -inset-2.5" />
-                    <span className="sr-only">Close panel</span>
-                    <XMarkIcon aria-hidden="true" className="h-6 w-6" />
+                    Logout
                   </button>
                 </div>
-              </TransitionChild>
-              <div className="flex h-full flex-col overflow-y-scroll bg-black py-6 shadow-xl">
-                <div className="px-4 sm:px-6">
-                  <DialogTitle className="text-base font-semibold leading-6 text-white">Panel title</DialogTitle>
+              ) : (
+                <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-800">
+                  <Link
+                    to="/login"
+                    onClick={() => setOpen(false)}
+                    className="flex justify-center items-center px-4 py-2 text-white bg-yellow-500 hover:bg-yellow-600 rounded-lg transition-colors duration-200"
+                  >
+                    Login
+                  </Link>
                 </div>
-                <div className="relative mt-6 flex-1 px-4 sm:px-6">{/* Your content */}</div>
-              </div>
-            </DialogPanel>
+              )}
+            </div>
           </div>
-        </div>
+        </DialogPanel>
       </div>
-    </Dialog>
+    </div>
+  </div>
+</Dialog>
+
     </nav>
     </>
   );

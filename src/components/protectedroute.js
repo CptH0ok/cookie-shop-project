@@ -1,6 +1,6 @@
-import axios from 'axios';
-import { Navigate } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
+import { Navigate } from 'react-router-dom';
+import axios from 'axios';
 
 const ProtectedRoute = ({ element, ...rest }) => {
   const token = localStorage.getItem('token');
@@ -20,7 +20,7 @@ const ProtectedRoute = ({ element, ...rest }) => {
 
       try {
         // Make a request to your backend to verify the JWT
-        const response = await axios.get('http://localhost:3001/api/security/verify-token', {
+        const response = await axios.get('http://localhost:3001/api/verify-token', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
