@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import axios from 'axios';
 
 const CheckoutPage = () => {
   const [formData, setFormData] = useState({
@@ -15,23 +16,130 @@ const CheckoutPage = () => {
   });
 
   const [cartItems, setCartItems] = useState([]);
-  const [total, setTotal] = useState(0);
+  const [subtotal, setSubtotal] = useState(0);
+  const [shipping] = useState(4.99);
+  const [selectedCurrency, setSelectedCurrency] = useState('USD');
+  const [convertedSubtotal, setConvertedSubtotal] = useState(0);
+  const [convertedShipping, setConvertedShipping] = useState(0);
+  const [convertedTotal, setConvertedTotal] = useState(0);
+  const token = localStorage.getItem('token');
 
-  useEffect(() => {
-    // Fetch cart items and total from your database
-    fetchCartData();
-  }, []);
+  const api = axios.create({
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  });
 
-  const fetchCartData = async () => {
+  const convertAmount = async (amount, fromCurrency = 'USD', toCurrency = selectedCurrency) => {
+    if (toCurrency === 'USD') return amount;
+    
     try {
-      const response = await fetch('/api/cart');
-      const data = await response.json();
-      setCartItems(data.items);
-      setTotal(data.total);
+      const response = await axios.post('http://localhost:3001/api/currency/convert', {
+        fromCurrency,
+        toCurrency,
+        amount
+      });
+      return parseFloat(response.data.message);
     } catch (error) {
-      console.error('Error fetching cart data:', error);
+      console.error('Error converting currency:', error);
+      const fallbackRates = {
+        USD: 1,
+        EUR: 0.93,
+        GBP: 0.79,
+        ILS: 3.70
+      };
+      return amount * fallbackRates[toCurrency];
     }
   };
+
+  const fetchCartItems = async () => {
+    try {
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      const userResponse = await axios.get('http://localhost:3001/api/users/getuserdetails', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      const userId = userResponse.data.id;
+
+      if (!userId) {
+        throw new Error('No user ID found in response');
+      }
+
+      const cartResponse = await axios.get(`http://localhost:3001/api/cart/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (!cartResponse.data.cart || !cartResponse.data.cart.items) {
+        return [];
+      }
+
+      const items = cartResponse.data.cart.items
+        .filter(item => item && item.cookie)
+        .map(item => {
+          const cookieData = item.cookie;
+          
+          if (!cookieData) {
+            return null;
+          }
+
+          return {
+            id: cookieData._id,
+            name: cookieData.name || 'Unknown Cookie',
+            price: typeof cookieData.price === 'number' 
+              ? cookieData.price 
+              : Number(cookieData.price?.$numberDouble || cookieData.price),
+            image: cookieData.imageUrl || '',
+            description: cookieData.description || '',
+            quantity: item.quantity || 1
+          };
+        })
+        .filter(item => item !== null);
+
+      setCartItems(items);
+      calculateSubtotal(items);
+      return items;
+    } catch (error) {
+      console.error('Error fetching cart items:', error);
+      return [];
+    }
+  };
+
+  const calculateSubtotal = (items) => {
+    if (!items || !Array.isArray(items)) {
+      setSubtotal(0);
+      return;
+    }
+
+    const total = items.reduce((sum, item) => {
+      if (!item || typeof item.price !== 'number' || typeof item.quantity !== 'number') {
+        return sum;
+      }
+      return sum + (item.price * item.quantity);
+    }, 0);
+
+    setSubtotal(total);
+  };
+
+  useEffect(() => {
+    fetchCartItems();
+  }, []);
+
+  useEffect(() => {
+    const updateConvertedPrices = async () => {
+      if (subtotal > 0) {
+        const convertedSubtotalAmount = await convertAmount(subtotal);
+        const convertedShippingAmount = await convertAmount(shipping);
+        setConvertedSubtotal(convertedSubtotalAmount);
+        setConvertedShipping(convertedShippingAmount);
+        setConvertedTotal(convertedSubtotalAmount + convertedShippingAmount + 2);
+      }
+    };
+
+    updateConvertedPrices();
+  }, [subtotal, shipping, selectedCurrency]);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -40,23 +148,31 @@ const CheckoutPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Make a request to your server to process the payment
-      await fetch('/api/checkout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          ...formData,
-          items: cartItems,
-          total
-        })
+      await api.post('/api/checkout', {
+        ...formData,
+        items: cartItems,
+        total: convertedTotal,
+        currency: selectedCurrency
       });
-      // Clear the cart or redirect the user to a success page
+      // Handle successful checkout (redirect to success page, clear cart, etc.)
     } catch (error) {
       console.error('Error processing payment:', error);
     }
   };
+
+  // Currency selector component
+  const CurrencySelector = () => (
+    <select
+      value={selectedCurrency}
+      onChange={(e) => setSelectedCurrency(e.target.value)}
+      className="ml-2 border rounded-md p-1"
+    >
+      <option value="USD">USD ($)</option>
+      <option value="EUR">EUR (€)</option>
+      <option value="GBP">GBP (£)</option>
+      <option value="ILS">ILS (₪)</option>
+    </select>
+  );
 
   return (
     <div className="bg-white py-8 antialiased md:py-16">
@@ -205,7 +321,7 @@ const CheckoutPage = () => {
                       className="z-10 inline-flex shrink-0 items-center rounded-s-lg border border-gray-300 bg-gray-100 px-4 py-2.5 text-center text-sm font-medium text-gray-900 hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-100"
                       type="button"
                     >
-                      +1
+                      +972
                     </button>
                     <div className="relative w-full">
                       <input
@@ -247,46 +363,64 @@ const CheckoutPage = () => {
           <h2 className="text-lg font-medium text-gray-900">Order Summary</h2>
 
           <ul className="mt-4 space-y-4">
-            {cartItems.map((item, index) => (
-              <li key={index} className="flex items-start justify-between">
-                <div className="flex-shrink-0">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="h-20 w-20 rounded-lg border border-gray-200"
-                  />
-                </div>
-                <div className="ml-4">
-                  <h3 className="text-sm font-medium text-gray-900">
-                    {item.name}
-                  </h3>
-                  <p className="text-sm text-gray-500">{item.description}</p>
-                  <p className="mt-1 text-sm font-medium text-gray-900">
-                    ${item.price}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ul>
+              {cartItems.map((item, index) => (
+                <li key={index} className="flex items-start justify-between">
+                  <div className="flex-shrink-0">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="h-20 w-20 rounded-lg border border-gray-200"
+                    />
+                  </div>
+                  <div className="ml-4">
+                    <h3 className="text-sm font-medium text-gray-900">
+                      {item.name}
+                    </h3>
+                    <p className="text-sm text-gray-500">{item.description}</p>
+                    <p className="mt-1 text-sm font-medium text-gray-900">
+                      {selectedCurrency === 'USD'
+                        ? `$${shipping.toFixed(2)}`
+                        : `${convertedShipping.toFixed(2)} ${selectedCurrency}`}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
 
             <div className="mt-6 border-t border-gray-200 pt-6">
+            <div className="flex items-center justify-between mb-4">
+                <p className="text-gray-500">Currency</p>
+                <CurrencySelector />
+            </div>
             <div className="flex items-center justify-between">
-              <p className="text-sm text-gray-500">Subtotal</p>
-              <p className="text-sm font-medium text-gray-900">${total.toFixed(2)}</p>
+                <p className="text-sm text-gray-500">Subtotal</p>
+                <p className="text-sm font-medium text-gray-900">
+                {selectedCurrency === 'USD'
+                    ? `$${subtotal.toFixed(2)}`
+                    : `${convertedSubtotal.toFixed(2)} ${selectedCurrency}`}
+                </p>
             </div>
             <div className="mt-4 flex items-center justify-between">
-              <p className="text-sm text-gray-500">Shipping</p>
-              <p className="text-sm font-medium text-gray-900">$5.00</p>
+                <p className="text-sm text-gray-500">Shipping</p>
+                <p className="text-sm font-medium text-gray-900">
+                {selectedCurrency === 'USD'
+                    ? `$${shipping.toFixed(2)}`
+                    : `${convertedShipping.toFixed(2)} ${selectedCurrency}`}
+                </p>
             </div>
             <div className="mt-4 flex items-center justify-between">
-              <p className="text-sm text-gray-500">Tax</p>
-              <p className="text-sm font-medium text-gray-900">$2.00</p>
+                <p className="text-sm text-gray-500">Tax</p>
+                <p className="text-sm font-medium text-gray-900">$2.00</p>
             </div>
             <div className="mt-4 flex items-center justify-between border-t border-gray-200 pt-4">
-              <p className="text-base font-medium text-gray-900">Total</p>
-              <p className="text-base font-medium text-gray-900">${(total + 5 + 2).toFixed(2)}</p>
+                <p className="text-base font-medium text-gray-900">Total</p>
+                <p className="text-base font-medium text-gray-900">
+                {selectedCurrency === 'USD'
+                    ? `$${convertedTotal.toFixed(2)}`
+                    : `${convertedTotal.toFixed(2)} ${selectedCurrency}`}
+                </p>
             </div>
-          </div>
+            </div>
 
             <button
               type="submit"
