@@ -122,16 +122,16 @@
 
 .breadcrumb a {
   text-decoration: none;
-  color: #9ca3af; /* Tailwind's gray-400 */
+  color: #9ca3af; 
 }
 
 .breadcrumb a:hover {
-  color: #6b7280; /* Tailwind's gray-500 */
+  color: #6b7280; 
 }
 
 .breadcrumb svg {
-  width: 1em; /* Adjust icon size */
-  height: 1em; /* Adjust icon size */
-  margin: 0 0.5em; /* Space around the icon */
+  width: 1em; 
+  height: 1em; 
+  margin: 0 0.5em; 
 }
 
