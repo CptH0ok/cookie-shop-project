@@ -7,7 +7,6 @@ const {authenticateJWT, checkAdmin, checkPermissions} = require('./middlewares')
 
 //1. list all cookies
 app.get('/', async (req, res) => {
-    console.log('Fetching cookies');
     try {
       const cookies = await Cookie.find({});
       //console.log('Fetched cookies:', cookies); // Log the cookies retrieved

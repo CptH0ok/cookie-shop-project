@@ -14,62 +14,78 @@ const Admin = () => {
   const [editingRow, setEditingRow] = useState(null);
 
   // Graphs
-  const chartContainer1 = useRef(null);
-  const chartContainer2 = useRef(null);
+  const chartContainerRef = useRef(null);
 
-  const drawChart = (data, containerRef) => {
-    const width = 400;
-    const height = 200;
+  const drawPurchaseHistoryChart = (purchaseHistory, container) => {
+    const processData = (data) => {
+      const purchasesByDate = data.reduce((acc, entry) => {
+        const date = new Date(entry.purchaseDate).toLocaleDateString(); // Convert to simple date string
+        acc[date] = (acc[date] || 0) + 1; // Count purchases per date
+        return acc;
+      }, {});
+
+      const result = Object.keys(purchasesByDate).map((date) => ({
+        date: new Date(date), // Convert back to Date object for D3
+        count: purchasesByDate[date],
+      }));
+
+      console.log("Processed data:", result); // Log processed data
+      return result;
+    };
+
+    const data = processData(purchaseHistory).sort(
+      (a, b) => new Date(a.date) - new Date(b.date)
+    );
+
+    const width = 500;
+    const height = 300;
     const margin = { top: 20, right: 30, bottom: 40, left: 40 };
 
-    // Clear any existing chart in this container
-    d3.select(containerRef.current).select("svg").remove();
+    // Clear any existing SVG in the container
+    d3.select(container).selectAll("svg").remove();
 
-    // Create the SVG container
     const svg = d3
-      .select(containerRef.current)
+      .select(container)
       .append("svg")
       .attr("width", width)
       .attr("height", height)
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // Define scales
     const x = d3
-      .scaleBand()
-      .domain(data.map(d => d.name))
-      .range([0, width - margin.left - margin.right])
-      .padding(0.1);
+      .scaleTime()
+      .domain(d3.extent(data, (d) => d.date))
+      .range([0, width - margin.left - margin.right]);
 
     const y = d3
       .scaleLinear()
-      .domain([0, d3.max(data, d => d.value)])
-      .nice()
+      .domain([0, d3.max(data, (d) => d.count)])
       .range([height - margin.top - margin.bottom, 0]);
 
-    // Draw bars
-    svg
-      .selectAll(".bar")
-      .data(data)
-      .enter()
-      .append("rect")
-      .attr("class", "bar")
-      .attr("x", d => x(d.name))
-      .attr("y", d => y(d.value))
-      .attr("width", x.bandwidth())
-      .attr("height", d => height - margin.top - margin.bottom - y(d.value))
-      .attr("fill", "#69b3a2");
-
-    // Add x-axis
     svg
       .append("g")
       .attr("transform", `translate(0, ${height - margin.top - margin.bottom})`)
-      .call(d3.axisBottom(x));
+      .call(d3.axisBottom(x).ticks(5));
 
-    // Add y-axis
     svg.append("g").call(d3.axisLeft(y));
-  };
 
+    // Draw line only if data is non-empty
+    if (data.length > 1) {
+      svg
+        .append("path")
+        .datum(data)
+        .attr("fill", "none")
+        .attr("stroke", "orange")
+        .attr("stroke-width", 1.5)
+        .attr(
+          "d",
+          d3
+            .line()
+            .x((d) => x(new Date(d.date))) // Ensure `date` is interpreted correctly
+            .y((d) => y(d.count))
+        );
+    }
+  };
 
   const [branchFormData, setbranchFormData] = useState({
     name: "",
@@ -121,18 +137,32 @@ const Admin = () => {
     "category",
     "available",
   ];
-  const purchaseColumns = ["_id", "memberId", "items","totalAmount", "purchaseDate"]
+  const purchaseColumns = [
+    "_id",
+    "memberId",
+    "items",
+    "totalAmount",
+    "purchaseDate",
+  ];
 
-
-
-
+  const homeHandleGraph = () => {
+    fetch("http://localhost:3001/api/purchasehistory/list")
+      .then((response) => response.json())
+      .then((fetchedData) => {
+        if (chartContainerRef.current) {
+          drawPurchaseHistoryChart(fetchedData, chartContainerRef.current);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  };
   const branchHandleEdit = (row) => {
     setEditingRow({ ...row }); // Create a copy of the row for editing
     setIsModalOpen(true);
     console.log("Editing", row); // Replace with actual edit logic
   };
-    // Update your handleAddBranch function
-  const handleAddBranch = async (e) => {
+  const branchHandleAdd = async (e) => {
     e.preventDefault();
     try {
       const address = {
@@ -154,7 +184,10 @@ const Admin = () => {
         saturday: "closed",
         sunday: "8:00 AM - 10:00 PM",
       };
-      const contact = { phone: branchFormData.phone, email: branchFormData.email };
+      const contact = {
+        phone: branchFormData.phone,
+        email: branchFormData.email,
+      };
       const services = {
         delivery: branchFormData.makesDeliveries,
         takeaway: branchFormData.hasTakeaway,
@@ -188,7 +221,7 @@ const Admin = () => {
   const stockHandleEdit = (row) => {
     console.log("Editing", row); // Replace with actual edit logic
   };
-  const handleAddStock = async (e) => {
+  const stockHandleAdd = async (e) => {
     e.preventDefault();
     try {
       const address = {
@@ -210,7 +243,10 @@ const Admin = () => {
         saturday: "closed",
         sunday: "8:00 AM - 10:00 PM",
       };
-      const contact = { phone: branchFormData.phone, email: branchFormData.email };
+      const contact = {
+        phone: branchFormData.phone,
+        email: branchFormData.email,
+      };
       const services = {
         delivery: branchFormData.makesDeliveries,
         takeaway: branchFormData.hasTakeaway,
@@ -247,8 +283,6 @@ const Admin = () => {
     axios.delete("http://localhost:3001/api/branches/delete/" + row._id);
     window.location.reload();
   };
-
-  // Create a single handler for all input changes
   const handleInputChange = (e) => {
     const { id, value, type, checked } = e.target;
     setbranchFormData((prev) => ({
@@ -257,8 +291,28 @@ const Admin = () => {
     }));
   };
 
-  // Page Contents
-  const HomeContent = () => <div className="p-4">Welcome to Home</div>;
+  const HomeContent = () => {
+    return (
+      <div className="p-4 text-4xl w-screen font-bold font-serif drop-shadow-md">
+        Welcome!
+        <div className="flex">
+          <div className="left-0 w-1/2 h-auto">
+            <div className="p-4 text-2xl font-semibold font-serif drop-shadow-md">
+              Purhcases Over Time:
+              <div className="drop-shadow-md" ref={chartContainerRef}>
+                {homeHandleGraph}
+              </div>
+            </div>
+          </div>
+          <div className="right-0 w-1/2 h-auto">
+            <div className="p-4 text-2xl font-semibold font-serif drop-shadow-md">
+              Purhcases Over Time:
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
   const ViewStockContent = () => (
     <div className="overflow-auto rounded-md text-md font-bold font-serif">
       <DataTable
@@ -272,7 +326,7 @@ const Admin = () => {
     return (
       <div className="relative flex-col w-screen p-6 pl-10 pt-10 text-6xl text-gray-950 font-serif font-bold drop-shadow-lg">
         Create A Branch
-        <form onSubmit={handleAddBranch} className="relative flex">
+        <form onSubmit={branchHandleAdd} className="relative flex">
           <div className="relative left-0 w-full h-auto ml-10">
             <label htmlFor="name" className="relative pt-10 text-2xl">
               Store Name
@@ -492,22 +546,23 @@ const Admin = () => {
   );
   const ViewPurchasesContent = () => (
     <div className="overflow-auto rounded-md text-md font-bold font-serif">
-    <DataTable
-      apiUrl={"http://localhost:3001/api/purchases/list"}
-      columnsToDisplay={purchaseColumns}
-      editable={false}
-    />
-  </div>
+      <DataTable
+        apiUrl={"http://localhost:3001/api/purchasehistory/list"}
+        columnsToDisplay={purchaseColumns}
+        editable={false}
+      />
+    </div>
   );
   const RemovePurchasesContent = () => (
     <div className="overflow-auto rounded-md text-md font-bold font-serif">
       <DataTable
-        apiUrl={"http://localhost:3001/api/purchases/list"}
+        apiUrl={"http://localhost:3001/api/purchasehistory/list"}
         columnsToDisplay={purchaseColumns}
         editable={true}
         onEdit={""}
         onDelete={purchaseHandleDelete}
-      /></div>
+      />
+    </div>
   );
   const ViewBranchesContent = () => (
     <div className="overflow-auto rounded-md text-md font-bold font-serif">
@@ -618,7 +673,7 @@ const Admin = () => {
     return (
       <div className="relative flex-col w-screen p-6 pl-10 pt-10 text-6xl text-gray-950 font-serif font-bold drop-shadow-lg">
         Create A Branch
-        <form onSubmit={handleAddBranch} className="relative flex">
+        <form onSubmit={branchHandleAdd} className="relative flex">
           <div className="relative left-0 w-full h-auto ml-10">
             <label htmlFor="name" className="relative pt-10 text-2xl">
               Store Name
@@ -833,7 +888,12 @@ const Admin = () => {
   };
 
   const handleMenuClick = (e) => {
-    setSelectedMenu(e);
+    if (e === "home") {
+      setOpenDropdown("");
+      setSelectedMenu(e);
+    } else {
+      setSelectedMenu(e);
+    }
   };
 
   const checkAdmin = async () => {
@@ -852,6 +912,12 @@ const Admin = () => {
       });
   };
 
+  useEffect(() => {
+    {
+      homeHandleGraph();
+    }
+  }, [openDropdown]);
+
   checkAdmin();
 
   return (
@@ -859,13 +925,14 @@ const Admin = () => {
       {!error && (
         <div className="flex bg-unsplash-[avJ9uz9Qhcw/lg] h-dvh bg-center bg-cover pb-32">
           <div className="relative flex flex-col z-10 top-20 left-2 mr-4 mt-5 h-full w-1/5 h-auto backdrop-contrast-50 backdrop-blur-2xl rounded-2xl">
-            <div className="relative z-10 mt-10 font-bold text-2xl text-center text-black">
-              {" "}
-              Header{" "}
-            </div>
+            <div className="relative z-10 mt-10 font-bold text-2xl text-center text-black"></div>
             <div
               name="home"
-              className={`realtive z-10 p-5 m-2 rounded-md hover:drop-shadow-lg hover:text-black hover:bg-yellow-500 duration-300`}
+              className={`realtive z-10 p-5 m-2 mt-10 rounded-md hover:drop-shadow-lg hover:text-black hover:bg-yellow-500 duration-300 ${
+                selectedMenu === "home" && openDropdown === ""
+                  ? "realtive z-10 p-5 m-2 rounded-md drop-shadow-lg text-black bg-yellow-600"
+                  : ""
+              }  `}
               onClick={() => handleMenuClick("home")}
             >
               <div className="relative z-10 font-bold text-2xl text-center text-white">
@@ -874,7 +941,7 @@ const Admin = () => {
             </div>
             <div name="stock">
               <div
-                className={`realtive z-10 p-5 m-2 rounded-md hover:drop-shadow-lg hover:text-black hover:bg-yellow-500 duration-300 ${
+                className={`realtive z-10 p-5 m-2 mt-10 rounded-md hover:drop-shadow-lg hover:text-black hover:bg-yellow-500 duration-300 ${
                   openDropdown === "stock"
                     ? "realtive z-10 p-5 m-2 rounded-md drop-shadow-lg text-black bg-yellow-600"
                     : ""
@@ -904,7 +971,7 @@ const Admin = () => {
             </div>
             <div name="purchases">
               <div
-                className={`realtive z-10 p-5 m-2 rounded-md hover:drop-shadow-lg hover:text-black hover:bg-yellow-500 duration-300 ${
+                className={`realtive z-10 p-5 m-2 mt-10 rounded-md hover:drop-shadow-lg hover:text-black hover:bg-yellow-500 duration-300 ${
                   openDropdown === "purchases"
                     ? "realtive z-10 p-5 m-2 rounded-md drop-shadow-lg text-black bg-yellow-600"
                     : ""
@@ -934,7 +1001,7 @@ const Admin = () => {
             </div>
             <div name="branches">
               <div
-                className={`realtive z-10 p-5 m-2 rounded-md hover:drop-shadow-lg hover:text-black hover:bg-yellow-500 duration-300 ${
+                className={`realtive -10 p-5 m-2 mt-10 rounded-md hover:drop-shadow-lg hover:text-black hover:bg-yellow-500 duration-300 ${
                   openDropdown === "branches"
                     ? "realtive z-10 p-5 m-2 rounded-md drop-shadow-lg text-black bg-yellow-600"
                     : ""
