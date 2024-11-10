@@ -167,7 +167,7 @@ const CheckoutPage = () => {
         itemName: item.cookie.name,
         quantity: item.quantity,
         price: item.cookie.price,
-        imageUrl: item.cookie.imageUrl  
+        imageUrl: item.cookie.imageUrl
       }));
   
       const purchaseData = {
@@ -187,18 +187,32 @@ const CheckoutPage = () => {
         }
       );
   
-      // Clear cart by removing all items
-      await Promise.all(cartItems.map(item => 
-        axios.delete('http://localhost:3001/api/cart/remove', {
-          data: { userId, cookieId: item.id },
-          headers: { Authorization: `Bearer ${token}` }
-        })
-      ));
+      // Get current cart version
+      const currentVersion = cartResponse.data.cart.version;
+      console.log('Current cart version:', currentVersion); // Debug log
   
-      // Show success popup
-      alert('Enjoy your order! 🍪');  // You can replace this with a nicer modal if preferred
-      
-      // Navigate to home page
+      // Remove each item from cart
+      for (const item of cartResponse.data.cart.items) {
+        try {
+          console.log('Removing item:', item.cookie._id); // Debug log
+          await axios.delete('http://localhost:3001/api/cart/remove', {
+            headers: { 
+              Authorization: `Bearer ${token}` 
+            },
+            data: {
+              userId: userId,
+              cookieId: item.cookie._id,
+              version: currentVersion // Include the version
+            }
+          });
+        } catch (removeError) {
+          console.error('Error removing item:', removeError.response?.data);
+          throw removeError; // Re-throw to trigger the outer catch block
+        }
+      }
+  
+      // Show success popup and navigate only if all operations succeeded
+      alert('Enjoy your order! 🍪');
       navigate('/');
   
     } catch (error) {
