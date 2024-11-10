@@ -5,111 +5,78 @@ const Footer = () => {
   const navigate = useNavigate();
 
   return (
-    <footer class="w-full">
-    <div class="bg-white mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-8 py-6 max-sm:max-w-sm max-sm:mx-auto gap-y-8">
-        <div class="col-span-full mb-10 lg:col-span-2 lg:mb-0">
-          <a href="#" class="flex justify-center lg:justify-start">
-            <img
-              src="https://img.icons8.com/fluency/48/cookies.png"
-              className="w-20 h-20 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300"
-            ></img>
-            <p className="pt-2 pl-1 text-6xl text-black text-nowrap font-serif font-bold">
-              Cookie Land
+    <footer className="w-full">
+      <div className="bg-white mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-8 py-6 max-sm:max-w-sm max-sm:mx-auto gap-y-8">
+          <div className="col-span-full mb-10 lg:col-span-2 lg:mb-0">
+            <Link to="/" className="flex justify-center lg:justify-start">
+              <img
+                src="https://img.icons8.com/fluency/48/cookies.png"
+                className="w-20 h-20 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300"
+                alt="Cookie Land Logo"
+              />
+              <p className="pt-2 pl-1 text-6xl text-black text-nowrap font-serif font-bold">
+                Cookie Land
+              </p>
+            </Link>
+            <p className="pt-2 pb-6 text-base text-gray-500 lg:max-w-sm text-center lg:text-left">
+              Have a question, special request, or just want to say hello?
+              We'd love to hear from you!
             </p>
-          </a>
-          <p class="pt-2 pb-6 text-base text-gray-500 lg:max-w-sm text-center lg:text-left">
-            Have a question, special request, or just want to say hello?
-            We’d love to hear from you!
-          </p>
-          <a
-            href="#"
-            className="relative z-10 rounded-md bg-yellow-600 px-3.5 py-2.5 text-sm font-serif font-semibold text-white drop-shadow-md hover:bg-yellow-500 duration-500"
-          >
-            Contact Us
-          </a>
+            <Link
+              to="/contactus"
+              className="relative z-10 rounded-md bg-yellow-600 px-3.5 py-2.5 text-sm font-serif font-semibold text-white drop-shadow-md hover:bg-yellow-500 duration-500"
+            >
+              Contact Us
+            </Link>
+          </div>
+          <div></div>
+          <div></div>
+          <div className="lg:mx-auto text-left">
+            <h4 className="text-lg text-gray-900 font-medium mb-7">Resources</h4>
+            <ul className="text-sm transition-all duration-500">
+              <li className="mb-6">
+                <Link to="/shop" className="text-gray-600 hover:text-gray-900">
+                  Shop our cookies
+                </Link>
+              </li>
+              <li className="mb-6">
+                <Link to="/branches" className="text-gray-600 hover:text-gray-900">
+                  Our brances
+                </Link>
+              </li>
+              <li className="mb-6">
+                <Link to="/aboutus" className="text-gray-600 hover:text-gray-900">
+                  About us
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div className="lg:mx-auto text-left">
+            <h4 className="text-lg text-gray-900 font-medium mb-7">Blogs</h4>
+            <ul className="text-sm transition-all duration-500">
+              <li className="mb-6">
+                <Link to="/signup" className="text-gray-600 hover:text-gray-900">
+                  Signup
+                </Link>
+              </li>
+              <li className="mb-6">
+                <Link to="/reviews" className="text-gray-600 hover:text-gray-900">
+                  Reviews
+                </Link>
+              </li>
+              <li className="mb-6">
+                <Link to="/glutenfree" className="text-gray-600 hover:text-gray-900">
+                  Read about gluten free
+                </Link>
+              </li>
+            </ul>
+          </div>
         </div>
-        <div></div>
-        <div></div>
-        <div class="lg:mx-auto text-left">
-          <h4 class="text-lg text-gray-900 font-medium mb-7">Resources</h4>
-          <ul class="text-sm  transition-all duration-500">
-            <li class="mb-6">
-              <a
-                href="javascript:;"
-                class="text-gray-600 hover:text-gray-900"
-              >
-                FAQs
-              </a>
-            </li>
-            <li class="mb-6">
-              <a
-                href="javascript:;"
-                class=" text-gray-600 hover:text-gray-900"
-              >
-                Quick Start
-              </a>
-            </li>
-            <li class="mb-6">
-              <a
-                href="javascript:;"
-                class=" text-gray-600 hover:text-gray-900"
-              >
-                Documentation
-              </a>
-            </li>
-            <li>
-              <a
-                href="javascript:;"
-                class=" text-gray-600 hover:text-gray-900"
-              >
-                User Guide
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div class="lg:mx-auto text-left">
-          <h4 class="text-lg text-gray-900 font-medium mb-7">Blogs</h4>
-          <ul class="text-sm  transition-all duration-500">
-            <li class="mb-6">
-              <a
-                href="javascript:;"
-                class="text-gray-600 hover:text-gray-900"
-              >
-                News
-              </a>
-            </li>
-            <li class="mb-6">
-              <a
-                href="javascript:;"
-                class=" text-gray-600 hover:text-gray-900"
-              >
-                Tips & Tricks
-              </a>
-            </li>
-            <li class="mb-6">
-              <a
-                href="javascript:;"
-                class=" text-gray-600 hover:text-gray-900"
-              >
-                New Updates
-              </a>
-            </li>
-            <li>
-              <a
-                href="javascript:;"
-                class=" text-gray-600 hover:text-gray-900"
-              >
-                Events
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <div class="py-7 border-t border-gray-200">
-        <div class="flex items-center justify-center flex-col lg:justify-between lg:flex-row">
-          <span class="text-sm text-gray-500 ">
-            ©<Link to={"/"}>Cookie Land</Link> 2024, All rights reserved.
+        <div className="py-7 border-t border-gray-200">
+          <div className="flex items-center justify-center flex-col lg:justify-between lg:flex-row">
+            <span className="text-sm text-gray-500">
+              ©<Link to="/">Cookie Land</Link> 2024, All rights reserved.
           </span>
           <div class="flex mt-4 space-x-4 sm:justify-center lg:mt-0 ">
             <a
