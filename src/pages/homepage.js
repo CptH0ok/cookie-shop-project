@@ -1,4 +1,13 @@
+"use client";
+
+import { useState } from "react";
+import { useNavigate } from "react-router-dom"; // for redirection 
+
 const HomePage = () => {
+  const navigate = useNavigate(); // Initialize useNavigate
+  const handleOrderNowClick = () => {
+    navigate("https://localhost:3000/shop"); // Redirect to /shop when the button is clicked
+  };
   return (
     <div className="relative flex flex-col z-10 min-h-screen h-auto">
       <div className="relative bg-unsplash-[1Gv_4RcljOE/lg] bg-no-repeat bg-cover z-10">
@@ -6,7 +15,7 @@ const HomePage = () => {
         <div className="mx-auto max-w-2xl mt-10 sm:py-48 lg:py-36">
           <div className="hidden sm:mb-8 sm:flex sm:justify-center">
             <div className="text-white relative rounded-full px-3 py-1 z-10 text-base font-serif leading-6 ring-1 ring-white/10 hover:ring-white/20">
-              New Gluten Free Options!{" "}
+              New Gluten Free blog!{" "}
               <a href="/glutenfree" className="font-semibold font-serif text-yellow-600">
                 <span aria-hidden="true" className="absolute inset-0" />
                 Read more <span aria-hidden="true">&rarr;</span>

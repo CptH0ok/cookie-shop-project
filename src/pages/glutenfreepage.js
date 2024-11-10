@@ -1,6 +1,6 @@
 import React from 'react';
-import './glutenfreepage.css';
 import { Link } from 'react-router-dom';
+import './glutenfreepage.css';
 
 const GlutenFreePage = () => {
   return (
@@ -15,7 +15,16 @@ const GlutenFreePage = () => {
           <br /><br />
           With endless possibilities for flavor combinations and textures, gluten-free cookies can be a delightful treat for everyone, regardless of dietary restrictions. So, whether you're gluten-sensitive or simply looking to explore new flavors, gluten-free cookies are a wonderful way to indulge guilt-free!
         </p>
-        <Link to="/" className="back-link hover:bg-emerald-950 duration-300">Back to Home Page</Link>
+
+        {/* Video player as requested */}
+        <div className="video-container">
+          <video className="gluten-free-video" controls autoPlay>
+            <source src="/videos/cookie_video.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+
+        <Link to="/" className="back-link">Back to Home Page</Link>
       </div>
     </div>
   );

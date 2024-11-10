@@ -1,18 +1,18 @@
-import axios from 'axios';
 import React, { useState } from 'react';
+import axios from 'axios';
 import { Link, useNavigate } from "react-router-dom";
 
 const Signup = () => {
-  const navigate = useNavigate();
-  const [name, setName] = useState('');
-  const [error, setError] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [name, setName] = useState('');
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
   
     const handleSignup = async (e) => {
       e.preventDefault();
       try {
-        const res = await axios.post('http://localhost:3001/api/security/signup', { email, password, name });
+        const res = await axios.post('http://localhost:3001/api/signup', { email, password, name });
         localStorage.setItem('token', res.data.token);
         setError('');
         navigate('/')

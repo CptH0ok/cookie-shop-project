@@ -1,10 +1,12 @@
+// cookiesapi.js
+
 const express = require('express');
-const router = express.Router();
 const Cookie = require('./models/cookie.js');
-const {authenticateJWT, checkAdmin} = require('./middlewares');
+const app = express.Router();
+const {authenticateJWT, checkAdmin, checkPermissions} = require('./middlewares');
 
 //1. list all cookies
-router.get('/', async (req, res) => {
+app.get('/', async (req, res) => {
     console.log('Fetching cookies');
     try {
       const cookies = await Cookie.find({});
@@ -17,7 +19,7 @@ router.get('/', async (req, res) => {
   });
   
 //2. Search and filter by category, name (in sensitive) and stock status - if we want to add more fields we can
-router.get('/search', async (req, res) => {
+app.get('/search', async (req, res) => {
     const { name, category, available } = req.query;
   
     // Building the filter object based on query parameters
@@ -50,7 +52,7 @@ router.get('/search', async (req, res) => {
   
 //3. Fetch unique categories from cookies - for the filter bar.
 //can also do it staticly if we prefer and delete this
-router.get('/categories', async (req, res) => {
+app.get('/categories', async (req, res) => {
     try {
         const cookies = await Cookie.find({});
         const uniqueCategories = [...new Set(cookies.map(cookie => cookie.category))];
@@ -63,7 +65,7 @@ router.get('/categories', async (req, res) => {
 
 /*4. create new cookie - only admins should be able to do it
 so it checks if the user is authenticated and is an admin*/
-router.post('/create', authenticateJWT, checkAdmin, async (req, res) => {
+app.post('/create', authenticateJWT, checkAdmin, async (req, res) => {
     const { name, description, price, category, available, imageUrl } = req.body;
   
     try {
@@ -87,7 +89,7 @@ router.post('/create', authenticateJWT, checkAdmin, async (req, res) => {
   doing it by the name of the cookie and not by _id (for the admins convenience)
   it is case-insensitive*/
   
-router.put('/update/:name', authenticateJWT, checkAdmin, async (req, res) => {
+app.put('/update/:name', authenticateJWT, checkAdmin, async (req, res) => {
     const cookieName = decodeURIComponent(req.params.name);
     const updatedData = req.body;
   
@@ -110,7 +112,7 @@ router.put('/update/:name', authenticateJWT, checkAdmin, async (req, res) => {
   });
   
 //6. delete a cookie by name (case-insensitive) - only for admins
-router.delete('/delete/:name', authenticateJWT, checkAdmin, async (req, res) => {
+app.delete('/delete/:name', authenticateJWT, checkAdmin, async (req, res) => {
     try {
       const cookieName = req.params.name;
       const deletedCookie = await Cookie.findOneAndDelete({
@@ -128,5 +130,38 @@ router.delete('/delete/:name', authenticateJWT, checkAdmin, async (req, res) => 
   });
 
   
-module.exports = router;
+module.exports = app;
+  //update cookie by id
+/*app.put('/api/cookies/:id', authenticateJWT, checkAdmin, async (req, res) => {
+  try {
+    const updatedCookie = await Cookie.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updatedCookie) return res.status(404).json({ message: 'Cookie not found' });
+    res.json(updatedCookie);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+app.delete('/api/cookies/:id', authenticateJWT, checkAdmin, async (req, res) => {
+  try {
+    const deletedCookie = await Cookie.findByIdAndDelete(req.params.id);
+    if (!deletedCookie) return res.status(404).json({ message: 'Cookie not found' });
+    res.json({ message: 'Cookie deleted' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+//search cookies by category
+app.get('/api/cookies/search', async (req, res) => {
+  const { category } = req.query;
+
+  try {
+    const cookies = await Cookie.find({ category });
+    res.json(cookies);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+*/
 
