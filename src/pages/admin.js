@@ -171,14 +171,16 @@ const Admin = () => {
       setSelectedCookie(e.target.value)
   };
 
-  const cookieHandleAdd = async () => {
+  const cookieHandleAdd = async (e) => {
     try {
-      const getResponse = await axios.get('http://localhost:3001/api/cookies/search', {name: selectedCookie});
-      const cookieData = getResponse.data;
-      console.log(cookieData);
-
-      const postResponse = await axios.post('http://localhost:3001/api/cookies/update', selectedCookie,cookieData);
-      console.log(postResponse);
+      const updateCookie = await axios.put(`http://localhost:3001/api/cookies/update/${selectedCookie}`,
+         {available:isCookieAvailable}, {
+          headers: {
+            'Authorization': `Bearer ${token}`,  // Token in headers
+            'Content-Type': 'application/json'
+          }
+        });
+      console.log(updateCookie);
     } catch (error) {
       console.error('Error:', error);
     }
