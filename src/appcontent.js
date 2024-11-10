@@ -8,6 +8,7 @@ import ShopPage from './pages/shoppage';
 import AboutUsPage from './pages/aboutus';
 import ContactUsPage from './pages/contactus';
 import CartPage from './pages/cartpage';
+import PurchaseHistoryPage from './pages/purchasehistory';
 import CheckoutPage from './pages/checkoutpage';
 import Branches from './pages/branches';
 import Footer from './components/footer';
@@ -25,7 +26,7 @@ function AppContent() {
   const pathsWithLayout = [
     "/",
     "/shop", "/branches", "/reviews", "/admin", "/glutenfree", "/cart", "/checkout",
-    "/aboutus", "/contactus"
+    "/aboutus", "/contactus", "/purchasehistory"
   ];
 
   const showLayout = pathsWithLayout.includes(location.pathname);
@@ -49,6 +50,7 @@ function AppContent() {
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/branches" element={<Branches />} />
+        <Route path="/purchasehistory" element={<PurchaseHistoryPage />} />
         <Route path="/glutenfree" element={<GlutenFreePage />} />
         <Route path="/cookie/:name" element={<CookieDetailPage />} />
         <Route path="/contactus" element={<ContactUsPage />} />

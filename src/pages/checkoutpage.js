@@ -151,52 +151,61 @@ const CheckoutPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-        // Get user details
-        const userResponse = await axios.get('http://localhost:3001/api/users/getuserdetails', {
-            headers: { Authorization: `Bearer ${token}` }
-        });
-        
-        const userId = userResponse.data.id;
-
-        // Prepare purchase data
-        const purchaseData = {
-            userId: userId,
-            items: cartItems.map(item => ({
-                itemName: item.name,
-                quantity: item.quantity,
-                price: item.price,
-            })),
-            totalAmount: selectedCurrency === 'USD' 
-                ? (subtotal + shipping + 2) // Adding tax
-                : convertedTotal
-        };
-
-        console.log('Sending purchase data:', purchaseData);
-
-        // Save purchase history
-        const response = await axios.post(
-            'http://localhost:3001/api/purchasehistory/create',
-            purchaseData,
-            {
-                headers: { 
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            }
-        );
-
-        console.log('Purchase response:', response.data);
-
-        if (response.data.success) {
-            alert('Order placed successfully!');
-            // Optionally redirect or clear cart
+      const userResponse = await axios.get('http://localhost:3001/api/users/getuserdetails', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      const userId = userResponse.data.id;
+  
+      // Get cart items with populated cookie data
+      const cartResponse = await axios.get(`http://localhost:3001/api/cart/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+  
+      // Transform cart items to match purchase history schema
+      const purchaseItems = cartResponse.data.cart.items.map(item => ({
+        itemName: item.cookie.name,
+        quantity: item.quantity,
+        price: item.cookie.price
+      }));
+  
+      const purchaseData = {
+        userId: userId,
+        items: purchaseItems,
+        totalAmount: selectedCurrency === 'USD' 
+          ? (subtotal + shipping + 2) 
+          : convertedTotal
+      };
+  
+      // Save purchase history
+      await axios.post(
+        'http://localhost:3001/api/purchasehistory/create',
+        purchaseData,
+        {
+          headers: { Authorization: `Bearer ${token}` }
         }
-
+      );
+  
+      // Clear cart by removing all items
+      await Promise.all(cartItems.map(item => 
+        axios.delete('http://localhost:3001/api/cart/remove', {
+          data: { userId, cookieId: item.id },
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      ));
+  
+      // Show success popup
+      alert('Enjoy your order! 🍪');  // You can replace this with a nicer modal if preferred
+      
+      // Navigate to home page
+      navigate('/');
+  
     } catch (error) {
-        console.error('Error:', error);
-        alert('Error processing your order. Please try again.');
+      console.error('Error processing order:', error);
+      alert('Error processing your order. Please try again.');
     }
-};
+  };
+
 
   // Currency selector component
   const CurrencySelector = () => (
@@ -213,7 +222,7 @@ const CheckoutPage = () => {
   );
 
   return (
-    <div className="pt-5">  {/* Adjust this padding based on your navbar height */}
+    <div className="pt-5">
         <div className="mx-auto max-w-5xl justify-center px-6 md:flex md:space-x-6 xl:px-0"></div>
     <div className="bg-white py-8 antialiased md:py-16">
       <form onSubmit={handleSubmit} className="mx-auto max-w-screen-xl px-4 2xl:px-0">

@@ -2,6 +2,8 @@
 
 import shelly from "../assets/shelly.jpg"
 import eitan from "../assets/eitan.jpg"
+import adi from "../assets/adi.jpg"
+import yam from "../assets/yam.jpg"
 
 const AboutUs = () => {
   return (
@@ -38,13 +40,13 @@ const AboutUs = () => {
               <div className="w-full lg:w-8/12 lg:pt-8">
                   <div className="grid md:grid-cols-4 sm:grid-cols-2 grid-cols-1 lg:gap-4 shadow-lg rounded-md">
                       <div className="p-4 pb-6 flex justify-center flex-col items-center">
-                          <img className="md:block hidden" src="https://i.ibb.co/FYTKDG6/Rectangle-118-2.png" alt="Alexa featured Img" />
-                          <img className="md:hidden block" src="https://i.ibb.co/zHjXqg4/Rectangle-118.png" alt="Alexa featured Img" />
+                          <img className="md:block hidden" src={yam} alt="yam Img" />
+                          <img className="md:hidden block" src={yam} alt="yam Img" />
                           <p className="font-serif text-xl leading-5 text-gray-800 mt-4">Yam</p>
                       </div>
                       <div className="p-4 pb-6 flex justify-center flex-col items-center">
-                          <img className="md:block hidden" src="https://i.ibb.co/fGmxhVy/Rectangle-119.png" alt="Olivia featured Img" />
-                          <img className="md:hidden block" src="https://i.ibb.co/NrWKJ1M/Rectangle-119.png" alt="Olivia featured Img" />
+                          <img className="md:block hidden" src={adi} alt="adi Img" />
+                          <img className="md:hidden block" src={adi} alt="di Img" />
                           <p className="font-serif text-xl leading-5 text-gray-800 mt-4">Adi</p>
                       </div>
                       <div className="p-4 pb-6 flex justify-center flex-col items-center">
