@@ -44,6 +44,7 @@ router.post('/create', authenticateJWT, async (req, res) => {
       console.error('Error creating purchase history:', error);
       res.status(500).json({ error: 'Failed to create purchase history' });
     }
+  });
 
 router.get('/list', async (req, res) => {
   try {

@@ -13,7 +13,29 @@ const Navbar = () => {
   const [isEmailPopupVisible, setEmailPopupVisible] = useState(false);
   const [isPasswdPopupVisible, setPasswdPopupVisible] = useState(false);
   const token = localStorage.getItem("token");
-  const [cartCount, setCartCount] = useState(0); //Holds the number of items in the cart
+  const [cartCount, setCartCount] = useState(0);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      if (!token || !userDetails) return;
+
+      try {
+        const userResponse = await axios.get('http://localhost:3001/api/users/getuserdetails', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        // Check if the user's role is admin
+        setIsAdmin(userResponse.data.role === 'admin');
+      } catch (error) {
+        console.error('Error checking admin status:', error);
+        setIsAdmin(false);
+      }
+    };
+
+    checkAdminStatus();
+  }, [token, userDetails]);
 
   const navigationItems = [
     { name: 'Home', href: '/', icon: HomeIcon },
@@ -25,7 +47,9 @@ const Navbar = () => {
     ] : []),
     { name: 'About Us', href: '/aboutus', icon: InformationCircleIcon },
     { name: 'Contact Us', href: '/contactus', icon: ChatBubbleLeftRightIcon },
-    //{ name: 'Profile', href: '/profile', icon: UserIcon },
+    ...(userDetails && isAdmin ? [
+    { name: 'Admin Page', href: '/admin', icon: UserIcon },
+  ] : []),
     { name: 'Our Branches', href: '/branches', icon: BuildingStorefrontIcon },
     { name: 'Reviews', href: '/reviews', icon: StarIcon },
   ];
