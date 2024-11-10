@@ -33,7 +33,6 @@ const Branches = () => {
   }, []);
 
   const handleViewOnMap = async (branch) => {
-    setLoading(true);
 
     try {
       const response = await axios.get('http://localhost:3001/api/branches/map/' + branch._id);
