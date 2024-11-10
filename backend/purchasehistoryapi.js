@@ -45,32 +45,6 @@ router.post('/create', authenticateJWT, async (req, res) => {
       res.status(500).json({ error: 'Failed to create purchase history' });
     }
 
-    // Create new purchase history record
-    const purchaseHistory = new PurchaseHistory({
-      memberId: userId,
-      items: items.map(item => ({
-        itemName: item.name,
-        quantity: item.quantity,
-        price: item.price
-      })),
-      totalAmount: totalAmount
-    });
-
-    // Save the purchase history
-    await purchaseHistory.save();
-
-    console.log('Purchase history saved successfully');
-    res.status(200).json({ 
-      message: 'Purchase history created successfully',
-      purchaseHistory
-    });
-
-  } catch (error) {
-    console.error('Error creating purchase history:', error);
-    res.status(500).json({ error: 'Failed to create purchase history' });
-  }
-});
-
 router.get('/list', async (req, res) => {
   try {
       const purchases = await PurchaseHistory.find().populate('memberId','name');

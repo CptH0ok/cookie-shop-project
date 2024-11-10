@@ -31,8 +31,6 @@ const Admin = () => {
         date: new Date(date), // Convert back to Date object for D3
         count: purchasesByDate[date],
       }));
-
-      console.log("Processed data:", result); // Log processed data
       return result;
     };
 
@@ -159,43 +157,30 @@ const Admin = () => {
     } catch (error) {
       console.error("Error:", error);
     }
-  };
+  }; 
   
+  const handleCookieCondition = () => {
+    if (isCookieAvailable){
+      setIsCookieAvailable(false)
+    } else{
+      setIsCookieAvailable(true)
+    }
+  };
+   
+  const handleCookieChooser = (e) => {
+      setSelectedCookie(e.target.value)
+  };
+
   const cookieHandleAdd = async () => {
     try {
-      // Update the backend with the edited data
-      const {name, description, price, ingredients,category, available} = await fetch(
-        `http://localhost:3001/api/cookies/search/`,
-        {
-          method: "GET",
-          body: JSON.stringify("name:",selectedCookie),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      
-      const response = await fetch(
-        `http://localhost:3001/api/cookies/update/${editingRow.name}`,
-        {
-          method: "PUT",
-          body: JSON.stringify("name:",name,"description:", description, "price:",price,"category:",category,"available:",isCookieAvailable),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const getResponse = await axios.get('http://localhost:3001/api/cookies/search', {name: selectedCookie});
+      const cookieData = getResponse.data;
+      console.log(cookieData);
 
-      if (response.ok) {
-        handleMenuClick(selectedMenu);
-
-        setIsModalOpen(false); // Close the modal after the update
-        window.location.reload();
-      } else {
-        alert("Error updating row");
-      }
+      const postResponse = await axios.post('http://localhost:3001/api/cookies/update', selectedCookie,cookieData);
+      console.log(postResponse);
     } catch (error) {
-      console.error("Error:", error);
+      console.error('Error:', error);
     }
   };
 
@@ -229,11 +214,6 @@ const Admin = () => {
         console.error("Error fetching data:", error);
       });
   };
-
-  // const handleCancel = () => {
-  //   setEditingRow(null); // Optionally clear the row data
-  //   setIsModalOpen(false); // Close the modal
-  // };
 
   const branchHandleEdit = (row) => {
     setEditingRow({ ...row });
@@ -912,11 +892,11 @@ const Admin = () => {
     );
   });
 
-  const AddStockContent = useMemo(() => {
+  const AddStockContent = () => {
     return (
       <div className="relative flex-col w-screen p-6 pl-10 pt-10 text-6xl text-gray-950 font-serif font-bold drop-shadow-lg">
         Update Cookie Stock
-        <form onSubmit={""} className="relative flex">
+        <form onSubmit={cookieHandleAdd} className="relative flex">
           <div className="relative left-0 w-full h-auto ml-10">
             <label htmlFor="name" className="relative pt-10 text-2xl">
               Store Name
@@ -925,9 +905,8 @@ const Admin = () => {
               <select
                 id="name"
                 type="text"
-                value={branchFormData.name}
                 placeholder="name"
-                onChange={handleInputChange}
+                onChange={handleCookieChooser}
                 className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
               ><option value="">Select a Cookie</option>
               {cookies.map((name, index) => (
@@ -941,7 +920,7 @@ const Admin = () => {
                 id="makesDeliveries"
                 type="checkbox"
                 checked={isCookieAvailable}
-                onChange={handleInputChange}
+                onChange={handleCookieCondition}
                 class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded duration-100"
               />
               <label
@@ -966,7 +945,7 @@ const Admin = () => {
         </form>
       </div>
     );
-  });
+  };
   // Menus
   const toggleDropdown = (menu) => {
     // Set the open dropdown to the clicked one, or close it if it's already open
@@ -1152,7 +1131,7 @@ const Admin = () => {
             {selectedMenu === "viewpurchases" && <ViewPurchasesContent />}
             {selectedMenu === "removepurchases" && <RemovePurchasesContent />}
             {selectedMenu === "viewbranches" && <ViewBranchesContent />}
-            {selectedMenu === "addstock" && AddStockContent}
+            {selectedMenu === "addstock" && <AddStockContent/>}
             {selectedMenu === "addbranch" && AddBranchContent}
             {selectedMenu === "updatebranches" && UpdateBranchesContent}
           </div>
