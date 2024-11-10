@@ -166,7 +166,8 @@ const CheckoutPage = () => {
       const purchaseItems = cartResponse.data.cart.items.map(item => ({
         itemName: item.cookie.name,
         quantity: item.quantity,
-        price: item.cookie.price
+        price: item.cookie.price,
+        imageUrl: item.cookie.imageUrl  
       }));
   
       const purchaseData = {

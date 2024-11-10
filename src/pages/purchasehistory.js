@@ -92,7 +92,7 @@ const PurchaseHistory = () => {
                   <div className="px-6 py-4">
                     <h3 className="text-lg font-semibold mb-4">Items</h3>
                     <div className="space-y-4">
-                      {purchase.items?.map((item, index) => (
+                    {purchase.items?.map((item, index) => (
                         <div 
                           key={index}
                           className="flex items-center py-4 border-b border-gray-100 last:border-0"
@@ -103,6 +103,7 @@ const PurchaseHistory = () => {
                               alt={item.itemName || 'Cookie'}
                               className="h-full w-full object-cover rounded-lg shadow-sm"
                               onError={(e) => {
+                                console.log('Image failed to load:', item.imageUrl);
                                 e.target.onerror = null;
                                 e.target.src = 'https://via.placeholder.com/80?text=Cookie';
                               }}
