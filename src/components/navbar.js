@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle, TransitionChild, Popover, PopoverButton, PopoverPanel } from '@headlessui/react'
-import { XMarkIcon, TruckIcon, HomeIcon, ShoppingBagIcon, ClockIcon, UserIcon, ShoppingCartIcon, FingerPrintIcon, BanknotesIcon, AtSymbolIcon } from '@heroicons/react/24/outline'
+import { XMarkIcon, BuildingStorefrontIcon, StarIcon, InformationCircleIcon,ChatBubbleLeftRightIcon , TruckIcon, HomeIcon, ShoppingBagIcon, ClockIcon, UserIcon, ShoppingCartIcon, FingerPrintIcon, BanknotesIcon, AtSymbolIcon } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, PhoneIcon } from '@heroicons/react/20/solid'
 import axios from 'axios';
 
@@ -18,9 +18,16 @@ const Navbar = () => {
   const navigationItems = [
     { name: 'Home', href: '/', icon: HomeIcon },
     { name: 'Shop', href: '/shop', icon: ShoppingBagIcon },
-    { name: 'Cart', href: '/cart', icon: ShoppingCartIcon },
-    { name: 'Orders', href: '/purchasehistory', icon: ClockIcon },
-    { name: 'Profile', href: '/profile', icon: UserIcon },
+    // Only add cart and orders for logged-in users
+    ...(userDetails ? [
+      { name: 'Cart', href: '/cart', icon: ShoppingCartIcon },
+      { name: 'Orders', href: '/purchasehistory', icon: ClockIcon },
+    ] : []),
+    { name: 'About Us', href: '/aboutus', icon: InformationCircleIcon },
+    { name: 'Contact Us', href: '/contactus', icon: ChatBubbleLeftRightIcon },
+    //{ name: 'Profile', href: '/profile', icon: UserIcon },
+    { name: 'Our Branches', href: '/branches', icon: BuildingStorefrontIcon },
+    // { name: 'Reviews', href: '/reviews', icon: StarIcon },
   ];
 
 
@@ -140,7 +147,7 @@ const Navbar = () => {
     };
 
   const solutions = [
-    { name: 'Cart', description: 'See your cart', href: '#cart', icon: TruckIcon },
+    //{ name: 'Cart', description: 'See your cart', href: '#cart', icon: TruckIcon },
     { name: 'Purchase History', description: 'List all of your past purchases', href: '#phistory', icon: BanknotesIcon },
     { name: 'Change Email', description: "Change your E-Mail", href: '#chngmail', icon: AtSymbolIcon },
     { name: 'Change Password', description: "Change your Password", href: '#chngpasswd', icon: FingerPrintIcon }
@@ -338,19 +345,19 @@ const Navbar = () => {
       </div>
 
       <div className="flex items-center space-x-4">
-            <CartIcon />
-            {/* Your existing navigation items */}
-            {userDetails ? (
-              <Popover className="relative">
-                {/* ... rest of your existing navbar code ... */}
-              </Popover>
-            ) : (
-              <Link
-                to="/login"
-                className="text-gray-600 hover:text-yellow-500 transition-colors duration-200"
-              >
-                Login
-              </Link>
+      {userDetails && <CartIcon />}
+              
+              {userDetails ? (
+                <Popover className="relative">
+                  {/* Your existing Popover content */}
+                </Popover>
+              ) : (
+                <Link
+                  to="/login"
+                  className="text-gray-600 hover:text-yellow-500 transition-colors duration-200"
+                >
+                  
+                </Link>
             )}
           </div>
 

@@ -6,43 +6,45 @@ const { authenticateJWT } = require('./middlewares');  // Same as cartapi
 const mongoose = require('mongoose');
 
 router.post('/create', authenticateJWT, async (req, res) => {
-  const { userId, items, totalAmount } = req.body;
-
-  console.log('Create purchase history start:', { userId, items, totalAmount });
-
-  try {
-    // Validate input
-    if (!userId || !items || !totalAmount) {
-      console.log('Missing required fields');
-      return res.status(400).json({ error: 'Missing required fields' });
+    const { userId, items, totalAmount } = req.body;
+  
+    console.log('Create purchase history start:', { userId, items, totalAmount });
+  
+    try {
+      // Validate input
+      if (!userId || !items || !totalAmount) {
+        console.log('Missing required fields');
+        return res.status(400).json({ error: 'Missing required fields' });
+      }
+  
+      // Create new purchase history record
+      const purchaseHistory = new PurchaseHistory({
+        memberId: userId,
+        items: items.map(item => ({
+          itemName: item.itemName,
+          quantity: item.quantity,
+          price: item.price,
+          imageUrl: item.imageUrl  // This should now be included
+        })),
+        totalAmount: totalAmount
+      });
+  
+      console.log('Saving purchase history with items:', JSON.stringify(purchaseHistory.items, null, 2));
+  
+      // Save the purchase history
+      await purchaseHistory.save();
+  
+      console.log('Purchase history saved successfully');
+      res.status(200).json({ 
+        message: 'Purchase history created successfully',
+        purchaseHistory
+      });
+  
+    } catch (error) {
+      console.error('Error creating purchase history:', error);
+      res.status(500).json({ error: 'Failed to create purchase history' });
     }
-
-    // Create new purchase history record
-    const purchaseHistory = new PurchaseHistory({
-      memberId: userId,
-      items: items.map(item => ({
-        itemName: item.name,
-        quantity: item.quantity,
-        price: item.price
-      })),
-      totalAmount: totalAmount
-    });
-
-    // Save the purchase history
-    await purchaseHistory.save();
-
-    console.log('Purchase history saved successfully');
-    res.status(200).json({ 
-      message: 'Purchase history created successfully',
-      purchaseHistory
-    });
-
-  } catch (error) {
-    console.error('Error creating purchase history:', error);
-    res.status(500).json({ error: 'Failed to create purchase history' });
-  }
-});
-
+  });
 
 
 // Get a specific purchase record
@@ -153,5 +155,33 @@ router.get('/stats/:userId', authenticateJWT, async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch purchase statistics' });
   }
 });
+
+router.get('/:userId', authenticateJWT, async (req, res) => {
+    try {
+      const { userId } = req.params;
+      console.log('Fetch user purchase history request:', { userId });
+  
+      // Validate input
+      if (!userId) {
+        console.log('Missing user ID');
+        return res.status(400).json({ error: 'Missing user ID' });
+      }
+  
+      // Find all purchases for this user
+      const purchases = await PurchaseHistory.find({ memberId: userId })
+        .sort({ purchaseDate: -1 }) // Sort by most recent first
+        .exec();
+  
+      console.log('Found purchases:', purchases.length);
+      res.status(200).json({
+        message: 'Purchase history retrieved successfully',
+        purchases: purchases
+      });
+  
+    } catch (error) {
+      console.error('Error fetching purchase history:', error);
+      res.status(500).json({ error: 'Failed to fetch purchase history' });
+    }
+  });
 
 module.exports = router;

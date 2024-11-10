@@ -71,7 +71,6 @@ router.post('/add', authenticateJWT, async (req, res) => {
   }
 });
 
-// Remove an item from the cart
 router.delete('/remove', authenticateJWT, async (req, res) => {
   try {
     const { userId, cookieId } = req.body;
@@ -127,31 +126,6 @@ router.delete('/remove', authenticateJWT, async (req, res) => {
   } catch (error) {
     console.error('Error removing item from cart:', error);
     res.status(500).json({ error: 'Failed to remove item from cart' });
-  }
-});
-
-router.post('/clear', authenticateJWT, async (req, res) => {
-  try {
-      const { userId } = req.body;
-      
-      // Assuming you have a Cart model with a userId field
-      await Cart.findOneAndUpdate(
-          { userId },
-          { $set: { items: [] } },  // Clear all items
-          { new: true }
-      );
-
-      res.json({
-          success: true,
-          message: 'Cart cleared successfully'
-      });
-  } catch (error) {
-      console.error('Error clearing cart:', error);
-      res.status(500).json({
-          success: false,
-          message: 'Error clearing cart',
-          error: error.message
-      });
   }
 });
 

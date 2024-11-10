@@ -14,7 +14,7 @@ const CartPage = () => {
   const [convertedShipping, setConvertedShipping] = useState(0);
   const [convertedTotal, setConvertedTotal] = useState(0);
 
-  // Create axios instance with auth header
+
   const api = axios.create({
     headers: {
       'Authorization': `Bearer ${token}`
@@ -23,7 +23,7 @@ const CartPage = () => {
 
   // Currency conversion function
   const convertAmount = async (amount, fromCurrency = 'USD', toCurrency = selectedCurrency) => {
-    if (toCurrency === 'USD') return amount; // No need to convert if target is USD
+    if (toCurrency === 'USD') return amount; 
     
     try {
       const response = await axios.post('http://localhost:3001/api/currency/convert', {
@@ -34,7 +34,6 @@ const CartPage = () => {
       return parseFloat(response.data.message);
     } catch (error) {
       console.error('Error converting currency:', error);
-      // Fallback conversion rates (temporary)
       const fallbackRates = {
         USD: 1,
         EUR: 0.93,
@@ -46,7 +45,6 @@ const CartPage = () => {
   };
 
   const fetchCartItems = async () => {
-    console.log('Starting fetchCartItems');
     setError(null);
   
     try {
@@ -110,7 +108,7 @@ const CartPage = () => {
         .filter(item => item !== null);
   
       console.log('Final transformed items:', items);
-      return items || []; // Ensure we always return an array
+      return items || []; 
   
     } catch (error) {
       console.error('Error in fetchCartItems:', error);
@@ -120,7 +118,7 @@ const CartPage = () => {
           data: error.response.data
         });
       }
-      return []; // Return empty array on error
+      return []; 
     }
   };
 
@@ -179,7 +177,7 @@ const removeItem = async (cookieId) => {
 
     // Make the delete request
     await axios.delete('http://localhost:3001/api/cart/remove', {
-      data: { // Important: for DELETE requests, we need to use 'data' property
+      data: { 
         userId,
         cookieId
       },
@@ -250,7 +248,6 @@ useEffect(() => {
 }, []);
 
 
-   // Add useEffect for currency conversion
    useEffect(() => {
     const updateConvertedPrices = async () => {
       if (subtotal > 0) {
