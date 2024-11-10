@@ -128,39 +128,24 @@ app.delete('/delete/:name', authenticateJWT, checkAdmin, async (req, res) => {
     }
   });
 
-  
+//7. group by query as requestd - count cookies in each category
+app.get('/group-by-category', async (req, res) => {
+  try {
+    const result = await Cookie.aggregate([
+      {
+        $group: {
+          _id: '$category', // Group by the 'category' field
+          count: { $sum: 1 }, // Count the number of cookies in each category
+        },
+      },
+      { $sort: { count: -1 } }, // Sort by count in descending order
+    ]);
+
+    res.json(result); // Send back the grouped result
+  } catch (error) {
+    console.error('Error in group by category query:', error);
+    res.status(500).send('Error in group by category query');
+  }
+});
+
 module.exports = app;
-  //update cookie by id
-/*app.put('/api/cookies/:id', authenticateJWT, checkAdmin, async (req, res) => {
-  try {
-    const updatedCookie = await Cookie.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!updatedCookie) return res.status(404).json({ message: 'Cookie not found' });
-    res.json(updatedCookie);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-app.delete('/api/cookies/:id', authenticateJWT, checkAdmin, async (req, res) => {
-  try {
-    const deletedCookie = await Cookie.findByIdAndDelete(req.params.id);
-    if (!deletedCookie) return res.status(404).json({ message: 'Cookie not found' });
-    res.json({ message: 'Cookie deleted' });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-//search cookies by category
-app.get('/api/cookies/search', async (req, res) => {
-  const { category } = req.query;
-
-  try {
-    const cookies = await Cookie.find({ category });
-    res.json(cookies);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-*/
-

@@ -60,6 +60,28 @@ async function postToFacebookPage(message) {
 /**
  * Function to get the last post from the Facebook Page
  */
+async function getLastFacebookPostCaption() {
+  try {
+    const response = await axios.get(
+      `${baseUrl}/${pageId}/posts`,
+      {
+        params: {
+          access_token: accessToken,
+          limit: 1,  // Get the latest post
+          fields: 'id,message,created_time'
+        }
+      }
+    );
+    const lastPost = response.data.data[0];
+    console.log('Last Post Message:', lastPost.message);
+    return lastPost.message;
+
+  } catch (error) {
+    console.error('Error retrieving last Facebook page post:', error.response?.data);
+    throw error;
+  }
+}
+
 async function getLastFacebookPost() {
   try {
     const response = await axios.get(
@@ -157,7 +179,7 @@ async function getFacebookPostLikes(postId) {
 
 router.get('/pagereviews', async (req, res, next) => {
   try {
-    const reviews = await getPageReviews();
+    const reviews = await getFacebookPageReviews();
     res.json(reviews);
   } catch (error) {
     next(error);
@@ -167,9 +189,19 @@ router.get('/pagereviews', async (req, res, next) => {
 
 router.get('/getlastdataphoto', async (req, res, next) => {
   try {
-    const lastPostId = await getLastPost();
-    const photo = await getPostPicture(lastPostId);
+    const lastPostId = await getLastFacebookPost();
+    const photo = await getFacebookPostPicture(lastPostId);
     res.json(photo);
+  } catch (error) {
+    next(error);
+  }
+  
+});
+
+router.get('/getlastdatacaption', async (req, res, next) => {
+  try {
+    const lastPostMessage = await getLastFacebookPostCaption();
+    res.json(lastPostMessage);
   } catch (error) {
     next(error);
   }
@@ -178,8 +210,8 @@ router.get('/getlastdataphoto', async (req, res, next) => {
 
 router.get('/getlastdatacomments', async (req, res, next) => {
   try{
-    const lastPostId = await getLastPost();
-    const comments = await getPostComments(lastPostId);
+    const lastPostId = await getLastFacebookPost();
+    const comments = await getFacebookPostComments(lastPostId);
     res.json(comments);
   } catch (error) {
       next(error);

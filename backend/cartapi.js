@@ -71,43 +71,28 @@ router.post('/add', authenticateJWT, async (req, res) => {
   }
 });
 
-// Remove an item from the cart
 router.delete('/remove', authenticateJWT, async (req, res) => {
   try {
-    const { userId, cookieId } = req.body;
-    console.log('Remove request:', { userId, cookieId });
+    const { userId, cookieId, version } = req.body;
+    console.log('Remove request:', { userId, cookieId, version });
 
     // Validate input
-    if (!userId || !cookieId) {
+    if (!userId || !cookieId || version === undefined) {
       console.log('Missing required fields');
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Find the cart
-    const cart = await CartItem.findOne({ user: userId });
+    // Find the cart and remove the item
+    const cart = await CartItem.findOneAndUpdate(
+      { user: userId, 'items.cookie': cookieId },
+      { $pull: { items: { cookie: cookieId } }, $inc: { version: 1 } },
+      { new: true, runValidators: true }
+    );
+
     if (!cart) {
       console.log('Cart not found');
       return res.status(404).json({ error: 'Cart not found' });
     }
-
-    console.log('Current cart items:', cart.items);
-
-    // Find the item index in the cart
-    const itemIndex = cart.items.findIndex(
-      item => item.cookie.toString() === cookieId.toString()
-    );
-
-    if (itemIndex === -1) {
-      console.log('Item not found in cart');
-      return res.status(404).json({ error: 'Item not found in cart' });
-    }
-
-    // Remove the item from the array
-    cart.items.splice(itemIndex, 1);
-    console.log('Updated cart items:', cart.items);
-
-    // Save the updated cart
-    await cart.save();
 
     // Fetch the updated cart with populated items
     const updatedCart = await CartItem.findOne({ user: userId })
@@ -125,33 +110,13 @@ router.delete('/remove', authenticateJWT, async (req, res) => {
     });
 
   } catch (error) {
+    if (error.name === 'VersionError') {
+      console.error('Version error when removing item from cart:', error);
+      return res.status(409).json({ error: 'Version conflict, please refresh and try again' });
+    }
+
     console.error('Error removing item from cart:', error);
     res.status(500).json({ error: 'Failed to remove item from cart' });
-  }
-});
-
-router.post('/clear', authenticateJWT, async (req, res) => {
-  try {
-      const { userId } = req.body;
-      
-      // Assuming you have a Cart model with a userId field
-      await Cart.findOneAndUpdate(
-          { userId },
-          { $set: { items: [] } },  // Clear all items
-          { new: true }
-      );
-
-      res.json({
-          success: true,
-          message: 'Cart cleared successfully'
-      });
-  } catch (error) {
-      console.error('Error clearing cart:', error);
-      res.status(500).json({
-          success: false,
-          message: 'Error clearing cart',
-          error: error.message
-      });
   }
 });
 

@@ -3,13 +3,14 @@ const mongoose = require('mongoose');
 const purchaseHistorySchema = new mongoose.Schema({
     memberId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User', // Reference to User model
+        ref: 'User',
         required: true,
     },
     items: [{
         itemName: String,
         quantity: Number,
         price: Number,
+        imageUrl: String,   
     }],
     totalAmount: {
         type: Number,

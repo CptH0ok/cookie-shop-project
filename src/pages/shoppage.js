@@ -8,49 +8,78 @@ const ShopPage = () => {
   const [cookies, setCookies] = useState([]);
   const [filteredCookies, setFilteredCookies] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [categoryCounts, setCategoryCounts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [stockStatus, setStockStatus] = useState("");
+  const [priceRange, setPriceRange] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch all cookies from the server
+    // Fetch cookies from your cookie API
     fetch("http://localhost:3001/api/cookies")
       .then((response) => response.json())
       .then((data) => {
         setCookies(data);
         setFilteredCookies(data);
 
-        // Extract unique categories for the filter bar
+        // Set unique categories for filter dropdown
         const uniqueCategories = [...new Set(data.map((cookie) => cookie.category))];
         setCategories(uniqueCategories);
       });
+
+    // Fetch cookie counts grouped by category from the backend
+    fetch("http://localhost:3001/api/cookies/group-by-category")
+      .then((response) => response.json())
+      .then((data) => {
+        setCategoryCounts(data); // Store the category counts for display
+      });
   }, []);
+
+  const handlePriceRangeChange = (event) => {
+    const range = event.target.value;
+    setPriceRange(range);
+    applyFilters(range, selectedCategory, stockStatus);
+  };
 
   const handleCategoryChange = (event) => {
     const category = event.target.value;
     setSelectedCategory(category);
-    filterCookies(category, stockStatus);
+    applyFilters(priceRange, category, stockStatus);
   };
 
   const handleStockStatusChange = (event) => {
     const stock = event.target.value;
     setStockStatus(stock);
-    filterCookies(selectedCategory, stock);
+    applyFilters(priceRange, selectedCategory, stock);
   };
 
-  const filterCookies = (category, stock) => {
+  // Apply all selected filters (price, category, stock)
+  const applyFilters = (range, category, stock) => {
     let filtered = cookies;
 
+    // Filter by price range
+    if (range) {
+      filtered = filtered.filter((cookie) => {
+        if (range === "Below $2") return cookie.price < 2;
+        if (range === "$2 - $3") return cookie.price >= 2 && cookie.price <= 3;
+        if (range === "Above $3") return cookie.price > 3;
+        return true;
+      });
+    }
+
+    // Filter by category
     if (category) {
       filtered = filtered.filter((cookie) => cookie.category === category);
     }
 
+    // Filter by stock status (inStock or outOfStock)
     if (stock) {
       filtered = filtered.filter((cookie) =>
         stock === "inStock" ? cookie.available : !cookie.available
       );
     }
 
+    // Set filtered cookies state to show the results
     setFilteredCookies(filtered);
   };
 
@@ -96,12 +125,16 @@ const ShopPage = () => {
 
       {/* Filter Bar */}
       <div className="filter-bar">
+        <label htmlFor="price-filter">Price Range: </label>
+        <select id="price-filter" value={priceRange} onChange={handlePriceRangeChange}>
+          <option value="">All</option>
+          <option value="Below $2">Below $2</option>
+          <option value="$2 - $3">$2 - $3</option>
+          <option value="Above $3">Above $3</option>
+        </select>
+
         <label htmlFor="category-filter">Category: </label>
-        <select
-          id="category-filter"
-          value={selectedCategory}
-          onChange={handleCategoryChange}
-        >
+        <select id="category-filter" value={selectedCategory} onChange={handleCategoryChange}>
           <option value="">All Categories</option>
           {categories.map((category) => (
             <option key={category} value={category}>{category}</option>
@@ -109,11 +142,7 @@ const ShopPage = () => {
         </select>
 
         <label htmlFor="stock-filter">Stock Status: </label>
-        <select
-          id="stock-filter"
-          value={stockStatus}
-          onChange={handleStockStatusChange}
-        >
+        <select id="stock-filter" value={stockStatus} onChange={handleStockStatusChange}>
           <option value="">All</option>
           <option value="inStock">In Stock</option>
           <option value="outOfStock">Out of Stock</option>
@@ -125,7 +154,7 @@ const ShopPage = () => {
         {filteredCookies.length > 0 ? (
           filteredCookies.map((cookie) => (
             <div
-              key={cookie.name}
+              key={cookie._id} // Make sure the key is unique (use _id if available)
               className="cookie-card"
               onClick={() => handleCookieClick(cookie.name)}
             >
@@ -142,6 +171,16 @@ const ShopPage = () => {
         ) : (
           <p>No cookies available for the selected filters.</p>
         )}
+      </div>
+
+      {/* Category Count Display */}
+      <div className="category-count mt-8 p-6 bg-gray-800 rounded-lg shadow-lg text-white">
+        <h3 className="text-2xl font-semibold mb-4">Cookies count per Category:</h3>
+        {categoryCounts.map((category) => (
+          <p key={category._id} className="text-lg">
+            <span className="font-bold">{category._id}:</span> {category.count} cookie{category.count > 1 ? 's' : ''}
+          </p>
+        ))}
       </div>
     </div>
   );

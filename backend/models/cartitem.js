@@ -8,7 +8,8 @@ const cartItemSchema = new mongoose.Schema({
       cookie: { type: mongoose.Schema.Types.ObjectId, ref: 'Cookie', required: true },
       quantity: { type: Number, required: true, min: 1 }
     }
-  ]
+  ],
+  version: { type: Number, default: 0 }
 }, { collection: 'cart' });
 
 const CartItem = mongoose.model('CartItem', cartItemSchema);

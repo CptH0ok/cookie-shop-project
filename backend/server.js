@@ -4,7 +4,7 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const cors = require('cors');
-//const boom = require('@hapi/boom');
+const boom = require('@hapi/boom');
 const facebookApi = require('./facebookapi');
 const usersApi = require('./usersapi');
 const cartApi = require('./cartapi');
@@ -12,7 +12,7 @@ const cookiesApi = require('./cookiesapi');
 const branchesApi = require('./branchesapi');
 const convertCurrency = require('./currencyapi')
 const securityApi = require('./security');
-const {authenticateJWT, checkAdmin, checkPermissions} = require('./middlewares');
+const {authenticateJWT, checkAdmin} = require('./middlewares');
 const purchaseHistory = require('./purchasehistoryapi');
 
 // Middleware
