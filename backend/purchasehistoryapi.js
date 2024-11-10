@@ -43,7 +43,14 @@ router.post('/create', authenticateJWT, async (req, res) => {
   }
 });
 
-
+router.get('/list', async (req, res) => {
+  try {
+      const purchases = await PurchaseHistory.find().populate('memberId','name');
+      res.json(purchases);
+  } catch (error) {
+      res.status(400).json({ message: 'Error fetching purchases', error });
+  }
+});
 
 // Get a specific purchase record
 router.get('/purchase/:purchaseId', authenticateJWT, async (req, res) => {

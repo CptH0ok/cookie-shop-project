@@ -28,7 +28,6 @@ app.use('/api/purchasehistory', purchaseHistory);
 app.use('/api/security', securityApi );
 app.use('/api/branches', branchesApi );
 app.use('/api/currency', convertCurrency );
-app.use('/api/purchases', purchasesApi );
 
 // Serve static images from the "images" folder
 app.use('/images', express.static(path.join(__dirname, 'images')));

@@ -13,7 +13,65 @@ const Admin = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRow, setEditingRow] = useState(null);
 
-  const [formData, setFormData] = useState({
+  // Graphs
+  const chartContainer1 = useRef(null);
+  const chartContainer2 = useRef(null);
+
+  const drawChart = (data, containerRef) => {
+    const width = 400;
+    const height = 200;
+    const margin = { top: 20, right: 30, bottom: 40, left: 40 };
+
+    // Clear any existing chart in this container
+    d3.select(containerRef.current).select("svg").remove();
+
+    // Create the SVG container
+    const svg = d3
+      .select(containerRef.current)
+      .append("svg")
+      .attr("width", width)
+      .attr("height", height)
+      .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    // Define scales
+    const x = d3
+      .scaleBand()
+      .domain(data.map(d => d.name))
+      .range([0, width - margin.left - margin.right])
+      .padding(0.1);
+
+    const y = d3
+      .scaleLinear()
+      .domain([0, d3.max(data, d => d.value)])
+      .nice()
+      .range([height - margin.top - margin.bottom, 0]);
+
+    // Draw bars
+    svg
+      .selectAll(".bar")
+      .data(data)
+      .enter()
+      .append("rect")
+      .attr("class", "bar")
+      .attr("x", d => x(d.name))
+      .attr("y", d => y(d.value))
+      .attr("width", x.bandwidth())
+      .attr("height", d => height - margin.top - margin.bottom - y(d.value))
+      .attr("fill", "#69b3a2");
+
+    // Add x-axis
+    svg
+      .append("g")
+      .attr("transform", `translate(0, ${height - margin.top - margin.bottom})`)
+      .call(d3.axisBottom(x));
+
+    // Add y-axis
+    svg.append("g").call(d3.axisLeft(y));
+  };
+
+
+  const [branchFormData, setbranchFormData] = useState({
     name: "",
     email: "",
     phone: "",
@@ -53,7 +111,7 @@ const Admin = () => {
     }
   };
 
-  // Consts
+  // Columns consts
   const branchColumns = ["_id", "name", "address", "contact", "services"];
   const stockColumns = [
     "name",
@@ -63,7 +121,9 @@ const Admin = () => {
     "category",
     "available",
   ];
-  const purchaseColumns = ["_id", "memberId", "items", "purchaseDate"]
+  const purchaseColumns = ["_id", "memberId", "items","totalAmount", "purchaseDate"]
+
+
 
 
   const branchHandleEdit = (row) => {
@@ -71,51 +131,19 @@ const Admin = () => {
     setIsModalOpen(true);
     console.log("Editing", row); // Replace with actual edit logic
   };
-  const branchHandleDelete = (row) => {
-    // Placeholder for dialog
-
-    console.log("Deleting", row.name); // Replace with actual delete logic
-    axios.delete("http://localhost:3001/api/branches/delete/" + row._id);
-    window.location.reload();
-  };
-  const stockHandleEdit = (row) => {
-    console.log("Editing", row); // Replace with actual edit logic
-  };
-  const stockHandleDelete = (row) => {
-    // Placeholder for dialog
-
-    console.log("Deleting", row); // Replace with actual delete logic
-    axios.delete();
-  };
-  const purchaseHandleDelete = (row) => {
-    // Placeholder for dialog
-
-    console.log("Deleting", row); // Replace with actual delete logic
-    axios.delete();
-  };
-
-  // Create a single handler for all input changes
-  const handleInputChange = (e) => {
-    const { id, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [id]: type === "checkbox" ? checked : value,
-    }));
-  };
-
-  // Update your handleAddBranch function
+    // Update your handleAddBranch function
   const handleAddBranch = async (e) => {
     e.preventDefault();
     try {
       const address = {
-        streetNumber: formData.streetNumber,
-        streetName: formData.streetName,
-        city: formData.city,
-        state: formData.state,
-        zipCode: formData.zipCode,
-        country: formData.country,
-        longitude: formData.longitude,
-        latitude: formData.latitude,
+        streetNumber: branchFormData.streetNumber,
+        streetName: branchFormData.streetName,
+        city: branchFormData.city,
+        state: branchFormData.state,
+        zipCode: branchFormData.zipCode,
+        country: branchFormData.country,
+        longitude: branchFormData.longitude,
+        latitude: branchFormData.latitude,
       };
       const openingHours = {
         monday: "8:00 AM - 10:00 PM",
@@ -126,15 +154,15 @@ const Admin = () => {
         saturday: "closed",
         sunday: "8:00 AM - 10:00 PM",
       };
-      const contact = { phone: formData.phone, email: formData.email };
+      const contact = { phone: branchFormData.phone, email: branchFormData.email };
       const services = {
-        delivery: formData.makesDeliveries,
-        takeaway: formData.hasTakeaway,
-        dineIn: formData.hasDineIn,
+        delivery: branchFormData.makesDeliveries,
+        takeaway: branchFormData.hasTakeaway,
+        dineIn: branchFormData.hasDineIn,
       };
 
       const branchBody = {
-        name: formData.name,
+        name: branchFormData.name,
         address,
         contact,
         services,
@@ -150,6 +178,84 @@ const Admin = () => {
       alert(err);
     }
   };
+  const branchHandleDelete = (row) => {
+    // Placeholder for dialog
+
+    console.log("Deleting", row.name); // Replace with actual delete logic
+    axios.delete("http://localhost:3001/api/branches/delete/" + row._id);
+    window.location.reload();
+  };
+  const stockHandleEdit = (row) => {
+    console.log("Editing", row); // Replace with actual edit logic
+  };
+  const handleAddStock = async (e) => {
+    e.preventDefault();
+    try {
+      const address = {
+        streetNumber: branchFormData.streetNumber,
+        streetName: branchFormData.streetName,
+        city: branchFormData.city,
+        state: branchFormData.state,
+        zipCode: branchFormData.zipCode,
+        country: branchFormData.country,
+        longitude: branchFormData.longitude,
+        latitude: branchFormData.latitude,
+      };
+      const openingHours = {
+        monday: "8:00 AM - 10:00 PM",
+        tuesday: "8:00 AM - 10:00 PM",
+        wednesday: "8:00 AM - 10:00 PM",
+        thursday: "8:00 AM - 10:00 PM",
+        friday: "8:00 AM - 5:00 PM",
+        saturday: "closed",
+        sunday: "8:00 AM - 10:00 PM",
+      };
+      const contact = { phone: branchFormData.phone, email: branchFormData.email };
+      const services = {
+        delivery: branchFormData.makesDeliveries,
+        takeaway: branchFormData.hasTakeaway,
+        dineIn: branchFormData.hasDineIn,
+      };
+
+      const branchBody = {
+        name: branchFormData.name,
+        address,
+        contact,
+        services,
+        openingHours,
+      };
+
+      const res = await axios.post(
+        "http://localhost:3001/api/branches/create",
+        branchBody
+      );
+      window.location.reload();
+    } catch (err) {
+      alert(err);
+    }
+  };
+  const stockHandleDelete = (row) => {
+    // Placeholder for dialog
+
+    console.log("Deleting", row); // Replace with actual delete logic
+    axios.delete();
+  };
+  const purchaseHandleDelete = (row) => {
+    // Placeholder for dialog
+
+    console.log("Deleting", row); // Replace with actual delete logic
+    axios.delete("http://localhost:3001/api/branches/delete/" + row._id);
+    window.location.reload();
+  };
+
+  // Create a single handler for all input changes
+  const handleInputChange = (e) => {
+    const { id, value, type, checked } = e.target;
+    setbranchFormData((prev) => ({
+      ...prev,
+      [id]: type === "checkbox" ? checked : value,
+    }));
+  };
 
   // Page Contents
   const HomeContent = () => <div className="p-4">Welcome to Home</div>;
@@ -162,6 +268,217 @@ const Admin = () => {
       />
     </div>
   );
+  const AddStockContent = useMemo(() => {
+    return (
+      <div className="relative flex-col w-screen p-6 pl-10 pt-10 text-6xl text-gray-950 font-serif font-bold drop-shadow-lg">
+        Create A Branch
+        <form onSubmit={handleAddBranch} className="relative flex">
+          <div className="relative left-0 w-full h-auto ml-10">
+            <label htmlFor="name" className="relative pt-10 text-2xl">
+              Store Name
+            </label>
+            <div className="mt-2">
+              <input
+                id="name"
+                type="text"
+                value={branchFormData.name}
+                placeholder="name"
+                onChange={handleInputChange}
+                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+            <label htmlFor="phone" className="relative pt-10 text-2xl">
+              Phone
+            </label>
+            <div className="mt-2">
+              <input
+                id="phone"
+                type="tel"
+                value={branchFormData.phone}
+                placeholder="Phone"
+                onChange={handleInputChange}
+                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+            <label htmlFor="email" className="relative pt-10 text-2xl">
+              E-mail
+            </label>
+            <div className="mt-2">
+              <input
+                id="email"
+                type="email"
+                value={branchFormData.email}
+                placeholder="E-mail"
+                onChange={handleInputChange}
+                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+            <div class="flex items-center mt-10">
+              <input
+                id="hasTakeaway"
+                type="checkbox"
+                checked={branchFormData.takeaway}
+                onChange={handleInputChange}
+                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded duration-100"
+              />
+              <label
+                for="hasTakeaway"
+                class="ms-2 text-xl font-medium text-gray-950"
+              >
+                Serves Takeaway
+              </label>
+            </div>
+            <div class="flex items-center mt-10">
+              <input
+                id="hasDineIn"
+                type="checkbox"
+                checked={branchFormData.dinein}
+                onChange={handleInputChange}
+                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded duration-100"
+              />
+              <label
+                for="default-checkbox"
+                class="ms-2 text-xl font-medium text-gray-950"
+              >
+                Has Dine In
+              </label>
+            </div>
+            <div class="flex items-center mt-10">
+              <input
+                id="makesDeliveries"
+                type="checkbox"
+                checked={branchFormData.delivery}
+                onChange={handleInputChange}
+                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded duration-100"
+              />
+              <label
+                for="default-checkbox"
+                class="ms-2 text-xl font-medium text-gray-950"
+              >
+                Makes Deliveries
+              </label>
+            </div>
+          </div>
+          <div className="relative right-0 w-full h-auto">
+            <label htmlFor="streetNumber" className="relative pt-10 text-2xl">
+              Street Number
+            </label>
+            <div className="relative mt-2">
+              <input
+                id="streetNumber"
+                type="text"
+                value={branchFormData.streetNumber}
+                placeholder="Street Number"
+                onChange={handleInputChange}
+                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+            <label htmlFor="streetName" className="relative pt-10 text-2xl">
+              Street Name
+            </label>
+            <div className="relative mt-2">
+              <input
+                id="streetName"
+                type="text"
+                value={branchFormData.streetName}
+                placeholder="Street Name"
+                onChange={handleInputChange}
+                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+            <label htmlFor="city" className="relative pt-10 text-2xl">
+              City
+            </label>
+            <div className="relative mt-2">
+              <input
+                id="city"
+                type="text"
+                value={branchFormData.city}
+                placeholder="City"
+                onChange={handleInputChange}
+                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+            <label htmlFor="state" className="relative pt-10 text-2xl">
+              State
+            </label>
+            <div className="relative mt-2">
+              <input
+                id="state"
+                type="text"
+                value={branchFormData.state}
+                placeholder="State"
+                onChange={handleInputChange}
+                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+            <label htmlFor="zipCode" className="relative pt-10 text-2xl">
+              Zip Code
+            </label>
+            <div className="relative mt-2">
+              <input
+                id="zipCode"
+                type="text"
+                value={branchFormData.zipCode}
+                placeholder="Zip Code"
+                onChange={handleInputChange}
+                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+            <label htmlFor="country" className="relative pt-10 text-2xl">
+              Country
+            </label>
+            <div className="relative mt-2">
+              <input
+                id="country"
+                type="text"
+                value={branchFormData.country}
+                placeholder="Country"
+                onChange={handleInputChange}
+                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+            <label htmlFor="latitude" className="relative pt-10 text-2xl">
+              latitude
+            </label>
+            <div className="relative mt-2">
+              <input
+                id="latitude"
+                type="number"
+                value={branchFormData.latitude}
+                placeholder="0"
+                onChange={handleInputChange}
+                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+            <label htmlFor="longitude" className="relative pt-10 text-2xl">
+              Longitude
+            </label>
+            <div className="relative mt-2">
+              <input
+                id="longitude"
+                type="number"
+                value={branchFormData.longitude}
+                placeholder="Longitude"
+                onChange={handleInputChange}
+                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+          </div>
+          <div className="absolute bottom-0 h-1 ml-10">
+            <button
+              type="submit"
+              className="relative w-mt-8 bg-green-600 rounded hover:bg-green-500 hover:ring-1 hover:ring-white duration-300"
+            >
+              <p className="text-2xl px-3 py-2 text-white drop-shadow-md">
+                Submit
+              </p>
+            </button>
+          </div>
+        </form>
+      </div>
+    );
+  });
   const UpdateStockContent = () => (
     <div className="overflow-auto rounded-md text-md font-bold font-serif">
       <DataTable
@@ -189,7 +506,7 @@ const Admin = () => {
         columnsToDisplay={purchaseColumns}
         editable={true}
         onEdit={""}
-        onDelete={branchHandleDelete}
+        onDelete={purchaseHandleDelete}
       /></div>
   );
   const ViewBranchesContent = () => (
@@ -310,7 +627,7 @@ const Admin = () => {
               <input
                 id="name"
                 type="text"
-                value={formData.name}
+                value={branchFormData.name}
                 placeholder="name"
                 onChange={handleInputChange}
                 className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
@@ -323,7 +640,7 @@ const Admin = () => {
               <input
                 id="phone"
                 type="tel"
-                value={formData.phone}
+                value={branchFormData.phone}
                 placeholder="Phone"
                 onChange={handleInputChange}
                 className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
@@ -336,7 +653,7 @@ const Admin = () => {
               <input
                 id="email"
                 type="email"
-                value={formData.email}
+                value={branchFormData.email}
                 placeholder="E-mail"
                 onChange={handleInputChange}
                 className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
@@ -346,7 +663,7 @@ const Admin = () => {
               <input
                 id="hasTakeaway"
                 type="checkbox"
-                checked={formData.takeaway}
+                checked={branchFormData.takeaway}
                 onChange={handleInputChange}
                 class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded duration-100"
               />
@@ -361,7 +678,7 @@ const Admin = () => {
               <input
                 id="hasDineIn"
                 type="checkbox"
-                checked={formData.dinein}
+                checked={branchFormData.dinein}
                 onChange={handleInputChange}
                 class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded duration-100"
               />
@@ -376,7 +693,7 @@ const Admin = () => {
               <input
                 id="makesDeliveries"
                 type="checkbox"
-                checked={formData.delivery}
+                checked={branchFormData.delivery}
                 onChange={handleInputChange}
                 class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded duration-100"
               />
@@ -396,7 +713,7 @@ const Admin = () => {
               <input
                 id="streetNumber"
                 type="text"
-                value={formData.streetNumber}
+                value={branchFormData.streetNumber}
                 placeholder="Street Number"
                 onChange={handleInputChange}
                 className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
@@ -409,7 +726,7 @@ const Admin = () => {
               <input
                 id="streetName"
                 type="text"
-                value={formData.streetName}
+                value={branchFormData.streetName}
                 placeholder="Street Name"
                 onChange={handleInputChange}
                 className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
@@ -422,7 +739,7 @@ const Admin = () => {
               <input
                 id="city"
                 type="text"
-                value={formData.city}
+                value={branchFormData.city}
                 placeholder="City"
                 onChange={handleInputChange}
                 className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
@@ -435,7 +752,7 @@ const Admin = () => {
               <input
                 id="state"
                 type="text"
-                value={formData.state}
+                value={branchFormData.state}
                 placeholder="State"
                 onChange={handleInputChange}
                 className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
@@ -448,7 +765,7 @@ const Admin = () => {
               <input
                 id="zipCode"
                 type="text"
-                value={formData.zipCode}
+                value={branchFormData.zipCode}
                 placeholder="Zip Code"
                 onChange={handleInputChange}
                 className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
@@ -461,7 +778,7 @@ const Admin = () => {
               <input
                 id="country"
                 type="text"
-                value={formData.country}
+                value={branchFormData.country}
                 placeholder="Country"
                 onChange={handleInputChange}
                 className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
@@ -474,7 +791,7 @@ const Admin = () => {
               <input
                 id="latitude"
                 type="number"
-                value={formData.latitude}
+                value={branchFormData.latitude}
                 placeholder="0"
                 onChange={handleInputChange}
                 className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
@@ -487,7 +804,7 @@ const Admin = () => {
               <input
                 id="longitude"
                 type="number"
-                value={formData.longitude}
+                value={branchFormData.longitude}
                 placeholder="Longitude"
                 onChange={handleInputChange}
                 className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
