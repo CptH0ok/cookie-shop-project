@@ -141,4 +141,36 @@ details p {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Subtle shadow for details */
 }
 
+.marquee {
+  overflow: hidden; /* Prevent overflow */
+  white-space: nowrap; /* Keep content in a single line */
+  width: 100%; /* Full width */
+  position: relative; /* For positioning the inner content */
+}
 
+.my-component .marquee-inner {
+  display: flex; /* Use flexbox for horizontal layout */
+  animation: marquee 5s linear infinite; /* Adjust duration for speed */
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0); /* Start at the beginning */
+  }
+  100% {
+    transform: translateX(-150%); /* Move halfway left (to the end of the first set) */
+  }
+}
+
+.inline-block {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.relative {
+  position: relative; /* Allows for absolute positioning of other elements if needed */
+}
+
+.overflow-hidden {
+  overflow: hidden; /* Ensures content does not overflow the container */
+}

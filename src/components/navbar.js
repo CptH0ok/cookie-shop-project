@@ -27,7 +27,7 @@ const Navbar = () => {
     { name: 'Contact Us', href: '/contactus', icon: ChatBubbleLeftRightIcon },
     //{ name: 'Profile', href: '/profile', icon: UserIcon },
     { name: 'Our Branches', href: '/branches', icon: BuildingStorefrontIcon },
-    // { name: 'Reviews', href: '/reviews', icon: StarIcon },
+    { name: 'Reviews', href: '/reviews', icon: StarIcon },
   ];
 
 
