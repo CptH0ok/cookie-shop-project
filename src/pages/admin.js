@@ -1060,7 +1060,7 @@ const Admin = () => {
     if (userStats && userStats.length > 0 && chartContainerRefChart.current) {
       drawUserStatsChart(userStats, chartContainerRefChart.current);
     }
-  }, [userStats]);
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -1126,12 +1126,6 @@ const Admin = () => {
                     onClick={() => handleMenuClick("addstock")}
                   >
                     Add Stock
-                  </div>
-                  <div
-                    className="relative z-0 text-gray-300 m-2 p-2 rounded-md font-bold text-xl text-center hover:bg-white hover:text-black duration-300"
-                    onClick={() => handleMenuClick("updatestock")}
-                  >
-                    Update Stock
                   </div>
                 </div>
               )}
@@ -1206,7 +1200,6 @@ const Admin = () => {
           <div className="relative flex z-10 top-20 mr-2 ml-4 mt-5 h-full w-4/5 h-auto backdrop-contrast-50 backdrop-blur-2xl rounded-2xl">
             {selectedMenu === "home" && <HomeContent />}
             {selectedMenu === "viewstock" && <ViewStockContent />}
-            {selectedMenu === "updatestock" && UpdateStockContent}
             {selectedMenu === "viewpurchases" && <ViewPurchasesContent />}
             {selectedMenu === "removepurchases" && <RemovePurchasesContent />}
             {selectedMenu === "viewbranches" && <ViewBranchesContent />}
