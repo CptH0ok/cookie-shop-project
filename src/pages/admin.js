@@ -13,6 +13,7 @@ const Admin = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRow, setEditingRow] = useState(null);
   const [cookies, setCookies] = useState([]);
+  const [isCookieAvailable, setIsCookieAvailable] = useState(false)
   const [selectedCookie, setSelectedCookie] = useState("");
 
   // Graphs
@@ -141,6 +142,44 @@ const Admin = () => {
         {
           method: "PUT",
           body: JSON.stringify(editingRow),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        handleMenuClick(selectedMenu);
+
+        setIsModalOpen(false); // Close the modal after the update
+        window.location.reload();
+      } else {
+        alert("Error updating row");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+  
+  const cookieHandleAdd = async () => {
+    try {
+      // Update the backend with the edited data
+      const {name, description, price, ingredients,category, available} = await fetch(
+        `http://localhost:3001/api/cookies/search/`,
+        {
+          method: "GET",
+          body: JSON.stringify("name:",selectedCookie),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      
+      const response = await fetch(
+        `http://localhost:3001/api/cookies/update/${editingRow.name}`,
+        {
+          method: "PUT",
+          body: JSON.stringify("name:",name,"description:", description, "price:",price,"category:",category,"available:",isCookieAvailable),
           headers: {
             "Content-Type": "application/json",
           },
@@ -873,6 +912,61 @@ const Admin = () => {
     );
   });
 
+  const AddStockContent = useMemo(() => {
+    return (
+      <div className="relative flex-col w-screen p-6 pl-10 pt-10 text-6xl text-gray-950 font-serif font-bold drop-shadow-lg">
+        Update Cookie Stock
+        <form onSubmit={""} className="relative flex">
+          <div className="relative left-0 w-full h-auto ml-10">
+            <label htmlFor="name" className="relative pt-10 text-2xl">
+              Store Name
+            </label>
+            <div className="mt-2">
+              <select
+                id="name"
+                type="text"
+                value={branchFormData.name}
+                placeholder="name"
+                onChange={handleInputChange}
+                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
+              ><option value="">Select a Cookie</option>
+              {cookies.map((name, index) => (
+                <option key={index} value={name}>
+                  {name}
+                </option>
+              ))}
+            </select>
+            <div class="flex items-center mt-10">
+              <input
+                id="makesDeliveries"
+                type="checkbox"
+                checked={isCookieAvailable}
+                onChange={handleInputChange}
+                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded duration-100"
+              />
+              <label
+                for="default-checkbox"
+                class="ms-2 text-xl font-medium text-gray-950"
+              >
+                Is Available
+              </label>
+            </div>
+          </div>
+          <div className="absolute bottom-0 h-1 ml-10">
+            <button
+              type="submit"
+              className="relative w-mt-8 bg-green-600 rounded hover:bg-green-500 hover:ring-1 hover:ring-white duration-300"
+            >
+              <p className="text-2xl px-3 py-2 text-white drop-shadow-md">
+                Submit
+              </p>
+            </button>
+          </div>
+          </div>
+        </form>
+      </div>
+    );
+  });
   // Menus
   const toggleDropdown = (menu) => {
     // Set the open dropdown to the clicked one, or close it if it's already open
@@ -971,6 +1065,12 @@ const Admin = () => {
                   </div>
                   <div
                     className="relative z-0 text-gray-300 m-2 p-2 rounded-md font-bold text-xl text-center hover:bg-white hover:text-black duration-300"
+                    onClick={() => handleMenuClick("addstock")}
+                  >
+                    Add Stock
+                  </div>
+                  <div
+                    className="relative z-0 text-gray-300 m-2 p-2 rounded-md font-bold text-xl text-center hover:bg-white hover:text-black duration-300"
                     onClick={() => handleMenuClick("updatestock")}
                   >
                     Update Stock
@@ -1052,6 +1152,7 @@ const Admin = () => {
             {selectedMenu === "viewpurchases" && <ViewPurchasesContent />}
             {selectedMenu === "removepurchases" && <RemovePurchasesContent />}
             {selectedMenu === "viewbranches" && <ViewBranchesContent />}
+            {selectedMenu === "addstock" && AddStockContent}
             {selectedMenu === "addbranch" && AddBranchContent}
             {selectedMenu === "updatebranches" && UpdateBranchesContent}
           </div>
