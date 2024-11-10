@@ -15,6 +15,7 @@ const Admin = () => {
   const [cookies, setCookies] = useState([]);
   const [isCookieAvailable, setIsCookieAvailable] = useState(false)
   const [selectedCookie, setSelectedCookie] = useState("");
+  const [userStats, setUserStats] = useState(null);
 
   // Graphs
   const chartContainerRef = useRef(null);
@@ -23,13 +24,13 @@ const Admin = () => {
   const drawPurchaseHistoryChart = (purchaseHistory, container) => {
     const processData = (data) => {
       const purchasesByDate = data.reduce((acc, entry) => {
-        const date = new Date(entry.purchaseDate).toLocaleDateString(); // Convert to simple date string
-        acc[date] = (acc[date] || 0) + 1; // Count purchases per date
+        const date = new Date(entry.purchaseDate).toLocaleDateString(); 
+        acc[date] = (acc[date] || 0) + 1;
         return acc;
       }, {});
 
       const result = Object.keys(purchasesByDate).map((date) => ({
-        date: new Date(date), // Convert back to Date object for D3
+        date: new Date(date), 
         count: purchasesByDate[date],
       }));
       return result;
@@ -89,44 +90,63 @@ const Admin = () => {
     }
   };
 
-  const drawUserStatsChart = (chartData ,container) => {
-    const width = 450;
-    const height = 450;
-    const margin = 40;
-    const radius = Math.min(width, height) / 2 - margin;
-
-    // Remove the old svg if it exists
-    d3.select(container).select("svg").remove();
-
-    const svg = d3.select(container)
-      .append("svg")
-      .attr("width", width)
-      .attr("height", height)
-      .append("g")
-      .attr("transform", `translate(${width / 2},${height / 2})`);
-
-    const color = d3.scaleOrdinal(d3.schemeCategory10);
-
-    const pie = d3.pie()
-      .value(d => d.value);
-
-    const data_ready = pie(chartData);
-
-    const arc = d3.arc()
-      .innerRadius(0)
-      .outerRadius(radius);
-
-    svg
-      .selectAll('path')
-      .data(data_ready)
-      .enter()
-      .append('path')
-      .attr('d', arc)
-      .attr('fill', d => color(d.data.label))
-      .attr("stroke", "white")
-      .style("stroke-width", "2px")
-      .style("opacity", 0.7);
+  const drawUserStatsChart = (chartData, container) => {
+    if (chartData && chartData.length > 0 && container) {
+      // Dimensions and radius
+      const width = 400;
+      const height = 400;
+      const radius = Math.min(width, height) / 2;
+  
+      // Clear any existing SVG in the container
+      d3.select(container).selectAll("svg").remove();
+  
+      // Append SVG to the container
+      const svg = d3.select(container)
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height)
+        .append('g')
+        .attr('transform', `translate(${width / 2}, ${height / 2})`);
+  
+      // Set up pie layout
+      const pie = d3.pie()
+        .value(d => d.count)
+        .sort(null);
+  
+      // Arc generator
+      const arc = d3.arc()
+        .innerRadius(0) // Full pie (no donut hole)
+        .outerRadius(radius);
+  
+      // Color scale
+      const color = d3.scaleOrdinal(['#812b00', '#eab905']);
+  
+      // Bind data and create pie chart segments
+      const arcData = pie(chartData);
+      svg.selectAll('path')
+        .data(arcData)
+        .enter()
+        .append('path')
+        .attr('d', arc)
+        .attr('fill', d => color(d.data.role))
+        .attr('stroke', 'white')
+        .style('stroke-width', '2px');
+  
+      // Add labels
+      svg.selectAll('text')
+        .data(arcData)
+        .enter()
+        .append('text')
+        .attr('transform', d => `translate(${arc.centroid(d)})`)
+        .attr('text-anchor', 'middle')
+        .attr('font-size', '14px')
+        .attr('fill', 'white')
+        .text(d => `${d.data.role}: ${Math.round((d.data.count / chartData.reduce((acc, d) => acc + d.count, 0)) * 100)}%`);
+    } else {
+      console.error("Chart data or container is invalid");
+    }
   };
+
 
   const [branchFormData, setbranchFormData] = useState({
     name: "",
@@ -147,7 +167,6 @@ const Admin = () => {
 
   const branchHandleEditSubmit = async () => {
     try {
-      // Update the backend with the edited data
       const response = await fetch(
         `http://localhost:3001/api/branches/update/${editingRow._id}`,
         {
@@ -162,7 +181,7 @@ const Admin = () => {
       if (response.ok) {
         handleMenuClick(selectedMenu);
 
-        setIsModalOpen(false); // Close the modal after the update
+        setIsModalOpen(false);
         window.location.reload();
       } else {
         alert("Error updating row");
@@ -174,7 +193,6 @@ const Admin = () => {
 
   const stockHandleEditSubmit = async () => {
     try {
-      // Update the backend with the edited data
       const response = await fetch(
         `http://localhost:3001/api/cookies/update/${editingRow.name}`,
         {
@@ -189,7 +207,7 @@ const Admin = () => {
       if (response.ok) {
         handleMenuClick(selectedMenu);
 
-        setIsModalOpen(false); // Close the modal after the update
+        setIsModalOpen(false); 
         window.location.reload();
       } else {
         alert("Error updating row");
@@ -224,7 +242,6 @@ const Admin = () => {
     }
   };
 
-  // Columns consts
   const branchColumns = ["_id", "name", "address", "contact", "services"];
   const stockColumns = [
     "name",
@@ -259,8 +276,14 @@ const Admin = () => {
     fetch("http://localhost:3001/api/users/list")
       .then((response) => response.json())
       .then((fetchedData) => {
+        const admins = fetchedData.filter(user => user.role === 'admin').length;
+        const nonAdmins = fetchedData.length - admins;
+  
+        const userData = [{ role: 'Admins', count: admins }, { role: 'Non-Admins', count: nonAdmins }];
+        setUserStats(userData);
+  
         if (chartContainerRefChart.current) {
-          drawUserStatsChart(fetchedData, chartContainerRefChart.current);
+          drawUserStatsChart(userData, chartContainerRefChart.current);
         }
       })
       .catch((error) => {
@@ -324,8 +347,6 @@ const Admin = () => {
     }
   };
   const branchHandleDelete = (row) => {
-    // Placeholder for dialog
-
     console.log("Deleting", row.name);
     axios.delete("http://localhost:3001/api/branches/delete/" + row._id);
     window.location.reload();
@@ -336,14 +357,11 @@ const Admin = () => {
     setIsModalOpen(true);
   };
   const stockHandleDelete = (row) => {
-    // Placeholder for dialog
     console.log("Deleting", row.name);
     axios.delete("http://localhost:3001/api/cookies/delete/" + row.name);
     window.location.reload();
   };
   const purchaseHandleDelete = (row) => {
-    // Placeholder for dialog
-
     console.log("Deleting", row);
     axios.delete("http://localhost:3001/api/branches/delete/" + row._id);
     window.location.reload();
@@ -359,36 +377,31 @@ const Admin = () => {
   const handleEditChange = (e) => {
     const { name, value, type, checked } = e.target;
 
-    // Check if the input is a checkbox and use the `checked` value
     const newValue = type === "checkbox" ? checked : value;
 
-    // Check if the name contains a dot (i.e., it's a nested field)
     if (name.includes(".")) {
       const nameParts = name.split(".");
 
-      // Create a deep copy of the editingRow object
       setEditingRow((prevState) => {
         let newState = { ...prevState };
 
         let currentObj = newState;
         for (let i = 0; i < nameParts.length - 1; i++) {
-          // Ensure the current part exists; if not, create it
+
           if (!currentObj[nameParts[i]]) {
-            currentObj[nameParts[i]] = {}; // Create an empty object if missing
+            currentObj[nameParts[i]] = {}; 
           }
-          currentObj = currentObj[nameParts[i]]; // Navigate to the nested object
+          currentObj = currentObj[nameParts[i]];
         }
 
-        // Finally, update the last part of the path
         currentObj[nameParts[nameParts.length - 1]] = newValue;
 
-        return newState; // Return the updated state
+        return newState; 
       });
     } else {
-      // If there's no dot, update the top-level field
       setEditingRow((prevState) => ({
         ...prevState,
-        [name]: newValue, // Update the top-level field (including boolean for checkbox)
+        [name]: newValue, 
       }));
     }
   };
@@ -409,7 +422,7 @@ const Admin = () => {
           <div className="right-0 w-1/2 h-auto">
             <div className="p-4 text-2xl font-semibold font-serif drop-shadow-md">
               Users:
-              <div className="drop-shadow-md" ref={chartContainerRefChart}>
+              <div className="drop-shadow-md" ref={chartContainerRefChart} style={{ width: '400px', height: '400px'}}>
                 {homeHandleGraphChart}
               </div>
             </div>
@@ -1037,8 +1050,15 @@ const Admin = () => {
   useEffect(() => {
     {
       homeHandleGraph();
+      homeHandleGraphChart();
     }
   }, [openDropdown]);
+
+  useEffect(() => {
+    if (userStats && userStats.length > 0 && chartContainerRefChart.current) {
+      drawUserStatsChart(userStats, chartContainerRefChart.current);
+    }
+  }, [userStats]);
 
   useEffect(() => {
     const fetchData = async () => {

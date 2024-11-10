@@ -51,7 +51,7 @@ router.delete('/delete/:id', authenticateJWT, checkPermissions, async (req, res)
 });
 
 // 4. List all users
-router.get('/list', authenticateJWT, async (req, res) => {
+router.get('/list', async (req, res) => {
     try {
         const users = await User.find();
         res.json(users);
