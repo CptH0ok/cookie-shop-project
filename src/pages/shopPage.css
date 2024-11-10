@@ -31,7 +31,8 @@
 }
 
 #category-filter,
-#stock-filter {
+#stock-filter,
+#price-filter  {
   padding: 12px, 16px;
   font-size: 1.1rem;
   border-radius: 5px;
