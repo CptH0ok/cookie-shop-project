@@ -52,73 +52,58 @@ const CartPage = () => {
         throw new Error('No authentication token found');
       }
   
-      // Get user details
+      // Fetch user details
       const userResponse = await axios.get('http://localhost:3001/api/users/getuserdetails', {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
   
-      console.log('User response data:', userResponse.data);
       const userId = userResponse.data.id;
-      console.log("User ID:", userId);
+      console.log('User ID:', userId);
   
-      if (!userId) {
-        throw new Error('No user ID found in response');
-      }
-  
-      // Get cart items
+      // Fetch cart items
       const cartResponse = await axios.get(`http://localhost:3001/api/cart/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
   
-      console.log('Cart response:', cartResponse.data);
+      const cart = cartResponse.data.cart;
+      console.log('Cart response:', cart);
   
-      if (!cartResponse.data.cart || !cartResponse.data.cart.items) {
-        console.log("No cart or items found");
+      if (!cart || !cart.items || cart.items.length === 0) {
+        console.log('No cart items found in response');
         return [];
       }
   
-      const items = cartResponse.data.cart.items
-        .filter(item => {
-          console.log('Processing cart item:', item);
-          return item && item.cookie;
-        })
-        .map(item => {
-          console.log('Cookie data for item:', item.cookie);
-          
+      const items = cart.items
+        .filter((item) => item && item.cookie)
+        .map((item) => {
           const cookieData = item.cookie;
-          
           if (!cookieData) {
             console.log('Missing cookie data for item:', item);
             return null;
           }
   
-          const mappedItem = {
+          return {
             id: cookieData._id,
             name: cookieData.name || 'Unknown Cookie',
-            price: typeof cookieData.price === 'number' 
-              ? cookieData.price 
-              : Number(cookieData.price?.$numberDouble || cookieData.price),
+            price: typeof cookieData.price === 'number' ? cookieData.price : Number(cookieData.price?.$numberDouble || cookieData.price),
             img: cookieData.imageUrl || '',
-            quantity: item.quantity || 1
+            quantity: item.quantity || 1,
+            version: item.version,
           };
-  
-          console.log('Mapped item:', mappedItem);
-          return mappedItem;
         })
-        .filter(item => item !== null);
+        .filter((item) => item !== null);
   
       console.log('Final transformed items:', items);
-      return items || []; 
-  
+      return items;
     } catch (error) {
       console.error('Error in fetchCartItems:', error);
       if (error.response) {
         console.error('Error response:', {
           status: error.response.status,
-          data: error.response.data
+          data: error.response.data,
         });
       }
-      return []; 
+      return [];
     }
   };
 
@@ -165,41 +150,45 @@ const CartPage = () => {
     }
   };
 
-const removeItem = async (cookieId) => {
-  try {
-    console.log('Removing item with ID:', cookieId);
-    
-    const userResponse = await axios.get('http://localhost:3001/api/users/getuserdetails', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    
-    const userId = userResponse.data.id;
-
-    // Make the delete request
-    await axios.delete('http://localhost:3001/api/cart/remove', {
-      data: { 
-        userId,
-        cookieId
-      },
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
+  const removeItem = async (cookieId) => {
+    try {
+      console.log('Removing item with ID:', cookieId);
+  
+      const userResponse = await axios.get('http://localhost:3001/api/users/getuserdetails', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
+      const userId = userResponse.data.id;
+  
+      // Make the delete request
+      await axios.delete('http://localhost:3001/api/cart/remove', {
+        data: {
+          userId,
+          cookieId,
+          version: cartItems.find((item) => item.id === cookieId)?.version,
+        },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      // Refresh cart after successful removal
+      const items = await fetchCartItems();
+      setCartItems(items);
+      calculateSubtotal(items);
+    } catch (error) {
+      if (error.response?.data?.error === 'Version conflict, please refresh and try again') {
+        alert('Version conflict, please refresh the page and try again.');
+      } else {
+        console.error('Error removing item:', error);
+        if (error.response) {
+          console.error('Error response:', error.response.data);
+        }
+        alert('Error removing item from cart');
       }
-    });
-
-    // Refresh cart after successful removal
-    const items = await fetchCartItems();
-    setCartItems(items);
-    calculateSubtotal(items);
-    
-  } catch (error) {
-    console.error('Error removing item:', error);
-    if (error.response) {
-      console.error('Error response:', error.response.data);
     }
-    alert('Error removing item from cart');
-  }
-};
+  };
 
 const calculateSubtotal = (items) => {
   if (!items || !Array.isArray(items)) {
@@ -226,19 +215,11 @@ useEffect(() => {
     try {
       setLoading(true);
       const items = await fetchCartItems();
-      if (Array.isArray(items)) {
-        setCartItems(items);
-        calculateSubtotal(items);
-      } else {
-        console.error('fetchCartItems did not return an array:', items);
-        setCartItems([]);
-        calculateSubtotal([]);
-      }
+      setCartItems(items);
+      calculateSubtotal(items);
     } catch (err) {
       setError(err.message);
       console.error('Error loading cart:', err);
-      setCartItems([]);
-      calculateSubtotal([]);
     } finally {
       setLoading(false);
     }

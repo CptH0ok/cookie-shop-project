@@ -151,7 +151,6 @@ const CheckoutPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Get user details
       const userResponse = await axios.get('http://localhost:3001/api/users/getuserdetails', {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -163,14 +162,11 @@ const CheckoutPage = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
   
-      console.log('Cart Response:', cartResponse.data.cart.items);
-  
       // Transform cart items to match purchase history schema
       const purchaseItems = cartResponse.data.cart.items.map(item => ({
         itemName: item.cookie.name,
         quantity: item.quantity,
-        price: item.cookie.price,
-        imageUrl: item.cookie.imageUrl // This should now match your populated cart data
+        price: item.cookie.price
       }));
   
       const purchaseData = {
@@ -181,9 +177,8 @@ const CheckoutPage = () => {
           : convertedTotal
       };
   
-      console.log('Purchase Data being sent:', purchaseData);
-  
-      const response = await axios.post(
+      // Save purchase history
+      await axios.post(
         'http://localhost:3001/api/purchasehistory/create',
         purchaseData,
         {
@@ -191,21 +186,23 @@ const CheckoutPage = () => {
         }
       );
   
-      console.log('Purchase history created:', response.data);
-  
-      // Clear cart and navigate
-      const clearCartResponse = await axios.post(
-        'http://localhost:3001/api/cart/clear',
-        { userId },
-        {
+      // Clear cart by removing all items
+      await Promise.all(cartItems.map(item => 
+        axios.delete('http://localhost:3001/api/cart/remove', {
+          data: { userId, cookieId: item.id },
           headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+        })
+      ));
   
-      navigate('/order-success');
+      // Show success popup
+      alert('Enjoy your order! 🍪');  // You can replace this with a nicer modal if preferred
+      
+      // Navigate to home page
+      navigate('/');
+  
     } catch (error) {
       console.error('Error processing order:', error);
-      console.error('Error details:', error.response?.data);
+      alert('Error processing your order. Please try again.');
     }
   };
 
