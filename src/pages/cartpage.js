@@ -160,16 +160,20 @@ const CartPage = () => {
   
       const userId = userResponse.data.id;
   
+      // Get the version from the cartItems array, or use a default value if not found
+      const item = cartItems.find((item) => item.id === cookieId);
+      const version = item?.version || 0;
+  
       // Make the delete request
       await axios.delete('http://localhost:3001/api/cart/remove', {
-        data: {
-          userId,
-          cookieId,
-          version: cartItems.find((item) => item.id === cookieId)?.version,
-        },
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
+        },
+        data: {
+          userId,
+          cookieId,
+          version,
         },
       });
   
