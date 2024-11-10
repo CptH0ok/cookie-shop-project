@@ -18,6 +18,7 @@ const Admin = () => {
 
   // Graphs
   const chartContainerRef = useRef(null);
+  const chartContainerRefChart = useRef(null);
 
   const drawPurchaseHistoryChart = (purchaseHistory, container) => {
     const processData = (data) => {
@@ -88,54 +89,43 @@ const Admin = () => {
     }
   };
 
-  const drawUserStatsChart = (users ,container) => {
+  const drawUserStatsChart = (chartData ,container) => {
     const width = 450;
     const height = 450;
     const margin = 40;
-
-    // The radius of the pieplot is half the width or half the height (smallest one). I take into account margin
     const radius = Math.min(width, height) / 2 - margin;
 
-    // Append the svg object to the div called 'chart'
-    const svg = d3.select("#chart")
+    // Remove the old svg if it exists
+    d3.select(container).select("svg").remove();
+
+    const svg = d3.select(container)
       .append("svg")
       .attr("width", width)
       .attr("height", height)
       .append("g")
       .attr("transform", `translate(${width / 2},${height / 2})`);
 
-    // Create dummy data
-    const data = chartData.reduce((acc, curr) => {
-      acc[curr.label] = curr.value;
-      return acc;
-    }, {});
+    const color = d3.scaleOrdinal(d3.schemeCategory10);
 
-    // Set the color scale
-    const color = d3.scaleOrdinal()
-      .domain(data)
-      .range(d3.schemeCategory10);
-
-    // Compute the position of each group on the pie
     const pie = d3.pie()
       .value(d => d.value);
 
-    const data_ready = pie(d3.entries(data));
+    const data_ready = pie(chartData);
 
-    // Build the pie chart
+    const arc = d3.arc()
+      .innerRadius(0)
+      .outerRadius(radius);
+
     svg
-      .selectAll('whatever')
+      .selectAll('path')
       .data(data_ready)
       .enter()
       .append('path')
-      .attr('d', d3.arc()
-        .innerRadius(0)
-        .outerRadius(radius)
-      )
-      .attr('fill', d => color(d.data.key))
+      .attr('d', arc)
+      .attr('fill', d => color(d.data.label))
       .attr("stroke", "white")
       .style("stroke-width", "2px")
       .style("opacity", 0.7);
-  };
   };
 
   const [branchFormData, setbranchFormData] = useState({
@@ -264,6 +254,20 @@ const Admin = () => {
         console.error("Error fetching data:", error);
       });
   };
+
+  const homeHandleGraphChart = () => {
+    fetch("http://localhost:3001/api/users/list")
+      .then((response) => response.json())
+      .then((fetchedData) => {
+        if (chartContainerRefChart.current) {
+          drawUserStatsChart(fetchedData, chartContainerRefChart.current);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  };
+
 
   const branchHandleEdit = (row) => {
     setEditingRow({ ...row });
@@ -404,7 +408,10 @@ const Admin = () => {
           </div>
           <div className="right-0 w-1/2 h-auto">
             <div className="p-4 text-2xl font-semibold font-serif drop-shadow-md">
-              Purhcases Over Time:
+              Users:
+              <div className="drop-shadow-md" ref={chartContainerRefChart}>
+                {homeHandleGraphChart}
+              </div>
             </div>
           </div>
         </div>
