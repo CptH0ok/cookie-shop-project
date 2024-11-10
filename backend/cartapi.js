@@ -132,7 +132,8 @@ router.get('/:userId', authenticateJWT, async (req, res) => {
       console.log('No cart found, creating new cart for user:', userId);
       cart = new CartItem({ 
         user: userId, 
-        items: [] 
+        items: [],
+        version: 0  // Initialize version
       });
       await cart.save();
       return res.status(200).json({ cart: { ...cart.toObject(), items: [] } });
@@ -170,15 +171,17 @@ router.get('/:userId', authenticateJWT, async (req, res) => {
       };
     }).filter(item => item !== null);
 
-    // Create the final cart object
+    // Create the final cart object - Include version here
     const populatedCart = {
       _id: cart._id,
       user: cart.user,
       items: populatedItems,
+      version: cart.version || 0,  // Include version in response
       __v: cart.__v
     };
 
     console.log('Final populated items:', populatedCart.items.length);
+    console.log('Cart version:', populatedCart.version); // Debug log
     res.status(200).json({ cart: populatedCart });
 
   } catch (error) {
