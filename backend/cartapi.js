@@ -48,10 +48,9 @@ router.post('/add', authenticateJWT, async (req, res) => {
       });
     }
 
-    // Save the updated cart
+    
     await cart.save();
 
-    // Fetch and return the updated cart
     const updatedCart = await CartItem.findOne({ user: userId })
       .populate({
         path: 'items.cookie',
@@ -76,13 +75,11 @@ router.delete('/remove', authenticateJWT, async (req, res) => {
     const { userId, cookieId, version } = req.body;
     console.log('Remove request:', { userId, cookieId, version });
 
-    // Validate input
     if (!userId || !cookieId || version === undefined) {
       console.log('Missing required fields');
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Find the cart and remove the item
     const cart = await CartItem.findOneAndUpdate(
       { user: userId, 'items.cookie': cookieId },
       { $pull: { items: { cookie: cookieId } }, $inc: { version: 1 } },
@@ -94,7 +91,6 @@ router.delete('/remove', authenticateJWT, async (req, res) => {
       return res.status(404).json({ error: 'Cart not found' });
     }
 
-    // Fetch the updated cart with populated items
     const updatedCart = await CartItem.findOne({ user: userId })
       .populate({
         path: 'items.cookie',
@@ -125,7 +121,6 @@ router.get('/:userId', authenticateJWT, async (req, res) => {
     const userId = req.params.userId;
     console.log('Fetching cart for user:', userId);
 
-    // First get the cart
     let cart = await CartItem.findOne({ user: userId });
     
     if (!cart) {
@@ -133,7 +128,7 @@ router.get('/:userId', authenticateJWT, async (req, res) => {
       cart = new CartItem({ 
         user: userId, 
         items: [],
-        version: 0  // Initialize version
+        version: 0  
       });
       await cart.save();
       return res.status(200).json({ cart: { ...cart.toObject(), items: [] } });
@@ -141,11 +136,9 @@ router.get('/:userId', authenticateJWT, async (req, res) => {
 
     console.log('Found cart:', JSON.stringify(cart, null, 2));
 
-    // Get all cookies
     const cookies = await Cookie.find({}).lean();
     console.log('Found cookies:', cookies.length);
 
-    // Map cart items with cookie data
     const populatedItems = cart.items.map(item => {
       const cookie = cookies.find(c => c._id.toString() === item.cookie.toString());
       console.log('Matching cookie for item:', {
@@ -171,17 +164,16 @@ router.get('/:userId', authenticateJWT, async (req, res) => {
       };
     }).filter(item => item !== null);
 
-    // Create the final cart object - Include version here
     const populatedCart = {
       _id: cart._id,
       user: cart.user,
       items: populatedItems,
-      version: cart.version || 0,  // Include version in response
+      version: cart.version || 0,  
       __v: cart.__v
     };
 
     console.log('Final populated items:', populatedCart.items.length);
-    console.log('Cart version:', populatedCart.version); // Debug log
+    console.log('Cart version:', populatedCart.version); 
     res.status(200).json({ cart: populatedCart });
 
   } catch (error) {
