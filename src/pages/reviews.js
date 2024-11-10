@@ -69,6 +69,7 @@ const Reviews = () => {
   }
 
   return (
+    <div className="reviews-page">
     <div className="review-container">
       {reviews.length > 0 ? (
         reviews.map((review, index) => (
@@ -88,6 +89,7 @@ const Reviews = () => {
       ) : (
         <p>Loading reviews...</p>
       )}
+    </div>
     </div>
   );
 };
