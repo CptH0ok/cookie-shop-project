@@ -157,7 +157,7 @@ async function getFacebookPostLikes(postId) {
 
 router.get('/pagereviews', async (req, res, next) => {
   try {
-    const reviews = await getPageReviews();
+    const reviews = await getFacebookPageReviews();
     res.json(reviews);
   } catch (error) {
     next(error);
@@ -167,8 +167,8 @@ router.get('/pagereviews', async (req, res, next) => {
 
 router.get('/getlastdataphoto', async (req, res, next) => {
   try {
-    const lastPostId = await getLastPost();
-    const photo = await getPostPicture(lastPostId);
+    const lastPostId = await getLastFacebookPost();
+    const photo = await getFacebookPostPicture(lastPostId);
     res.json(photo);
   } catch (error) {
     next(error);
@@ -178,7 +178,7 @@ router.get('/getlastdataphoto', async (req, res, next) => {
 
 router.get('/getlastdatacomments', async (req, res, next) => {
   try{
-    const lastPostId = await getLastPost();
+    const lastPostId = await getLastFacebookPost();
     const comments = await getPostComments(lastPostId);
     res.json(comments);
   } catch (error) {
