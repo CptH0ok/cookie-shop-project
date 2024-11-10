@@ -72,18 +72,24 @@ function DataTable({ apiUrl, columnsToDisplay, editable, onEdit, onDelete }) {
                 <tr key={rowIndex}>
                   {columnsToDisplay.map((key, colIndex) => (
                     <td key={colIndex} className="px-4 py-2 border text-white">
-                      {typeof row[key] === "object"
+                      {typeof row[key] === "object" && row[key] !== null
                         ? Object.values(row[key]).join(", ")
+                        : typeof row[key] === "boolean"
+                        ? row[key]
+                          ? "Yes"
+                          : "No"
                         : row[key]}
                     </td>
                   ))}
                   <td className="px-4 py-2 border">
-                    {onEdit != "" && (<button
-                      onClick={() => onEdit(row)}
-                      className="realtive px-3 py-1 mb-2 bg-blue-500 text-white drop-shadow-md rounded mr-2 hover:bg-blue-600 hover:ring-1 hover:ring-white duration-300"
-                    >
-                      Edit
-                    </button> )}
+                    {onEdit != "" && (
+                      <button
+                        onClick={() => onEdit(row)}
+                        className="realtive px-3 py-1 mb-2 bg-blue-500 text-white drop-shadow-md rounded mr-2 hover:bg-blue-600 hover:ring-1 hover:ring-white duration-300"
+                      >
+                        Edit
+                      </button>
+                    )}
                     <button
                       onClick={() => onDelete(row)}
                       className="realtive px-3 py-1 bg-red-500 text-white drop-shadow-md rounded hover:bg-red-600 hover:ring-1 hover:ring-white duration-300"
@@ -126,8 +132,12 @@ function DataTable({ apiUrl, columnsToDisplay, editable, onEdit, onDelete }) {
             <tr key={rowIndex}>
               {columnsToDisplay.map((key, colIndex) => (
                 <td key={colIndex} className="px-4 py-2 border text-white">
-                  {typeof row[key] === "object"
+                  {typeof row[key] === "object" && row[key] !== null
                     ? Object.values(row[key]).join(", ")
+                    : typeof row[key] === "boolean"
+                    ? row[key]
+                      ? "Yes"
+                      : "No"
                     : row[key]}
                 </td>
               ))}

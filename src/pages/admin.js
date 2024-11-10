@@ -12,6 +12,8 @@ const Admin = () => {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRow, setEditingRow] = useState(null);
+  const [cookies, setCookies] = useState([]);
+  const [selectedCookie, setSelectedCookie] = useState("");
 
   // Graphs
   const chartContainerRef = useRef(null);
@@ -104,21 +106,52 @@ const Admin = () => {
     hasDineIn: false,
   });
 
-  const handleEditSubmit = async () => {
+  const branchHandleEditSubmit = async () => {
     try {
       // Update the backend with the edited data
-      const response = await fetch(`/api/update-row/${editingRow.id}`, {
-        method: "PUT",
-        body: JSON.stringify(editingRow),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `http://localhost:3001/api/branches/update/${editingRow._id}`,
+        {
+          method: "PUT",
+          body: JSON.stringify(editingRow),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (response.ok) {
         handleMenuClick(selectedMenu);
 
         setIsModalOpen(false); // Close the modal after the update
+        window.location.reload();
+      } else {
+        alert("Error updating row");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const stockHandleEditSubmit = async () => {
+    try {
+      // Update the backend with the edited data
+      const response = await fetch(
+        `http://localhost:3001/api/cookies/update/${editingRow.name}`,
+        {
+          method: "PUT",
+          body: JSON.stringify(editingRow),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        handleMenuClick(selectedMenu);
+
+        setIsModalOpen(false); // Close the modal after the update
+        window.location.reload();
       } else {
         alert("Error updating row");
       }
@@ -157,10 +190,16 @@ const Admin = () => {
         console.error("Error fetching data:", error);
       });
   };
+
+  // const handleCancel = () => {
+  //   setEditingRow(null); // Optionally clear the row data
+  //   setIsModalOpen(false); // Close the modal
+  // };
+
   const branchHandleEdit = (row) => {
-    setEditingRow({ ...row }); // Create a copy of the row for editing
+    setEditingRow({ ...row });
+    console.log("Editing", row);
     setIsModalOpen(true);
-    console.log("Editing", row); // Replace with actual edit logic
   };
   const branchHandleAdd = async (e) => {
     e.preventDefault();
@@ -214,72 +253,25 @@ const Admin = () => {
   const branchHandleDelete = (row) => {
     // Placeholder for dialog
 
-    console.log("Deleting", row.name); // Replace with actual delete logic
+    console.log("Deleting", row.name);
     axios.delete("http://localhost:3001/api/branches/delete/" + row._id);
     window.location.reload();
   };
   const stockHandleEdit = (row) => {
-    console.log("Editing", row); // Replace with actual edit logic
-  };
-  const stockHandleAdd = async (e) => {
-    e.preventDefault();
-    try {
-      const address = {
-        streetNumber: branchFormData.streetNumber,
-        streetName: branchFormData.streetName,
-        city: branchFormData.city,
-        state: branchFormData.state,
-        zipCode: branchFormData.zipCode,
-        country: branchFormData.country,
-        longitude: branchFormData.longitude,
-        latitude: branchFormData.latitude,
-      };
-      const openingHours = {
-        monday: "8:00 AM - 10:00 PM",
-        tuesday: "8:00 AM - 10:00 PM",
-        wednesday: "8:00 AM - 10:00 PM",
-        thursday: "8:00 AM - 10:00 PM",
-        friday: "8:00 AM - 5:00 PM",
-        saturday: "closed",
-        sunday: "8:00 AM - 10:00 PM",
-      };
-      const contact = {
-        phone: branchFormData.phone,
-        email: branchFormData.email,
-      };
-      const services = {
-        delivery: branchFormData.makesDeliveries,
-        takeaway: branchFormData.hasTakeaway,
-        dineIn: branchFormData.hasDineIn,
-      };
-
-      const branchBody = {
-        name: branchFormData.name,
-        address,
-        contact,
-        services,
-        openingHours,
-      };
-
-      const res = await axios.post(
-        "http://localhost:3001/api/branches/create",
-        branchBody
-      );
-      window.location.reload();
-    } catch (err) {
-      alert(err);
-    }
+    setEditingRow({ ...row });
+    console.log("Editing", row);
+    setIsModalOpen(true);
   };
   const stockHandleDelete = (row) => {
     // Placeholder for dialog
-
-    console.log("Deleting", row); // Replace with actual delete logic
-    axios.delete();
+    console.log("Deleting", row.name);
+    axios.delete("http://localhost:3001/api/cookies/delete/" + row.name);
+    window.location.reload();
   };
   const purchaseHandleDelete = (row) => {
     // Placeholder for dialog
 
-    console.log("Deleting", row); // Replace with actual delete logic
+    console.log("Deleting", row);
     axios.delete("http://localhost:3001/api/branches/delete/" + row._id);
     window.location.reload();
   };
@@ -289,6 +281,43 @@ const Admin = () => {
       ...prev,
       [id]: type === "checkbox" ? checked : value,
     }));
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value, type, checked } = e.target;
+
+    // Check if the input is a checkbox and use the `checked` value
+    const newValue = type === "checkbox" ? checked : value;
+
+    // Check if the name contains a dot (i.e., it's a nested field)
+    if (name.includes(".")) {
+      const nameParts = name.split(".");
+
+      // Create a deep copy of the editingRow object
+      setEditingRow((prevState) => {
+        let newState = { ...prevState };
+
+        let currentObj = newState;
+        for (let i = 0; i < nameParts.length - 1; i++) {
+          // Ensure the current part exists; if not, create it
+          if (!currentObj[nameParts[i]]) {
+            currentObj[nameParts[i]] = {}; // Create an empty object if missing
+          }
+          currentObj = currentObj[nameParts[i]]; // Navigate to the nested object
+        }
+
+        // Finally, update the last part of the path
+        currentObj[nameParts[nameParts.length - 1]] = newValue;
+
+        return newState; // Return the updated state
+      });
+    } else {
+      // If there's no dot, update the top-level field
+      setEditingRow((prevState) => ({
+        ...prevState,
+        [name]: newValue, // Update the top-level field (including boolean for checkbox)
+      }));
+    }
   };
 
   const HomeContent = () => {
@@ -322,228 +351,100 @@ const Admin = () => {
       />
     </div>
   );
-  const AddStockContent = useMemo(() => {
+  const UpdateStockContent = useMemo(() => {
     return (
-      <div className="relative flex-col w-screen p-6 pl-10 pt-10 text-6xl text-gray-950 font-serif font-bold drop-shadow-lg">
-        Create A Branch
-        <form onSubmit={branchHandleAdd} className="relative flex">
-          <div className="relative left-0 w-full h-auto ml-10">
-            <label htmlFor="name" className="relative pt-10 text-2xl">
-              Store Name
-            </label>
-            <div className="mt-2">
-              <input
-                id="name"
-                type="text"
-                value={branchFormData.name}
-                placeholder="name"
-                onChange={handleInputChange}
-                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
-              />
-            </div>
-            <label htmlFor="phone" className="relative pt-10 text-2xl">
-              Phone
-            </label>
-            <div className="mt-2">
-              <input
-                id="phone"
-                type="tel"
-                value={branchFormData.phone}
-                placeholder="Phone"
-                onChange={handleInputChange}
-                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
-              />
-            </div>
-            <label htmlFor="email" className="relative pt-10 text-2xl">
-              E-mail
-            </label>
-            <div className="mt-2">
-              <input
-                id="email"
-                type="email"
-                value={branchFormData.email}
-                placeholder="E-mail"
-                onChange={handleInputChange}
-                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
-              />
-            </div>
-            <div class="flex items-center mt-10">
-              <input
-                id="hasTakeaway"
-                type="checkbox"
-                checked={branchFormData.takeaway}
-                onChange={handleInputChange}
-                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded duration-100"
-              />
-              <label
-                for="hasTakeaway"
-                class="ms-2 text-xl font-medium text-gray-950"
-              >
-                Serves Takeaway
-              </label>
-            </div>
-            <div class="flex items-center mt-10">
-              <input
-                id="hasDineIn"
-                type="checkbox"
-                checked={branchFormData.dinein}
-                onChange={handleInputChange}
-                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded duration-100"
-              />
-              <label
-                for="default-checkbox"
-                class="ms-2 text-xl font-medium text-gray-950"
-              >
-                Has Dine In
-              </label>
-            </div>
-            <div class="flex items-center mt-10">
-              <input
-                id="makesDeliveries"
-                type="checkbox"
-                checked={branchFormData.delivery}
-                onChange={handleInputChange}
-                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded duration-100"
-              />
-              <label
-                for="default-checkbox"
-                class="ms-2 text-xl font-medium text-gray-950"
-              >
-                Makes Deliveries
-              </label>
-            </div>
-          </div>
-          <div className="relative right-0 w-full h-auto">
-            <label htmlFor="streetNumber" className="relative pt-10 text-2xl">
-              Street Number
-            </label>
-            <div className="relative mt-2">
-              <input
-                id="streetNumber"
-                type="text"
-                value={branchFormData.streetNumber}
-                placeholder="Street Number"
-                onChange={handleInputChange}
-                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
-              />
-            </div>
-            <label htmlFor="streetName" className="relative pt-10 text-2xl">
-              Street Name
-            </label>
-            <div className="relative mt-2">
-              <input
-                id="streetName"
-                type="text"
-                value={branchFormData.streetName}
-                placeholder="Street Name"
-                onChange={handleInputChange}
-                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
-              />
-            </div>
-            <label htmlFor="city" className="relative pt-10 text-2xl">
-              City
-            </label>
-            <div className="relative mt-2">
-              <input
-                id="city"
-                type="text"
-                value={branchFormData.city}
-                placeholder="City"
-                onChange={handleInputChange}
-                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
-              />
-            </div>
-            <label htmlFor="state" className="relative pt-10 text-2xl">
-              State
-            </label>
-            <div className="relative mt-2">
-              <input
-                id="state"
-                type="text"
-                value={branchFormData.state}
-                placeholder="State"
-                onChange={handleInputChange}
-                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
-              />
-            </div>
-            <label htmlFor="zipCode" className="relative pt-10 text-2xl">
-              Zip Code
-            </label>
-            <div className="relative mt-2">
-              <input
-                id="zipCode"
-                type="text"
-                value={branchFormData.zipCode}
-                placeholder="Zip Code"
-                onChange={handleInputChange}
-                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
-              />
-            </div>
-            <label htmlFor="country" className="relative pt-10 text-2xl">
-              Country
-            </label>
-            <div className="relative mt-2">
-              <input
-                id="country"
-                type="text"
-                value={branchFormData.country}
-                placeholder="Country"
-                onChange={handleInputChange}
-                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
-              />
-            </div>
-            <label htmlFor="latitude" className="relative pt-10 text-2xl">
-              latitude
-            </label>
-            <div className="relative mt-2">
-              <input
-                id="latitude"
-                type="number"
-                value={branchFormData.latitude}
-                placeholder="0"
-                onChange={handleInputChange}
-                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
-              />
-            </div>
-            <label htmlFor="longitude" className="relative pt-10 text-2xl">
-              Longitude
-            </label>
-            <div className="relative mt-2">
-              <input
-                id="longitude"
-                type="number"
-                value={branchFormData.longitude}
-                placeholder="Longitude"
-                onChange={handleInputChange}
-                className="block w-1/2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-yellow-600 sm:text-sm sm:leading-6"
-              />
+      <div className="overflow-auto rounded-md text-md font-bold font-serif">
+        <DataTable
+          apiUrl={"http://localhost:3001/api/cookies/"}
+          columnsToDisplay={stockColumns}
+          editable={true}
+          onEdit={stockHandleEdit}
+          onDelete={stockHandleDelete}
+        />
+        {isModalOpen && (
+          <div className="modal">
+            <div className="fixed inset-0 z-10 bg-black bg-opacity-75 backdrop-blur-2xl" />
+            <div className="fixed inset-0 z-20 mx-auto w-2/3 flex items-center justify-center">
+              <div className="modal-content border rounded-2xl w-screen h-3/5 text-gray-950 bg-white bg-opacity-25 backdrop-blur-md">
+                <h2 className="text-4xl p-4 pl-10 pt-10 drop-shadow-md">
+                  Edit Row
+                </h2>
+                <div className="ml-2 grid grid-cols-3 gap-4 p-4 content-start">
+                  <div>
+                    <label className="drop-shadow-md">Cookie Name: </label>
+                    <input
+                      name="name"
+                      type="text"
+                      value={editingRow.name}
+                      onChange={handleEditChange}
+                    />
+                  </div>
+                  <div>
+                    <label className="drop-shadow-md">Description: </label>
+                    <input
+                      name="description"
+                      type="text"
+                      value={editingRow.description}
+                      onChange={handleEditChange}
+                    />
+                  </div>
+                  <div>
+                    <label className="drop-shadow-md">Price: </label>
+                    <input
+                      name="price"
+                      type="number"
+                      value={editingRow.price}
+                      onChange={handleEditChange}
+                    />
+                  </div>
+                  <div>
+                    <label className="drop-shadow-md">Category: </label>
+                    <input
+                      name="category"
+                      type="text"
+                      value={editingRow.category}
+                      onChange={handleEditChange}
+                    />
+                  </div>
+                </div>
+                <div className="pl-6 flex">
+                  <div className="flex items-center mt-10">
+                    <input
+                      name="available"
+                      type="checkbox"
+                      checked={editingRow.available}
+                      onChange={handleEditChange}
+                      class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded duration-100"
+                    />
+                    <label
+                      for="available"
+                      class="ms-2 text-xl font-medium text-gray-950"
+                    >
+                      Available
+                    </label>
+                  </div>
+                </div>
+                <div className="p-4 pb-10">
+                  <button
+                    onClick={stockHandleEditSubmit}
+                    className="relative px-3 py-1 m-2 bg-green-500 text-white drop-shadow-md rounded hover:bg-green-600 hover:ring-1 hover:ring-white duration-300"
+                  >
+                    Submit
+                  </button>
+                  <button
+                    onClick={() => setIsModalOpen(false)}
+                    className="realtive px-3 py-1 m-2 bg-red-500 text-white drop-shadow-md rounded hover:bg-red-600 hover:ring-1 hover:ring-white duration-300"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-          <div className="absolute bottom-0 h-1 ml-10">
-            <button
-              type="submit"
-              className="relative w-mt-8 bg-green-600 rounded hover:bg-green-500 hover:ring-1 hover:ring-white duration-300"
-            >
-              <p className="text-2xl px-3 py-2 text-white drop-shadow-md">
-                Submit
-              </p>
-            </button>
-          </div>
-        </form>
+        )}
       </div>
     );
-  });
-  const UpdateStockContent = () => (
-    <div className="overflow-auto rounded-md text-md font-bold font-serif">
-      <DataTable
-        apiUrl={"http://localhost:3001/api/cookies/"}
-        columnsToDisplay={stockColumns}
-        editable={true}
-        onEdit={branchHandleEdit}
-        onDelete={branchHandleDelete}
-      />
-    </div>
-  );
+  }, []);
   const ViewPurchasesContent = () => (
     <div className="overflow-auto rounded-md text-md font-bold font-serif">
       <DataTable
@@ -573,102 +474,193 @@ const Admin = () => {
       />
     </div>
   );
-  const UpdateBranchesContent = () => (
-    <div className="overflow-auto rounded-md text-md font-bold font-serif">
-      <DataTable
-        apiUrl={"http://localhost:3001/api/branches/list"}
-        columnsToDisplay={branchColumns}
-        editable={true}
-        onEdit={branchHandleEdit}
-        onDelete={branchHandleDelete}
-      />
-      {isModalOpen && (
-        <div className="modal">
-          <div className="modal-content">
-            <h2>Edit Row</h2>
-            <div>
-              <label>Name: </label>
-              <input
-                type="text"
-                value={editingRow.name}
-                onChange={(e) =>
-                  setEditingRow({ ...editingRow, name: e.target.value })
-                }
-              />
+  const UpdateBranchesContent = useMemo(() => {
+    return (
+      <div className="overflow-auto rounded-md text-md font-bold font-serif">
+        <DataTable
+          apiUrl={"http://localhost:3001/api/branches/list"}
+          columnsToDisplay={branchColumns}
+          editable={true}
+          onEdit={branchHandleEdit}
+          onDelete={branchHandleDelete}
+        />
+        {isModalOpen && (
+          <div className="modal">
+            <div className="fixed inset-0 z-10 bg-black bg-opacity-75 backdrop-blur-2xl" />
+            <div className="fixed inset-0 z-20 mx-auto w-2/3 flex items-center justify-center">
+              <div className="modal-content border rounded-2xl w-screen h-3/5 text-gray-950 bg-white bg-opacity-25 backdrop-blur-md">
+                <h2 className="text-4xl p-4 pl-10 pt-10 drop-shadow-md">
+                  Edit Row
+                </h2>
+                <div className="ml-2 grid grid-cols-3 gap-4 p-4 content-start">
+                  <div>
+                    <label className="drop-shadow-md">Branch Name: </label>
+                    <input
+                      name="name"
+                      type="text"
+                      value={editingRow.name}
+                      onChange={handleEditChange}
+                    />
+                  </div>
+                  <div>
+                    <label className="drop-shadow-md">E-Mail: </label>
+                    <input
+                      name="contact.email"
+                      type="email"
+                      value={editingRow.contact.email}
+                      onChange={handleEditChange}
+                    />
+                  </div>
+                  <div>
+                    <label className="drop-shadow-md">Phone: </label>
+                    <input
+                      name="contact.phone"
+                      type="tel"
+                      value={editingRow.contact.phone}
+                      onChange={handleEditChange}
+                    />
+                  </div>
+                  <div>
+                    <label className="drop-shadow-md">Street Number: </label>
+                    <input
+                      name="address.streetNumber"
+                      type="text"
+                      value={editingRow.address.streetNumber}
+                      onChange={handleEditChange}
+                    />
+                  </div>
+                  <div>
+                    <label className="drop-shadow-md">Street Name: </label>
+                    <input
+                      name="address.streetName"
+                      type="text"
+                      value={editingRow.address.streetName}
+                      onChange={handleEditChange}
+                    />
+                  </div>
+                  <div>
+                    <label className="drop-shadow-md">Branch City: </label>
+                    <input
+                      name="address.city"
+                      type="text"
+                      value={editingRow.address.city}
+                      onChange={handleEditChange}
+                    />
+                  </div>
+                  <div>
+                    <label className="drop-shadow-md">Branch State: </label>
+                    <input
+                      name="address.state"
+                      type="text"
+                      value={editingRow.address.state}
+                      onChange={handleEditChange}
+                    />
+                  </div>
+                  <div>
+                    <label className="drop-shadow-md">Zip Code: </label>
+                    <input
+                      name="address.zipCode"
+                      type="text"
+                      value={editingRow.address.zipCode}
+                      onChange={handleEditChange}
+                    />
+                  </div>
+                  <div>
+                    <label className="drop-shadow-md">Country: </label>
+                    <input
+                      name="country"
+                      type="text"
+                      value={editingRow.address.country}
+                      onChange={handleEditChange}
+                    />
+                  </div>
+                  <div>
+                    <label className="drop-shadow-md">Latitude: </label>
+                    <input
+                      name="latitude"
+                      type="number"
+                      value={editingRow.address.latitude}
+                      onChange={handleEditChange}
+                    />
+                  </div>
+                  <div>
+                    <label className="drop-shadow-md">Longitude: </label>
+                    <input
+                      name="longitude"
+                      type="number"
+                      value={editingRow.address.longitude}
+                      onChange={handleEditChange}
+                    />
+                  </div>
+                </div>
+                <div className="pl-6 flex">
+                  <div className="flex items-center mt-10 mr-6">
+                    <input
+                      name="services.takeaway"
+                      type="checkbox"
+                      checked={editingRow.services.takeaway}
+                      onChange={handleEditChange}
+                      class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded duration-100"
+                    />
+                    <label
+                      for="hasTakeaway"
+                      class="ms-2 text-xl font-medium text-gray-950"
+                    >
+                      Serves Takeaway
+                    </label>
+                  </div>
+                  <div className="flex items-center mt-10 mr-6">
+                    <input
+                      name="services.delivery"
+                      type="checkbox"
+                      checked={editingRow.makesDeliveries}
+                      onChange={handleEditChange}
+                      class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded duration-100"
+                    />
+                    <label
+                      for="makesDeliveries"
+                      class="ms-2 text-xl font-medium text-gray-950"
+                    >
+                      Makes Deliveries
+                    </label>
+                  </div>
+                  <div className="flex items-center mt-10 mr-6">
+                    <input
+                      name="services.dinein"
+                      type="checkbox"
+                      checked={branchFormData.takeaway}
+                      onChange={handleEditChange}
+                      class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded duration-100"
+                    />
+                    <label
+                      for="hasDineIn"
+                      class="ms-2 text-xl font-medium text-gray-950"
+                    >
+                      hasDineIn
+                    </label>
+                  </div>
+                </div>
+                <div className="p-4 pb-10">
+                  <button
+                    onClick={branchHandleEditSubmit}
+                    className="relative px-3 py-1 m-2 bg-green-500 text-white drop-shadow-md rounded hover:bg-green-600 hover:ring-1 hover:ring-white duration-300"
+                  >
+                    Submit
+                  </button>
+                  <button
+                    onClick={() => setIsModalOpen(false)}
+                    className="realtive px-3 py-1 m-2 bg-red-500 text-white drop-shadow-md rounded hover:bg-red-600 hover:ring-1 hover:ring-white duration-300"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
             </div>
-            <div>
-              <label>Street Number: </label>
-              <input
-                type="text"
-                value={editingRow.address.streetNumber}
-                onChange={(e) =>
-                  setEditingRow({ ...editingRow, streetNumber: e.target.value })
-                }
-              />
-              <label>Street Name: </label>
-              <input
-                type="text"
-                value={editingRow.address.streetName}
-                onChange={(e) =>
-                  setEditingRow({ ...editingRow, streetName: e.target.value })
-                }
-              />
-              <label>City: </label>
-              <input
-                type="text"
-                value={editingRow.address.city}
-                onChange={(e) =>
-                  setEditingRow({ ...editingRow, city: e.target.value })
-                }
-              />
-              <label>State: </label>
-              <input
-                type="text"
-                value={editingRow.address.state}
-                onChange={(e) =>
-                  setEditingRow({ ...editingRow, state: e.target.value })
-                }
-              />
-              <label>Zip Code: </label>
-              <input
-                type="text"
-                value={editingRow.address.zipCode}
-                onChange={(e) =>
-                  setEditingRow({ ...editingRow, zipCode: e.target.value })
-                }
-              />
-              <label>Country: </label>
-              <input
-                type="text"
-                value={editingRow.address.country}
-                onChange={(e) =>
-                  setEditingRow({ ...editingRow, country: e.target.value })
-                }
-              />
-              <label>Latitude: </label>
-              <input
-                type="number"
-                value={editingRow.address.latitude}
-                onChange={(e) =>
-                  setEditingRow({ ...editingRow, latitude: e.target.value })
-                }
-              />
-              <label>Longitude: </label>
-              <input
-                type="number"
-                value={editingRow.address.longitude}
-                onChange={(e) =>
-                  setEditingRow({ ...editingRow, longitude: e.target.value })
-                }
-              />
-            </div>
-            <button onClick={handleEditSubmit}>Submit</button>
-            <button onClick={() => setIsModalOpen(false)}>Cancel</button>
           </div>
-        </div>
-      )}
-    </div>
-  );
+        )}
+      </div>
+    );
+  });
   const AddBranchContent = useMemo(() => {
     return (
       <div className="relative flex-col w-screen p-6 pl-10 pt-10 text-6xl text-gray-950 font-serif font-bold drop-shadow-lg">
@@ -918,6 +910,23 @@ const Admin = () => {
     }
   }, [openDropdown]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("http://localhost:3001/api/cookies/"); // Replace with your backend API endpoint
+        const data = await response.json();
+
+        // Extract unique departments from the fetched data
+        const uniqueCookies = [...new Set(data.map((item) => item.name))];
+        setCookies(uniqueCookies);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   checkAdmin();
 
   return (
@@ -1039,12 +1048,12 @@ const Admin = () => {
           <div className="relative flex z-10 top-20 mr-2 ml-4 mt-5 h-full w-4/5 h-auto backdrop-contrast-50 backdrop-blur-2xl rounded-2xl">
             {selectedMenu === "home" && <HomeContent />}
             {selectedMenu === "viewstock" && <ViewStockContent />}
-            {selectedMenu === "updatestock" && <UpdateStockContent />}
+            {selectedMenu === "updatestock" && UpdateStockContent}
             {selectedMenu === "viewpurchases" && <ViewPurchasesContent />}
             {selectedMenu === "removepurchases" && <RemovePurchasesContent />}
             {selectedMenu === "viewbranches" && <ViewBranchesContent />}
             {selectedMenu === "addbranch" && AddBranchContent}
-            {selectedMenu === "updatebranches" && <UpdateBranchesContent />}
+            {selectedMenu === "updatebranches" && UpdateBranchesContent}
           </div>
         </div>
       )}
